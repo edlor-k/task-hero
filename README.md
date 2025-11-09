@@ -1,3 +1,5 @@
+![Build](https://github.com/edlor-k/TaskHero/actions/workflows/ci.yml/badge.svg?branch=develop)
+
 # 🦸‍♂️ TaskHero
 
 **TaskHero** — это веб-приложение, которое помогает родителям мотивировать детей выполнять полезные дела в игровой форме.  
