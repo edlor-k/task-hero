@@ -13,7 +13,9 @@ import java.util.Map;
 @AllArgsConstructor
 @Builder
 public class ExceptionBody {
+    /** Сообщение об ошибке. */
     private String message;
+    /** Список ошибок. */
     private Map<String, String> errors;
 
     /**
@@ -21,7 +23,7 @@ public class ExceptionBody {
      *
      * @param message текст ошибки
      */
-    public ExceptionBody(String message) {
+    public ExceptionBody(final String message) {
         this.message = message;
     }
 }
