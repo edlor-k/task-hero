@@ -1,4 +1,4 @@
-![Build](https://github.com/edlor-k/TaskHero/actions/workflows/ci.yml/badge.svg?branch=develop)
+![Build](https://github.com/edlor-k/task-hero/actions/workflows/ci.yml/badge.svg?branch=develop)
 
 # 🦸‍♂️ TaskHero
 
