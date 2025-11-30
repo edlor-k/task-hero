@@ -1,0 +1,67 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.idea
+*.iml
+.vscode
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+.metadata
+
+# Build artifacts
+target/
+build/
+out/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+
+# Maven
+.mvn/
+mvnw
+mvnw.cmd
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Documentation
+*.md
+docs/
+DEVELOPMENT_PLAN.md
+LICENSE
+
+# Environment and config
+.env
+.env.local
+.env.*.local
+
+# Test files
+**/*Test.java
+**/test/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Other
+*.tmp
+*.bak
+*.swp
+.cache/

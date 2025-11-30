@@ -3,34 +3,85 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- 🌱 Родитель Spring Boot -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.6</version>
+        <version>3.4.0</version>
         <relativePath/>
     </parent>
 
     <groupId>ru.taskhero</groupId>
     <artifactId>task-hero</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>${revision}</version>
     <packaging>pom</packaging>
     <name>task-hero</name>
+    <description>TaskHero — система геймификации полезных дел для детей</description>
 
+    <!-- Глобальные свойства -->
     <properties>
+        <revision>0.0.1-SNAPSHOT</revision>
         <java.version>21</java.version>
+
+        <!-- Унификация кодировок и компиляции -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+
+        <!-- Версии для annotation processors (используются в maven-compiler-plugin) -->
+        <lombok.version>1.18.34</lombok.version>
+        <mapstruct.version>1.6.0</mapstruct.version>
+        <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
     </properties>
 
+    <!-- 📦 Модули проекта -->
     <modules>
-        <module>dependency_bom</module>
+        <module>dependency-bom</module>
         <module>common</module>
+        <module>user-service</module>
+        <!-- Позже добавим: -->
+        <!-- <module>task-service</module> -->
+        <!-- <module>reward-service</module> -->
+        <!-- <module>notification-service</module> -->
+        <!-- <module>gateway</module> -->
+        <!-- <module>app</module> -->
     </modules>
 
     <build>
         <plugins>
+
+            <!-- Flatten plugin: подставляет ${revision} -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>1.5.0</version>
+                <configuration>
+                    <updatePomFile>true</updatePomFile>
+                    <flattenMode>resolveCiFriendliesOnly</flattenMode>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Checkstyle -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>3.3.1</version>
+                <configuration>
+                    <configLocation>${maven.multiModuleProjectDirectory}/checkstyle.xml</configLocation>
+                    <consoleOutput>true</consoleOutput>
+                    <failsOnError>true</failsOnError>
+                    <linkXRef>false</linkXRef>
+                </configuration>
                 <executions>
                     <execution>
                         <id>validate</id>
@@ -40,15 +91,19 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
                 <configuration>
-                    <configLocation>${maven.multiModuleProjectDirectory}/checkstyle.xml</configLocation>
-                    <consoleOutput>true</consoleOutput>
-                    <failsOnError>true</failsOnError>
-                    <linkXRef>false</linkXRef>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
-
 
 </project>

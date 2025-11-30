@@ -1,0 +1,45 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: taskhero-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-taskhero}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    networks:
+      - taskhero-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-taskhero}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  adminer:
+    image: adminer:latest
+    container_name: ${ADMINER_CONTAINER_NAME}
+    restart: always
+    depends_on:
+      - postgres
+    ports:
+      - "${ADMINER_PORT}:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: ${POSTGRES_CONTAINER_NAME}
+      ADMINER_DESIGN: pepa-linha
+    networks:
+      - taskhero-network
+
+networks:
+  taskhero-network:
+    driver: bridge
+    name: taskhero-network
+
+volumes:
+  postgres-data:
+    driver: local
+    name: taskhero-postgres-data
