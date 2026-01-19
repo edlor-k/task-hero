@@ -5,9 +5,9 @@
 
     <parent>
         <groupId>ru.taskhero</groupId>
-        <artifactId>dependency_bom</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
-        <relativePath>../dependency_bom/pom.xml</relativePath>
+        <artifactId>dependency-bom</artifactId>
+        <version>${revision}</version>
+        <relativePath>../dependency-bom/pom.xml</relativePath>
     </parent>
 
     <artifactId>common</artifactId>
@@ -18,7 +18,7 @@
         <dependencies>
             <dependency>
                 <groupId>ru.taskhero</groupId>
-                <artifactId>dependency_bom</artifactId>
+                <artifactId>dependency-bom</artifactId>
                 <version>${project.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
@@ -43,6 +43,10 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
         </dependency>
     </dependencies>
 

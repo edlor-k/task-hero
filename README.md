@@ -79,7 +79,7 @@ task-hero/
 
 ## 🚀 Запуск проекта
 
-### 1. Клонирование репозитория 
+### 1. Клонирование репозитория
 ```bash
 git clone https://github.com/<your-username>/task-hero.git
 cd task-hero

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.8.xsd">
+
+    <include file="db/changelog/migrations/001-create-users-table.xml"/>
+    <include file="db/changelog/migrations/002-create-parents-table.xml"/>
+    <include file="db/changelog/migrations/003-create-children-table.xml"/>
+</databaseChangeLog>

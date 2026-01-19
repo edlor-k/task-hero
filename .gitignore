@@ -20,6 +20,7 @@ target/
 *.ipr
 out/
 .mvn
+user-service.iml
 
 ### NetBeans ###
 /nbproject/private/
@@ -37,3 +38,7 @@ build/
 ### Envinronment ###
 .env
 .env.production
+.env.local
+
+### Docker ###
+backup_*.sql
