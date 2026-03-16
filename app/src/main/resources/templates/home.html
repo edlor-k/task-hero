@@ -10,7 +10,7 @@
             <nav class="d-flex justify-content-between align-items-center mb-5 pt-3">
                 <a href="/" class="text-white text-decoration-none d-flex align-items-center gap-2">
                     <i class="bi bi-trophy-fill fs-3"></i>
-                    <span class="fw-bold fs-4">TaskHero</span>
+                    <span class="fw-bold fs-4">TaskGamer</span>
                 </a>
                 <div class="d-flex gap-2" sec:authorize="!isAuthenticated()">
                     <a th:href="@{/login}" class="btn btn-outline-light">Войти</a>
@@ -20,7 +20,7 @@
             <div class="row align-items-center py-5">
                 <div class="col-lg-7">
                     <h1 class="display-4 fw-bold mb-4">Превратите полезные дела в игру!</h1>
-                    <p class="lead opacity-75 mb-4">TaskHero помогает родителям мотивировать детей выполнять
+                    <p class="lead opacity-75 mb-4">TaskGamer помогает родителям мотивировать детей выполнять
                         полезные дела через систему заданий, наград и уровней.</p>
                     <div sec:authorize="!isAuthenticated()" class="d-flex gap-2 flex-wrap">
                         <a th:href="@{/register}" class="btn btn-light btn-lg fw-semibold text-primary">
@@ -115,7 +115,7 @@
 
     <!-- Footer -->
     <div class="text-center py-4 text-muted">
-        <small>TaskHero &copy; 2025</small>
+        <small>TaskGamer &copy; 2025</small>
     </div>
 
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
