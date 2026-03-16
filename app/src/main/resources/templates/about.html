@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('О проекте')}"></head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark" style="background: #1e293b;">
+    <div class="container">
+        <a class="navbar-brand fw-bold" th:href="@{/}">
+            <i class="bi bi-trophy me-2"></i>TaskHero
+        </a>
+        <div class="ms-auto">
+            <a th:href="@{/}" class="btn btn-outline-light btn-sm">На главную</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container py-5">
+    <!-- Header -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold">О проекте TaskHero</h1>
+        <p class="lead text-muted">Gamification-платформа для управления детскими заданиями</p>
+    </div>
+
+    <!-- Description -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body p-4">
+                    <p class="mb-3">
+                        <strong>TaskHero</strong> — это платформа, которая превращает повседневные задания в увлекательное
+                        приключение для детей. Родители создают задания, а дети выполняют их, получая опыт, коины и
+                        прокачивая своего персонажа.
+                    </p>
+                    <p class="mb-0">
+                        Система геймификации мотивирует детей развивать полезные привычки через игровые механики:
+                        уровни, классы персонажей, магазин наград и систему достижений.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features -->
+    <h3 class="fw-bold text-center mb-4">Возможности</h3>
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <div class="stat-icon bg-primary bg-opacity-10 text-primary mx-auto mb-3">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <h5 class="fw-bold">Для родителей</h5>
+                    <p class="text-muted small mb-0">Создание заданий, шаблоны, библиотека, проверка выполнения, магазин наград</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <div class="stat-icon bg-success bg-opacity-10 text-success mx-auto mb-3">
+                        <i class="bi bi-controller"></i>
+                    </div>
+                    <h5 class="fw-bold">Для детей</h5>
+                    <p class="text-muted small mb-0">Выбор персонажа, выполнение заданий, прокачка уровня, покупки в магазине</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <div class="stat-icon bg-warning bg-opacity-10 text-warning mx-auto mb-3">
+                        <i class="bi bi-trophy"></i>
+                    </div>
+                    <h5 class="fw-bold">Геймификация</h5>
+                    <p class="text-muted small mb-0">Опыт, уровни, классы героев, коины, магазин, повторяющиеся задания</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tech stack -->
+    <h3 class="fw-bold text-center mb-4">Технологии</h3>
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-8">
+            <div class="d-flex flex-wrap justify-content-center gap-2">
+                <span class="badge bg-primary fs-6 px-3 py-2">Java 17</span>
+                <span class="badge bg-success fs-6 px-3 py-2">Spring Boot 3</span>
+                <span class="badge bg-info fs-6 px-3 py-2">Thymeleaf</span>
+                <span class="badge bg-secondary fs-6 px-3 py-2">PostgreSQL</span>
+                <span class="badge bg-warning text-dark fs-6 px-3 py-2">Liquibase</span>
+                <span class="badge bg-danger fs-6 px-3 py-2">Docker</span>
+                <span class="badge bg-dark fs-6 px-3 py-2">Bootstrap 5</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Architecture -->
+    <h3 class="fw-bold text-center mb-4">Архитектура</h3>
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row g-3 text-center">
+                        <div class="col-md-4">
+                            <div class="bg-primary bg-opacity-10 rounded-3 p-3">
+                                <i class="bi bi-window-stack display-6 text-primary"></i>
+                                <h6 class="fw-bold mt-2 mb-0">App (BFF)</h6>
+                                <small class="text-muted">Порт 8080</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="bg-success bg-opacity-10 rounded-3 p-3">
+                                <i class="bi bi-person-badge display-6 text-success"></i>
+                                <h6 class="fw-bold mt-2 mb-0">User Service</h6>
+                                <small class="text-muted">Порт 8081</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="bg-warning bg-opacity-10 rounded-3 p-3">
+                                <i class="bi bi-list-check display-6 text-warning"></i>
+                                <h6 class="fw-bold mt-2 mb-0">Task Service</h6>
+                                <small class="text-muted">Порт 8082</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="bg-dark text-white text-center py-3 mt-5">
+    <small>&copy; 2025 TaskHero. Все права защищены.</small>
+</footer>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

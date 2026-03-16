@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('История заданий')}"></head>
+<body>
+<div class="th-layout">
+    <nav th:replace="~{fragments/layout :: sidebar-child}"></nav>
+    <div class="th-content">
+        <header th:replace="~{fragments/layout :: header}"></header>
+        <main class="th-main">
+
+            <h4 class="fw-bold mb-4"><i class="bi bi-clock-history me-2"></i>История заданий</h4>
+
+            <!-- Empty state -->
+            <div th:if="${#lists.isEmpty(assignments)}" class="text-center py-5">
+                <i class="bi bi-clock-history display-1 text-muted"></i>
+                <h4 class="mt-3 text-muted">История пуста</h4>
+                <p class="text-muted">Выполненные задания появятся здесь</p>
+            </div>
+
+            <!-- History list -->
+            <div th:unless="${#lists.isEmpty(assignments)}" class="list-group">
+                <div th:each="a : ${assignments}" class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="me-3">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <h6 class="fw-semibold mb-0" th:text="${a.template?.title}">Задание</h6>
+                                <span class="badge"
+                                      th:classappend="${a.status == 'APPROVED' ? 'bg-success' :
+                                                        a.status == 'REJECTED' ? 'bg-danger' : 'bg-secondary'}"
+                                      th:text="${a.status == 'APPROVED' ? 'Одобрено' :
+                                                 a.status == 'REJECTED' ? 'Отклонено' : a.status}">Статус</span>
+                            </div>
+                            <p class="text-muted small mb-1" th:text="${a.template?.description}" th:if="${a.template?.description}">Описание</p>
+
+                            <!-- Rewards -->
+                            <div class="d-flex gap-2" th:if="${a.status == 'APPROVED'}">
+                                <span class="badge bg-success-subtle text-success" th:if="${a.expEarned}">
+                                    <i class="bi bi-star-fill me-1"></i>+<span th:text="${a.expEarned}">10</span> EXP
+                                </span>
+                                <span class="badge bg-warning-subtle text-warning" th:if="${a.coinsEarned}">
+                                    <i class="bi bi-coin me-1"></i>+<span th:text="${a.coinsEarned}">5</span> коинов
+                                </span>
+                            </div>
+
+                            <!-- Parent comment -->
+                            <div th:if="${a.parentComment}" class="mt-1">
+                                <small class="text-muted"><i class="bi bi-chat-left-text me-1"></i><span th:text="${a.parentComment}">Комментарий</span></small>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <small class="text-muted d-block" th:if="${a.reviewedAt}"
+                                   th:text="${#temporals.format(a.reviewedAt, 'dd.MM.yyyy')}">01.01.2025</small>
+                            <small class="text-muted d-block" th:if="${a.reviewedAt}"
+                                   th:text="${#temporals.format(a.reviewedAt, 'HH:mm')}">12:00</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

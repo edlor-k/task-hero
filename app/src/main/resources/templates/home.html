@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Главная')}"></head>
+<body>
+
+    <!-- Hero -->
+    <div class="hero-gradient text-white">
+        <div class="container py-5">
+            <nav class="d-flex justify-content-between align-items-center mb-5 pt-3">
+                <a href="/" class="text-white text-decoration-none d-flex align-items-center gap-2">
+                    <i class="bi bi-trophy-fill fs-3"></i>
+                    <span class="fw-bold fs-4">TaskHero</span>
+                </a>
+                <div class="d-flex gap-2" sec:authorize="!isAuthenticated()">
+                    <a th:href="@{/login}" class="btn btn-outline-light">Войти</a>
+                    <a th:href="@{/register}" class="btn btn-light text-primary fw-semibold">Регистрация</a>
+                </div>
+            </nav>
+            <div class="row align-items-center py-5">
+                <div class="col-lg-7">
+                    <h1 class="display-4 fw-bold mb-4">Превратите полезные дела в игру!</h1>
+                    <p class="lead opacity-75 mb-4">TaskHero помогает родителям мотивировать детей выполнять
+                        полезные дела через систему заданий, наград и уровней.</p>
+                    <div sec:authorize="!isAuthenticated()" class="d-flex gap-2 flex-wrap">
+                        <a th:href="@{/register}" class="btn btn-light btn-lg fw-semibold text-primary">
+                            <i class="bi bi-person-plus me-1"></i>Начать бесплатно
+                        </a>
+                        <a th:href="@{/login}" class="btn btn-outline-light btn-lg">
+                            <i class="bi bi-box-arrow-in-right me-1"></i>Войти
+                        </a>
+                    </div>
+                    <div sec:authorize="hasRole('PARENT')">
+                        <a th:href="@{/parent/dashboard}" class="btn btn-light btn-lg fw-semibold text-primary">
+                            <i class="bi bi-grid-1x2 me-1"></i>Перейти в Dashboard
+                        </a>
+                    </div>
+                    <div sec:authorize="hasRole('CHILD')">
+                        <a th:href="@{/child/dashboard}" class="btn btn-light btn-lg fw-semibold text-primary">
+                            <i class="bi bi-controller me-1"></i>Мои задания
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-5 text-center d-none d-lg-block">
+                    <i class="bi bi-trophy" style="font-size: 12rem; opacity: 0.15;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features -->
+    <div class="bg-white py-5">
+        <div class="container">
+            <h2 class="text-center fw-bold mb-5">Как это работает?</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card text-center h-100 border-0 shadow-sm">
+                        <div class="card-body py-5">
+                            <div class="stat-icon bg-primary bg-opacity-10 text-primary mx-auto mb-3">
+                                <i class="bi bi-person-plus-fill fs-4"></i>
+                            </div>
+                            <h5 class="fw-bold">1. Создайте аккаунт</h5>
+                            <p class="text-muted mb-0">Зарегистрируйтесь как родитель и добавьте своих детей.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-center h-100 border-0 shadow-sm">
+                        <div class="card-body py-5">
+                            <div class="stat-icon bg-success bg-opacity-10 text-success mx-auto mb-3">
+                                <i class="bi bi-list-check fs-4"></i>
+                            </div>
+                            <h5 class="fw-bold">2. Создавайте задания</h5>
+                            <p class="text-muted mb-0">Формируйте задания с наградами в виде EXP и коинов.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-center h-100 border-0 shadow-sm">
+                        <div class="card-body py-5">
+                            <div class="stat-icon bg-warning bg-opacity-10 text-warning mx-auto mb-3">
+                                <i class="bi bi-star-fill fs-4"></i>
+                            </div>
+                            <h5 class="fw-bold">3. Дети получают награды</h5>
+                            <p class="text-muted mb-0">Дети выполняют задания, повышают уровень и зарабатывают коины!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- For children -->
+    <div class="bg-body-secondary py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h2 class="fw-bold mb-4">Для детей</h2>
+                    <ul class="list-unstyled">
+                        <li class="mb-3 d-flex align-items-center"><i class="bi bi-check-circle-fill text-success fs-5 me-2"></i>Выполняй задания и зарабатывай EXP</li>
+                        <li class="mb-3 d-flex align-items-center"><i class="bi bi-check-circle-fill text-success fs-5 me-2"></i>Повышай свой уровень</li>
+                        <li class="mb-3 d-flex align-items-center"><i class="bi bi-check-circle-fill text-success fs-5 me-2"></i>Копи коины на награды</li>
+                        <li class="mb-3 d-flex align-items-center"><i class="bi bi-check-circle-fill text-success fs-5 me-2"></i>Простой вход по уникальному токену</li>
+                    </ul>
+                    <a th:href="@{/login/child}" class="btn btn-primary">
+                        <i class="bi bi-controller me-1"></i>Войти как ребёнок
+                    </a>
+                </div>
+                <div class="col-md-6 text-center d-none d-md-block">
+                    <i class="bi bi-controller" style="font-size: 8rem; opacity: 0.15;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="text-center py-4 text-muted">
+        <small>TaskHero &copy; 2025</small>
+    </div>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

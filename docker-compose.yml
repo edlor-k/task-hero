@@ -1,36 +1,119 @@
+# ============================================================
+# Docker Compose для TaskHero
+# ============================================================
+# Использование:
+#   Только БД и Adminer (для разработки):
+#     docker-compose up -d postgres adminer
+#
+#   Все сервисы:
+#     docker-compose up -d
+#
+#   Посмотреть логи:
+#     docker-compose logs -f [service-name]
+#
+#   Остановить:
+#     docker-compose down
+# ============================================================
+
 services:
+  # ==================== PostgreSQL ====================
   postgres:
     image: postgres:16-alpine
     container_name: taskhero-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-taskhero}
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: taskhero
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - postgres-data:/var/lib/postgresql/data
     ports:
-      - "${POSTGRES_PORT:-5433}:5432"
+      - "5433:5432"
     networks:
       - taskhero-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-taskhero}"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d taskhero"]
       interval: 10s
       timeout: 5s
       retries: 5
 
+  # ==================== Adminer (DB UI) ====================
   adminer:
     image: adminer:latest
-    container_name: ${ADMINER_CONTAINER_NAME}
-    restart: always
+    container_name: taskhero-adminer
+    restart: unless-stopped
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     ports:
-      - "${ADMINER_PORT}:8080"
+      - "8888:8080"
     environment:
-      ADMINER_DEFAULT_SERVER: ${POSTGRES_CONTAINER_NAME}
+      ADMINER_DEFAULT_SERVER: postgres
       ADMINER_DESIGN: pepa-linha
+    networks:
+      - taskhero-network
+
+  # ==================== User Service ====================
+  user-service:
+    build:
+      context: .
+      dockerfile: user-service/Dockerfile
+    container_name: taskhero-user-service
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/taskhero
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      JWT_SECRET: mySecretKeyForJWTTokenGenerationThatIsLongEnough256bits
+      JWT_EXPIRATION_MS: 86400000
+      LOGGING_LEVEL_ROOT: INFO
+    networks:
+      - taskhero-network
+
+  # ==================== Task Service ====================
+  task-service:
+    build:
+      context: .
+      dockerfile: task-service/Dockerfile
+    container_name: taskhero-task-service
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/taskhero
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      USER_SERVICE_URL: http://user-service:8081/users
+      JWT_SECRET: mySecretKeyForJWTTokenGenerationThatIsLongEnough256bits
+      LOGGING_LEVEL_ROOT: INFO
+    networks:
+      - taskhero-network
+
+  # ==================== App (UI) ====================
+  app:
+    build:
+      context: .
+      dockerfile: app/Dockerfile
+    container_name: taskhero-app
+    restart: unless-stopped
+    depends_on:
+      - user-service
+      - task-service
+    ports:
+      - "8080:8080"
+    environment:
+      USER_SERVICE_URL: http://user-service:8081/users
+      TASK_SERVICE_URL: http://task-service:8082/tasks
+      LOGGING_LEVEL_ROOT: INFO
     networks:
       - taskhero-network
 

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Проверка заданий')}"></head>
+<body>
+<div class="th-layout">
+    <nav th:replace="~{fragments/layout :: sidebar-parent}"></nav>
+    <div class="th-content">
+        <header th:replace="~{fragments/layout :: header}"></header>
+        <main class="th-main">
+
+            <h4 class="fw-bold mb-4"><i class="bi bi-clipboard-check me-2"></i>Проверка заданий</h4>
+
+            <!-- Messages -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                <i class="bi bi-check-circle me-2"></i><span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Empty state -->
+            <div th:if="${#lists.isEmpty(assignments)}" class="text-center py-5">
+                <i class="bi bi-check-circle display-1 text-success"></i>
+                <h4 class="mt-3 text-muted">Нет заданий для проверки</h4>
+                <p class="text-muted">Все задания проверены!</p>
+            </div>
+
+            <!-- Review cards -->
+            <div th:unless="${#lists.isEmpty(assignments)}" class="row g-4">
+                <div th:each="a : ${assignments}" class="col-md-6 col-xl-4">
+                    <div class="card h-100 border-start border-warning border-4">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="fw-bold mb-0" th:text="${a.template?.title}">Задание</h5>
+                                <span class="badge bg-warning text-dark">На проверке</span>
+                            </div>
+                            <p class="text-muted small mb-3" th:text="${a.template?.description}" th:if="${a.template?.description}">Описание</p>
+
+                            <div class="bg-body-secondary rounded-3 p-2 mb-3" th:if="${a.childComment}">
+                                <small class="text-muted"><i class="bi bi-chat-left-text me-1"></i>
+                                    <span th:text="${a.childComment}">Комментарий</span>
+                                </small>
+                            </div>
+
+                            <div class="d-flex gap-3 mb-3">
+                                <span class="text-success" th:if="${a.template?.expReward}">
+                                    <i class="bi bi-star-fill me-1"></i><span th:text="${a.template.expReward}">10</span> EXP
+                                </span>
+                                <span class="text-warning" th:if="${a.template?.coinsReward}">
+                                    <i class="bi bi-coin me-1"></i><span th:text="${a.template.coinsReward}">5</span> коинов
+                                </span>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <form th:action="@{/parent/assignments/{id}/approve(id=${a.id})}" method="post" class="flex-fill">
+                                    <button type="submit" class="btn btn-success w-100">
+                                        <i class="bi bi-check-lg me-1"></i>Одобрить
+                                    </button>
+                                </form>
+                                <button class="btn btn-outline-danger flex-fill" type="button"
+                                        th:attr="data-bs-toggle='collapse', data-bs-target='#reject-' + ${a.id}">
+                                    <i class="bi bi-x-lg me-1"></i>Отклонить
+                                </button>
+                            </div>
+
+                            <!-- Reject collapse -->
+                            <div th:id="'reject-' + ${a.id}" class="collapse mt-3">
+                                <form th:action="@{/parent/assignments/{id}/reject(id=${a.id})}" method="post">
+                                    <div class="mb-2">
+                                        <textarea class="form-control" name="comment" rows="2"
+                                                  placeholder="Комментарий (необязательно)"></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-danger w-100">
+                                        <i class="bi bi-x-circle me-1"></i>Подтвердить отклонение
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-transparent text-muted small">
+                            <i class="bi bi-clock me-1"></i>
+                            <span th:text="${#temporals.format(a.submittedAt, 'dd.MM.yyyy HH:mm')}" th:if="${a.submittedAt}">01.01.2025</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

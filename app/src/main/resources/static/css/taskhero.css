@@ -1,0 +1,212 @@
+/* ========================================================
+   TaskHero — Modern Bootstrap 5 Theme
+   Pure Bootstrap 5.3 + Bootstrap Icons + custom sidebar
+   ======================================================== */
+
+:root {
+    --th-sidebar-width: 260px;
+    --th-sidebar-bg: #1e293b;
+    --th-sidebar-color: #94a3b8;
+    --th-sidebar-active: #ffffff;
+    --th-sidebar-hover-bg: rgba(255,255,255,0.08);
+    --th-sidebar-active-bg: rgba(99,102,241,0.2);
+    --th-topbar-height: 60px;
+    --th-primary: #6366f1;
+    --th-primary-light: rgba(99,102,241,0.1);
+}
+
+/* --- Sidebar --- */
+.th-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: var(--th-sidebar-width);
+    background: var(--th-sidebar-bg);
+    z-index: 1040;
+    transition: transform 0.3s ease;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.sidebar-section-label {
+    display: block;
+    padding: 1rem 1rem 0.35rem 1rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #64748b;
+    list-style: none;
+}
+
+.sidebar-link {
+    display: flex !important;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.55rem 1rem !important;
+    margin-bottom: 2px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--th-sidebar-color) !important;
+    border-radius: 0.5rem;
+    transition: all 0.15s ease;
+}
+.sidebar-link i {
+    font-size: 1.1rem;
+    width: 24px;
+    text-align: center;
+    flex-shrink: 0;
+}
+.sidebar-link:hover {
+    color: var(--th-sidebar-active) !important;
+    background: var(--th-sidebar-hover-bg);
+}
+.sidebar-link.active {
+    color: var(--th-sidebar-active) !important;
+    background: var(--th-sidebar-active-bg);
+    font-weight: 600;
+}
+
+/* --- Topbar --- */
+.th-topbar {
+    height: var(--th-topbar-height);
+}
+
+/* --- Main layout --- */
+.th-layout {
+    display: flex;
+    min-height: 100vh;
+}
+.th-content {
+    margin-left: var(--th-sidebar-width);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: #f8fafc;
+}
+.th-main {
+    flex: 1;
+    padding: 1.5rem;
+}
+
+/* --- Sidebar backdrop (mobile) --- */
+.sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1035;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+.sidebar-backdrop.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* --- Mobile: hide sidebar by default --- */
+@media (max-width: 991.98px) {
+    .th-sidebar {
+        transform: translateX(-100%);
+    }
+    .th-sidebar.show {
+        transform: translateX(0);
+    }
+    .th-content {
+        margin-left: 0;
+    }
+}
+
+/* --- Cards --- */
+.card {
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: box-shadow 0.2s ease;
+}
+.card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+.card-header {
+    border-radius: 0.75rem 0.75rem 0 0 !important;
+}
+
+/* --- Stat icon helper --- */
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.75rem;
+    font-size: 1.25rem;
+}
+
+/* --- Character card (select-character page) --- */
+.character-card {
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.character-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 25px rgba(99,102,241,0.15) !important;
+    border-color: var(--th-primary) !important;
+}
+.character-emoji {
+    font-size: 3.5rem;
+    line-height: 1;
+}
+
+/* --- Auth pages --- */
+.auth-wrapper {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+}
+
+/* --- Progress bar --- */
+.progress {
+    border-radius: 1rem;
+}
+
+/* --- Buttons rounded --- */
+.btn {
+    border-radius: 0.5rem;
+}
+
+/* --- Hero section gradient --- */
+.hero-gradient {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+}
+
+/* --- Badge helpers --- */
+.badge {
+    font-weight: 600;
+}
+
+/* --- Table --- */
+.table > thead {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* --- Template card subtle hover --- */
+.template-card {
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.template-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08) !important;
+}
+
+/* --- Scrollbar for sidebar --- */
+.th-sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+.th-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.15);
+    border-radius: 4px;
+}

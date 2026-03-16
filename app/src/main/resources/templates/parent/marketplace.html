@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Маркетплейс наград')}"></head>
+<body>
+<div class="th-layout">
+    <nav th:replace="~{fragments/layout :: sidebar-parent}"></nav>
+    <div class="th-content">
+        <header th:replace="~{fragments/layout :: header}"></header>
+        <main class="th-main">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h4 class="fw-bold mb-0"><i class="bi bi-shop-window me-2"></i>Маркетплейс наград</h4>
+                    <p class="text-muted mb-0 small">Готовые шаблоны наград — добавьте в свой магазин одним кликом</p>
+                </div>
+                <a th:href="@{/parent/shop}" class="btn btn-outline-secondary">
+                    <i class="bi bi-cart me-1"></i>Мой магазин
+                </a>
+            </div>
+
+            <!-- Messages -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                <i class="bi bi-check-circle me-2"></i><span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- No children warning -->
+            <div th:if="${children == null or children.isEmpty()}" class="alert alert-warning">
+                <i class="bi bi-exclamation-circle me-2"></i>
+                Сначала <a th:href="@{/parent/children}" class="alert-link">добавьте ребёнка</a>, чтобы добавлять награды в магазин.
+            </div>
+
+            <!-- Marketplace items grid -->
+            <div th:if="${marketplaceItems == null or marketplaceItems.isEmpty()}" class="text-center py-5">
+                <i class="bi bi-shop display-1 text-muted"></i>
+                <h4 class="mt-3 text-muted">Маркетплейс пуст</h4>
+                <p class="text-muted">Сейчас нет готовых наград в каталоге</p>
+            </div>
+
+            <div th:unless="${marketplaceItems == null or marketplaceItems.isEmpty()}" class="row g-4">
+                <div th:each="item : ${marketplaceItems}" class="col-md-6 col-lg-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="display-3 mb-2" th:if="${item.iconName}" th:text="${item.iconName}">🎁</div>
+                            <div class="display-3 mb-2" th:unless="${item.iconName}">🎁</div>
+                            <h5 class="fw-bold" th:text="${item.title}">Награда</h5>
+                            <p class="text-muted small" th:text="${item.description}" th:if="${item.description}">Описание</p>
+                            <div class="mb-3">
+                                <span class="badge bg-warning text-dark fs-6" th:text="${item.priceCoins} + ' коинов'">10 коинов</span>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent border-0 pb-3 px-3"
+                             th:if="${children != null and !children.isEmpty()}">
+                            <button type="button" class="btn btn-primary w-100"
+                                    data-bs-toggle="modal" data-bs-target="#addFromMarketplaceModal"
+                                    onclick="openMarketplaceModal(this)"
+                                    th:attr="data-id=${item.id}, data-title=${item.title}, data-icon=${item.iconName}, data-price=${item.priceCoins}">
+                                <i class="bi bi-plus-circle me-1"></i>Добавить в магазин
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+
+<!-- Modal: Add from Marketplace -->
+<div class="modal fade" id="addFromMarketplaceModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="marketplaceForm" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-plus-circle me-2"></i>Добавить награду в магазин</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="card bg-body-secondary mb-3">
+                        <div class="card-body text-center py-3">
+                            <div class="fs-1 mb-1" id="modalItemIcon">🎁</div>
+                            <h5 class="fw-bold mb-1" id="modalItemTitle">Название</h5>
+                            <span class="badge bg-warning text-dark" id="modalItemPrice">0 коинов</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Доступна для детей</label>
+                        <div th:each="child : ${children}" class="form-check">
+                            <input class="form-check-input marketplace-child-check" type="checkbox"
+                                   name="childIds" th:value="${child.id}" th:id="'mp-child-' + ${child.id}" checked>
+                            <label class="form-check-label" th:for="'mp-child-' + ${child.id}"
+                                   th:text="${child.firstName + ' ' + child.surname}">Ребёнок</label>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info py-2 small">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Цену можно изменить позже в магазине через «Изменить».
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-cart-plus me-1"></i>Добавить в магазин
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+<script>
+    function openMarketplaceModal(el) {
+        const id = el.getAttribute('data-id');
+        const title = el.getAttribute('data-title');
+        const icon = el.getAttribute('data-icon') || '🎁';
+        const price = el.getAttribute('data-price');
+
+        document.getElementById('modalItemTitle').textContent = title;
+        document.getElementById('modalItemIcon').textContent = icon;
+        document.getElementById('modalItemPrice').textContent = price + ' коинов';
+
+        const form = document.getElementById('marketplaceForm');
+        form.action = '/parent/shop/marketplace/' + id + '/copy';
+
+        // Reset checkboxes
+        document.querySelectorAll('.marketplace-child-check').forEach(cb => cb.checked = true);
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="001-create-task-templates-table" author="Vladlen Korablev">
+        <createTable tableName="task_templates">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="parent_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="varchar(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(1024)"/>
+            <column name="exp_reward" type="int" defaultValueNumeric="10">
+                <constraints nullable="false"/>
+            </column>
+            <column name="coins_reward" type="int" defaultValueNumeric="5">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_repeatable" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="repeat_schedule" type="varchar(64)"/>
+            <column name="is_active" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp"/>
+        </createTable>
+
+        <createIndex tableName="task_templates" indexName="idx_task_templates_parent_id">
+            <column name="parent_id"/>
+        </createIndex>
+
+        <createIndex tableName="task_templates" indexName="idx_task_templates_active">
+            <column name="is_active"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

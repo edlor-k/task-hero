@@ -1,0 +1,115 @@
+# ============================================================
+# Docker Compose — Production (VPS + Caddy HTTPS)
+# ============================================================
+# Использование:
+#   1. cp .env.example .env && nano .env
+#   2. docker-compose -f docker-compose.dev.yml up -d
+#   3. docker-compose -f docker-compose.dev.yml logs -f
+# ============================================================
+
+services:
+  # ==================== Caddy (Reverse Proxy + HTTPS) ====================
+  caddy:
+    image: caddy:2-alpine
+    container_name: taskhero-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - app
+    networks:
+      - taskhero-network
+
+  # ==================== PostgreSQL ====================
+  postgres:
+    image: postgres:16-alpine
+    container_name: taskhero-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-taskhero}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - taskhero-network
+
+  # ==================== User Service ====================
+  user-service:
+    build:
+      context: .
+      dockerfile: user-service/Dockerfile
+    container_name: taskhero-user-service
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-taskhero}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      JWT_EXPIRATION_MS: 86400000
+      LOGGING_LEVEL_ROOT: ${LOGGING_LEVEL_ROOT:-INFO}
+    networks:
+      - taskhero-network
+
+  # ==================== Task Service ====================
+  task-service:
+    build:
+      context: .
+      dockerfile: task-service/Dockerfile
+    container_name: taskhero-task-service
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-taskhero}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      USER_SERVICE_URL: http://user-service:8081/users
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      LOGGING_LEVEL_ROOT: ${LOGGING_LEVEL_ROOT:-INFO}
+    networks:
+      - taskhero-network
+
+  # ==================== App (UI) ====================
+  app:
+    build:
+      context: .
+      dockerfile: app/Dockerfile
+    container_name: taskhero-app
+    restart: unless-stopped
+    depends_on:
+      - user-service
+      - task-service
+    environment:
+      USER_SERVICE_URL: http://user-service:8081/users
+      TASK_SERVICE_URL: http://task-service:8082/tasks
+      LOGGING_LEVEL_ROOT: ${LOGGING_LEVEL_ROOT:-INFO}
+    networks:
+      - taskhero-network
+
+networks:
+  taskhero-network:
+    driver: bridge
+    name: taskhero-network
+
+volumes:
+  postgres-data:
+    driver: local
+    name: taskhero-postgres-data
+  caddy-data:
+    driver: local
+    name: taskhero-caddy-data
+  caddy-config:
+    driver: local
+    name: taskhero-caddy-config

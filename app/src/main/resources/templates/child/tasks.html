@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Мои задания')}"></head>
+<body>
+<div class="th-layout">
+    <nav th:replace="~{fragments/layout :: sidebar-child}"></nav>
+    <div class="th-content">
+        <header th:replace="~{fragments/layout :: header}"></header>
+        <main class="th-main">
+
+            <h4 class="fw-bold mb-4"><i class="bi bi-list-task me-2"></i>Мои задания</h4>
+
+            <!-- Messages -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                <i class="bi bi-check-circle me-2"></i><span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Status filters -->
+            <div class="d-flex flex-wrap gap-2 mb-4">
+                <a th:href="@{/child/tasks}"
+                   class="btn btn-sm"
+                   th:classappend="${currentStatus == null} ? 'btn-primary' : 'btn-outline-primary'">Все</a>
+                <a th:href="@{/child/tasks(status='CREATED')}"
+                   class="btn btn-sm"
+                   th:classappend="${currentStatus == 'CREATED'} ? 'btn-primary' : 'btn-outline-primary'">
+                    <i class="bi bi-circle me-1"></i>Новые
+                </a>
+                <a th:href="@{/child/tasks(status='SUBMITTED')}"
+                   class="btn btn-sm"
+                   th:classappend="${currentStatus == 'SUBMITTED'} ? 'btn-warning' : 'btn-outline-warning'">
+                    <i class="bi bi-hourglass-split me-1"></i>На проверке
+                </a>
+            </div>
+
+            <!-- Empty state -->
+            <div th:if="${#lists.isEmpty(assignments)}" class="text-center py-5">
+                <i class="bi bi-inbox display-1 text-muted"></i>
+                <h4 class="mt-3 text-muted">Нет заданий</h4>
+                <p class="text-muted">Здесь будут появляться твои задания</p>
+            </div>
+
+            <!-- Assignments -->
+            <div th:unless="${#lists.isEmpty(assignments)}" class="row g-3">
+                <div th:each="a : ${assignments}" class="col-md-6 col-lg-4">
+                    <div class="card h-100"
+                         th:classappend="${a.status == 'APPROVED' ? 'border-success border-2' :
+                                          a.status == 'REJECTED' ? 'border-danger border-2' : ''}">
+                        <div class="card-body">
+                            <!-- Status indicator -->
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge"
+                                      th:classappend="${a.status == 'CREATED' ? 'bg-primary' :
+                                                        a.status == 'SUBMITTED' ? 'bg-warning text-dark' :
+                                                        a.status == 'APPROVED' ? 'bg-success' :
+                                                        a.status == 'REJECTED' ? 'bg-danger' : 'bg-secondary'}"
+                                      th:text="${a.status == 'CREATED' ? 'Новое' :
+                                                 a.status == 'SUBMITTED' ? 'На проверке' :
+                                                 a.status == 'APPROVED' ? 'Одобрено' :
+                                                 a.status == 'REJECTED' ? 'Отклонено' : a.status}">Статус</span>
+                                <span class="badge"
+                                      th:if="${a.template?.difficulty}"
+                                      th:classappend="${a.template.difficulty == 'EASY' ? 'bg-success-subtle text-success' :
+                                                        a.template.difficulty == 'NORMAL' ? 'bg-warning-subtle text-warning' :
+                                                        a.template.difficulty == 'HARD' ? 'bg-danger-subtle text-danger' : 'bg-secondary'}"
+                                      th:text="${a.template.difficulty}">EASY</span>
+                            </div>
+
+                            <h5 class="fw-bold" th:text="${a.template?.title}">Задание</h5>
+                            <p class="text-muted small" th:text="${a.template?.description}" th:if="${a.template?.description}">Описание</p>
+
+                            <div class="d-flex gap-2 mb-3">
+                                <span class="text-success small" th:if="${a.template?.expReward}">
+                                    <i class="bi bi-star-fill me-1"></i><span th:text="${a.template.expReward}">10</span> EXP
+                                </span>
+                                <span class="text-warning small" th:if="${a.template?.coinsReward}">
+                                    <i class="bi bi-coin me-1"></i><span th:text="${a.template.coinsReward}">5</span> коинов
+                                </span>
+                            </div>
+
+                            <!-- Sub-items (subtasks) -->
+                            <div th:if="${a.template?.subItems != null and !a.template.subItems.isEmpty()}" class="mb-3">
+                                <small class="text-muted fw-semibold">Подзадачи:</small>
+                                <ul class="list-unstyled mb-0 mt-1">
+                                    <li th:each="sub : ${a.template.subItems}" class="small text-muted">
+                                        <i class="bi bi-check2-square me-1"></i><span th:text="${sub.title}">Подзадача</span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Approved alert -->
+                            <div th:if="${a.status == 'APPROVED'}" class="alert alert-success py-2 small mb-2">
+                                <i class="bi bi-check-circle me-1"></i>Одобрено!
+                                <span th:if="${a.expEarned}"> +<span th:text="${a.expEarned}">10</span> EXP</span>
+                                <span th:if="${a.coinsEarned}"> +<span th:text="${a.coinsEarned}">5</span> коинов</span>
+                            </div>
+
+                            <!-- Rejected alert -->
+                            <div th:if="${a.status == 'REJECTED'}" class="alert alert-danger py-2 small mb-2">
+                                <i class="bi bi-x-circle me-1"></i>Отклонено
+                                <span th:if="${a.parentComment}" class="d-block mt-1" th:text="${a.parentComment}">Комментарий</span>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent border-0 pb-3 px-3"
+                             th:if="${a.status == 'CREATED'}">
+                            <form th:action="@{/child/tasks/{id}/submit(id=${a.id})}" method="post">
+                                <button type="submit" class="btn btn-success w-100">
+                                    <i class="bi bi-check-lg me-1"></i>Сдать задание
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

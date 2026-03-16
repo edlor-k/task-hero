@@ -40,12 +40,12 @@
         <module>dependency-bom</module>
         <module>common</module>
         <module>user-service</module>
+        <module>task-service</module>
+        <module>app</module>
         <!-- Позже добавим: -->
-        <!-- <module>task-service</module> -->
         <!-- <module>reward-service</module> -->
         <!-- <module>notification-service</module> -->
         <!-- <module>gateway</module> -->
-        <!-- <module>app</module> -->
     </modules>
 
     <build>

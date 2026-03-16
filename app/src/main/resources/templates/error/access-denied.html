@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Доступ запрещён')}"></head>
+<body class="auth-wrapper">
+<div class="d-flex align-items-center justify-content-center min-vh-100">
+    <div class="text-center">
+        <div class="display-1 mb-3">🔒</div>
+        <h1 class="display-4 fw-bold text-white">403</h1>
+        <h4 class="text-white-50 mb-4">Доступ запрещён</h4>
+        <p class="text-white-50 mb-4">У вас нет прав для просмотра этой страницы</p>
+        <a th:href="@{/}" class="btn btn-light btn-lg">
+            <i class="bi bi-house me-2"></i>На главную
+        </a>
+    </div>
+</div>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

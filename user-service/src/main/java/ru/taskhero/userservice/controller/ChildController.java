@@ -16,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.taskhero.common.exception.ExceptionBody;
 import ru.taskhero.common.exception.ValidationException;
+import ru.taskhero.common.model.enums.CharacterType;
 import ru.taskhero.userservice.dto.ChildCreateRequestDto;
 import ru.taskhero.userservice.dto.ChildResponseDto;
 import ru.taskhero.userservice.dto.ParentResponseDto;
@@ -137,6 +138,54 @@ public class ChildController {
         List<ChildResponseDto> response = childService.getChildrenByParent(parent.id());
         log.info("Найдено детей: {}", response.size());
 
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Получить профиль текущего ребёнка (по JWT).
+     *
+     * @return DTO ребёнка с информацией об опыте
+     */
+    @GetMapping("/me")
+    @PreAuthorize("hasRole('CHILD')")
+    @Operation(
+            summary = "Получить свой профиль (ребёнок)",
+            description = "Возвращает профиль текущего авторизованного ребёнка"
+    )
+    public ResponseEntity<ChildResponseDto> getMyProfile() {
+        UUID childId = SecurityUtils.getCurrentUserId();
+        log.info("Запрос профиля ребёнка: {}", childId);
+        ChildResponseDto response = childService.getById(childId);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Получить информацию о ребенке по ID.
+     *
+     * @param id ID ребенка
+     * @return DTO ребенка
+     */
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('PARENT', 'ADMIN')")
+    @Operation(
+            summary = "Получить ребенка по ID",
+            description = "Возвращает информацию о ребенке по его ID"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Информация о ребенке получена",
+                    content = @Content(schema = @Schema(implementation = ChildResponseDto.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Ребенок не найден",
+                    content = @Content(schema = @Schema(implementation = ExceptionBody.class))
+            )
+    })
+    public ResponseEntity<ChildResponseDto> getChildById(@PathVariable UUID id) {
+        log.info("Запрос ребенка по ID: {}", id);
+        ChildResponseDto response = childService.getById(id);
         return ResponseEntity.ok(response);
     }
 
@@ -283,5 +332,103 @@ public class ChildController {
         log.info("Ребенок {} удален", id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Начислить награду ребёнку.
+     * Используется task-service для начисления EXP и коинов.
+     *
+     * @param childId ID ребёнка
+     * @param request данные о награде
+     * @return обновленные данные ребёнка
+     */
+    @PutMapping("/{childId}/reward")
+    @PreAuthorize("hasAnyRole('PARENT', 'ADMIN')")
+    @Operation(
+            summary = "Начислить награду ребёнку",
+            description = "Начисляет EXP и коины ребёнку. Автоматически пересчитывает уровень."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Награда начислена",
+                    content = @Content(schema = @Schema(implementation = ChildResponseDto.class))
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Недостаточно прав",
+                    content = @Content(schema = @Schema(implementation = ExceptionBody.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Ребёнок не найден",
+                    content = @Content(schema = @Schema(implementation = ExceptionBody.class))
+            )
+    })
+    public ResponseEntity<ChildResponseDto> addReward(
+            @PathVariable UUID childId,
+            @Valid @RequestBody ru.taskhero.userservice.dto.RewardRequest request
+    ) {
+        log.info("Начисление награды ребёнку {}: {} EXP, {} коинов", childId, request.exp(), request.coins());
+
+        ChildResponseDto response = childService.addReward(childId, request.exp(), request.coins());
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Выбрать персонажа для ребёнка (при первом входе).
+     *
+     * @param characterType тип персонажа
+     * @return обновленные данные ребёнка
+     */
+    @PostMapping("/me/character")
+    @PreAuthorize("hasRole('CHILD')")
+    @Operation(
+            summary = "Выбрать персонажа",
+            description = "Ребёнок выбирает своего персонажа при первом входе"
+    )
+    public ResponseEntity<ChildResponseDto> selectCharacter(
+            @RequestParam CharacterType characterType
+    ) {
+        UUID childId = SecurityUtils.getCurrentUserId();
+        log.info("Выбор персонажа {} ребёнком {}", characterType, childId);
+
+        ChildResponseDto response = childService.selectCharacter(childId, characterType);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Проверить, принадлежит ли ребёнок родителю.
+     * Используется task-service для проверки доступа.
+     *
+     * @param childId  ID ребёнка
+     * @param parentId ID родителя
+     * @return true если ребёнок принадлежит родителю
+     */
+    @GetMapping("/{childId}/belongs-to/{parentId}")
+    @PreAuthorize("hasAnyRole('PARENT', 'ADMIN')")
+    @Operation(
+            summary = "Проверить принадлежность ребёнка",
+            description = "Проверяет, принадлежит ли ребёнок указанному родителю"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Результат проверки"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Ребёнок не найден",
+                    content = @Content(schema = @Schema(implementation = ExceptionBody.class))
+            )
+    })
+    public ResponseEntity<Boolean> isChildBelongsToParent(
+            @PathVariable UUID childId,
+            @PathVariable UUID parentId
+    ) {
+        log.info("Проверка принадлежности ребёнка {} родителю {}", childId, parentId);
+
+        boolean belongs = childService.isChildBelongsToParent(childId, parentId);
+        return ResponseEntity.ok(belongs);
     }
 }

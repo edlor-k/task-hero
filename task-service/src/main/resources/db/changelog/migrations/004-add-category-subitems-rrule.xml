@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="004-add-category-subitems-rrule" author="task-hero">
+        <!-- Категория задания (STUDY, HOUSEHOLD, SPORTS, ...) -->
+        <addColumn tableName="task_templates">
+            <column name="category" type="varchar(32)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <!-- RRULE-формат повторения (заменяет repeat_interval + repeat_unit) -->
+        <addColumn tableName="task_templates">
+            <column name="recurrence_rule" type="varchar(256)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <!-- Флаг: шаблон из библиотеки -->
+        <addColumn tableName="task_templates">
+            <column name="is_library_template" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <!-- Таблица подпунктов задания -->
+        <createTable tableName="task_sub_items">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="template_id" type="uuid">
+                <constraints nullable="false"
+                             foreignKeyName="fk_sub_item_template"
+                             references="task_templates(id)"
+                             deleteCascade="true"/>
+            </column>
+            <column name="title" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="order_index" type="int" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="task_sub_items" indexName="idx_sub_items_template_id">
+            <column name="template_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="006-fix-library-templates-encoding" author="task-hero">
+        <comment>Удалить и пересоздать библиотечные шаблоны с правильной кодировкой</comment>
+
+        <!-- Удалить все библиотечные шаблоны -->
+        <delete tableName="task_templates">
+            <where>is_library_template = true</where>
+        </delete>
+
+        <!-- Учёба -->
+        <insert tableName="task_templates">
+            <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="parent_id" valueComputed="'00000000-0000-0000-0000-000000000000'::uuid"/>
+            <column name="title" value="Сделать домашнее задание"/>
+            <column name="description" value="Выполнить все заданные уроки на сегодня"/>
+            <column name="exp_reward" valueNumeric="15"/>
+            <column name="coins_reward" valueNumeric="8"/>
+            <column name="is_repeatable" valueBoolean="true"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="difficulty" value="NORMAL"/>
+            <column name="category" value="STUDY"/>
+            <column name="is_library_template" valueBoolean="true"/>
+            <column name="recurrence_rule" value="FREQ=DAILY;BYDAY=MO,TU,WE,TH,FR"/>
+            <column name="created_at" valueComputed="now()"/>
+            <column name="updated_at" valueComputed="now()"/>
+        </insert>
+
+        <insert tableName="task_templates">
+            <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="parent_id" valueComputed="'00000000-0000-0000-0000-000000000000'::uuid"/>
+            <column name="title" value="Подготовиться к контрольной"/>
+            <column name="description" value="Повторить материал и решить примеры"/>
+            <column name="exp_reward" valueNumeric="25"/>
+            <column name="coins_reward" valueNumeric="15"/>
+            <column name="is_repeatable" valueBoolean="false"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="difficulty" value="HARD"/>
+            <column name="category" value="STUDY"/>
+            <column name="is_library_template" valueBoolean="true"/>
+            <column name="created_at" valueComputed="now()"/>
+            <column name="updated_at" valueComputed="now()"/>
+        </insert>
+
+        <!-- По дому -->
+        <insert tableName="task_templates">
+            <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="parent_id" valueComputed="'00000000-0000-0000-0000-000000000000'::uuid"/>
+            <column name="title" value="Убраться в комнате"/>
+            <column name="description" value="Прибраться на столе, заправить кровать, пропылесосить"/>
+            <column name="exp_reward" valueNumeric="20"/>
+            <column name="coins_reward" valueNumeric="10"/>
+            <column name="is_repeatable" valueBoolean="true"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="difficulty" value="NORMAL"/>
+            <column name="category" value="HOUSEHOLD"/>
+            <column name="is_library_template" valueBoolean="true"/>
+            <column name="recurrence_rule" value="FREQ=WEEKLY;BYDAY=SA"/>
+            <column name="created_at" valueComputed="now()"/>
+            <column name="updated_at" valueComputed="now()"/>
+        </insert>
+
+        <insert tableName="task_templates">
+            <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="parent_id" valueComputed="'00000000-0000-0000-0000-000000000000'::uuid"/>
+            <column name="title" value="Помыть посуду"/>
+            <column name="description" value="Помыть всю посуду после обеда"/>
+            <column name="exp_reward" valueNumeric="10"/>
+            <column name="coins_reward" valueNumeric="5"/>
+            <column name="is_repeatable" valueBoolean="true"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="difficulty" value="EASY"/>
+            <column name="category" value="HOUSEHOLD"/>
+            <column name="is_library_template" valueBoolean="true"/>
+            <column name="recurrence_rule" value="FREQ=DAILY"/>
+            <column name="created_at" valueComputed="now()"/>
+            <column name="updated_at" valueComputed="now()"/>
+        </insert>
+
+        <insert tableName="task_templates">
+            <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="parent_id" valueComputed="'00000000-0000-0000-0000-000000000000'::uuid"/>
+            <column name="title" value="Вынести мусор"/>
+            <column name="description" value="Собрать мусор из всех ведер и вынести"/>
+            <column name="exp_reward" valueNumeric="8"/>
+            <column name="coins_reward" valueNumeric="4"/>
+            <column name="is_repeatable" valueBoolean="true"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="difficulty" value="EASY"/>
+            <column name="category" value="HOUSEHOLD"/>
+            <column name="is_library_template" valueBoolean="true"/>
+            <column name="created_at" valueComputed="now()"/>
+            <column name="updated_at" valueComputed="now()"/>
+        </insert>
+
+        <!-- Спорт -->
+        <insert tableName="task_templates">
+            <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="parent_id" valueComputed="'00000000-0000-0000-0000-000000000000'::uuid"/>
+            <column name="title" value="Утренняя зарядка"/>
+            <column name="description" value="Выполнить комплекс утренних упражнений (15 мин)"/>
+            <column name="exp_reward" valueNumeric="10"/>
+            <column name="coins_reward" valueNumeric="5"/>
+            <column name="is_repeatable" valueBoolean="true"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="difficulty" value="EASY"/>
+            <column name="category" value="SPORTS"/>
+            <column name="is_library_template" valueBoolean="true"/>
+            <column name="recurrence_rule" value="FREQ=DAILY"/>
+            <column name="created_at" valueComputed="now()"/>
+            <column name="updated_at" valueComputed="now()"/>
+        </insert>
+
+        <insert tableName="task_templates">
+            <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="parent_id" valueComputed="'00000000-0000-0000-0000-000000000000'::uuid"/>
+            <column name="title" value="Прогулка на свежем воздухе"/>
+            <column name="description" value="Погулять на улице не менее 30 минут"/>
+            <column name="exp_reward" valueNumeric="12"/>
+            <column name="coins_reward" valueNumeric="6"/>
+            <column name="is_repeatable" valueBoolean="true"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="difficulty" value="EASY"/>
+            <column name="category" value="SPORTS"/>
+            <column name="is_library_template" valueBoolean="true"/>
+            <column name="recurrence_rule" value="FREQ=DAILY"/>
+            <column name="created_at" valueComputed="now()"/>
+            <column name="updated_at" valueComputed="now()"/>
+        </insert>
+
+        <!-- Творчество -->
+        <insert tableName="task_templates">
+            <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="parent_id" valueComputed="'00000000-0000-0000-0000-000000000000'::uuid"/>
+            <column name="title" value="Нарисовать рисунок"/>
+            <column name="description" value="Нарисовать рисунок на свободную тему"/>
+            <column name="exp_reward" valueNumeric="15"/>
+            <column name="coins_reward" valueNumeric="8"/>
+            <column name="is_repeatable" valueBoolean="false"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="difficulty" value="NORMAL"/>
+            <column name="category" value="CREATIVITY"/>
+            <column name="is_library_template" valueBoolean="true"/>
+            <column name="created_at" valueComputed="now()"/>
+            <column name="updated_at" valueComputed="now()"/>
+        </insert>
+
+        <!-- Гигиена -->
+        <insert tableName="task_templates">
+            <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="parent_id" valueComputed="'00000000-0000-0000-0000-000000000000'::uuid"/>
+            <column name="title" value="Почистить зубы (утро и вечер)"/>
+            <column name="description" value="Почистить зубы утром и вечером не менее 2 минут"/>
+            <column name="exp_reward" valueNumeric="5"/>
+            <column name="coins_reward" valueNumeric="3"/>
+            <column name="is_repeatable" valueBoolean="true"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="difficulty" value="EASY"/>
+            <column name="category" value="HYGIENE"/>
+            <column name="is_library_template" valueBoolean="true"/>
+            <column name="recurrence_rule" value="FREQ=DAILY"/>
+            <column name="created_at" valueComputed="now()"/>
+            <column name="updated_at" valueComputed="now()"/>
+        </insert>
+
+        <!-- Чтение -->
+        <insert tableName="task_templates">
+            <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="parent_id" valueComputed="'00000000-0000-0000-0000-000000000000'::uuid"/>
+            <column name="title" value="Прочитать 20 страниц книги"/>
+            <column name="description" value="Прочитать не менее 20 страниц художественной или учебной книги"/>
+            <column name="exp_reward" valueNumeric="15"/>
+            <column name="coins_reward" valueNumeric="8"/>
+            <column name="is_repeatable" valueBoolean="true"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="difficulty" value="NORMAL"/>
+            <column name="category" value="READING"/>
+            <column name="is_library_template" valueBoolean="true"/>
+            <column name="recurrence_rule" value="FREQ=DAILY"/>
+            <column name="created_at" valueComputed="now()"/>
+            <column name="updated_at" valueComputed="now()"/>
+        </insert>
+
+        <!-- Общение -->
+        <insert tableName="task_templates">
+            <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="parent_id" valueComputed="'00000000-0000-0000-0000-000000000000'::uuid"/>
+            <column name="title" value="Позвонить бабушке/дедушке"/>
+            <column name="description" value="Позвонить и поговорить с бабушкой или дедушкой"/>
+            <column name="exp_reward" valueNumeric="10"/>
+            <column name="coins_reward" valueNumeric="5"/>
+            <column name="is_repeatable" valueBoolean="true"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="difficulty" value="EASY"/>
+            <column name="category" value="SOCIAL"/>
+            <column name="is_library_template" valueBoolean="true"/>
+            <column name="recurrence_rule" value="FREQ=WEEKLY;BYDAY=SU"/>
+            <column name="created_at" valueComputed="now()"/>
+            <column name="updated_at" valueComputed="now()"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

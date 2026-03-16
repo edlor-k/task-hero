@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="003-add-difficulty-and-recurrence" author="task-hero">
+        <!-- Добавляем сложность задания -->
+        <addColumn tableName="task_templates">
+            <column name="difficulty" type="varchar(16)" defaultValue="NORMAL">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <!-- Добавляем поля повторяемости -->
+        <addColumn tableName="task_templates">
+            <column name="repeat_count" type="int">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <addColumn tableName="task_templates">
+            <column name="repeat_interval" type="int">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <addColumn tableName="task_templates">
+            <column name="repeat_unit" type="varchar(16)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

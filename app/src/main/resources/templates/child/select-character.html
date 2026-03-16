@@ -1,0 +1,117 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Выбери персонажа')}"></head>
+<body class="auth-wrapper">
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold text-white">⚔️ Выбери своего героя!</h2>
+        <p class="text-white-50">Каждый класс уникален. Выбирай того, кто тебе ближе!</p>
+    </div>
+
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mx-auto" style="max-width: 600px;">
+        <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+        <!-- WARRIOR -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <form th:action="@{/child/select-character}" method="post">
+                <input type="hidden" name="characterType" value="WARRIOR">
+                <button type="submit" class="btn p-0 w-100 text-start">
+                    <div class="card character-card h-100 text-center">
+                        <div class="card-body">
+                            <div class="display-1 mb-2">⚔️</div>
+                            <h5 class="fw-bold">Воин</h5>
+                            <p class="text-muted small mb-0">Сильный и храбрый. Всегда идёт вперёд!</p>
+                        </div>
+                    </div>
+                </button>
+            </form>
+        </div>
+
+        <!-- MAGE -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <form th:action="@{/child/select-character}" method="post">
+                <input type="hidden" name="characterType" value="MAGE">
+                <button type="submit" class="btn p-0 w-100 text-start">
+                    <div class="card character-card h-100 text-center">
+                        <div class="card-body">
+                            <div class="display-1 mb-2">🧙</div>
+                            <h5 class="fw-bold">Маг</h5>
+                            <p class="text-muted small mb-0">Мудрый и загадочный. Знания — его сила!</p>
+                        </div>
+                    </div>
+                </button>
+            </form>
+        </div>
+
+        <!-- ARCHER -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <form th:action="@{/child/select-character}" method="post">
+                <input type="hidden" name="characterType" value="ARCHER">
+                <button type="submit" class="btn p-0 w-100 text-start">
+                    <div class="card character-card h-100 text-center">
+                        <div class="card-body">
+                            <div class="display-1 mb-2">🏹</div>
+                            <h5 class="fw-bold">Лучник</h5>
+                            <p class="text-muted small mb-0">Точный и ловкий. Попадает в цель!</p>
+                        </div>
+                    </div>
+                </button>
+            </form>
+        </div>
+
+        <!-- HEALER -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <form th:action="@{/child/select-character}" method="post">
+                <input type="hidden" name="characterType" value="HEALER">
+                <button type="submit" class="btn p-0 w-100 text-start">
+                    <div class="card character-card h-100 text-center">
+                        <div class="card-body">
+                            <div class="display-1 mb-2">💚</div>
+                            <h5 class="fw-bold">Целитель</h5>
+                            <p class="text-muted small mb-0">Добрый и заботливый. Помогает друзьям!</p>
+                        </div>
+                    </div>
+                </button>
+            </form>
+        </div>
+
+        <!-- ROGUE -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <form th:action="@{/child/select-character}" method="post">
+                <input type="hidden" name="characterType" value="ROGUE">
+                <button type="submit" class="btn p-0 w-100 text-start">
+                    <div class="card character-card h-100 text-center">
+                        <div class="card-body">
+                            <div class="display-1 mb-2">🗡️</div>
+                            <h5 class="fw-bold">Разбойник</h5>
+                            <p class="text-muted small mb-0">Хитрый и быстрый. Мастер сюрпризов!</p>
+                        </div>
+                    </div>
+                </button>
+            </form>
+        </div>
+
+        <!-- KNIGHT -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <form th:action="@{/child/select-character}" method="post">
+                <input type="hidden" name="characterType" value="KNIGHT">
+                <button type="submit" class="btn p-0 w-100 text-start">
+                    <div class="card character-card h-100 text-center">
+                        <div class="card-body">
+                            <div class="display-1 mb-2">🛡️</div>
+                            <h5 class="fw-bold">Рыцарь</h5>
+                            <p class="text-muted small mb-0">Благородный защитник. Щит и опора!</p>
+                        </div>
+                    </div>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

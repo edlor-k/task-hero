@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Магазин наград')}"></head>
+<body>
+<div class="th-layout">
+    <nav th:replace="~{fragments/layout :: sidebar-parent}"></nav>
+    <div class="th-content">
+        <header th:replace="~{fragments/layout :: header}"></header>
+        <main class="th-main">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold mb-0"><i class="bi bi-shop me-2"></i>Магазин наград</h4>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addItemModal">
+                    <i class="bi bi-plus-lg me-1"></i>Добавить товар
+                </button>
+            </div>
+
+            <!-- Messages -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                <i class="bi bi-check-circle me-2"></i><span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Pending purchases -->
+            <div th:if="${pendingPurchases != null and !pendingPurchases.isEmpty()}" class="card mb-4 border-warning">
+                <div class="card-header bg-warning bg-opacity-10">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-clock-history me-2"></i>Ожидают подтверждения</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Ребёнок</th>
+                                <th>Товар</th>
+                                <th>Цена</th>
+                                <th>Дата</th>
+                                <th class="text-end">Действия</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="p : ${pendingPurchases}">
+                                <td th:text="${p.childFirstName}">Имя</td>
+                                <td>
+                                    <span th:if="${p.shopItem?.iconName}" th:text="${p.shopItem.iconName}" class="me-1"></span>
+                                    <span th:text="${p.shopItem?.title}">Товар</span>
+                                </td>
+                                <td><span class="badge bg-warning text-dark" th:text="${p.shopItem?.priceCoins} + ' коинов'">10</span></td>
+                                <td><small class="text-muted" th:text="${#temporals.format(p.createdAt, 'dd.MM.yyyy')}">01.01.2025</small></td>
+                                <td class="text-end">
+                                    <form th:action="@{/parent/shop/purchases/{id}/approve(id=${p.id})}" method="post" class="d-inline">
+                                        <button class="btn btn-sm btn-success"><i class="bi bi-check-lg"></i></button>
+                                    </form>
+                                    <form th:action="@{/parent/shop/purchases/{id}/reject(id=${p.id})}" method="post" class="d-inline ms-1">
+                                        <button class="btn btn-sm btn-danger"><i class="bi bi-x-lg"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shop items -->
+            <h5 class="fw-semibold mb-3">Товары</h5>
+            <div th:if="${#lists.isEmpty(items)}" class="text-center py-5">
+                <i class="bi bi-bag-plus display-1 text-muted"></i>
+                <h4 class="mt-3 text-muted">Нет товаров</h4>
+                <p class="text-muted">Добавьте товары, которые дети смогут покупать за коины</p>
+                <a th:href="@{/parent/shop/marketplace}" class="btn btn-outline-primary mt-2">
+                    <i class="bi bi-shop-window me-1"></i>Выбрать из маркетплейса
+                </a>
+            </div>
+
+            <div th:unless="${#lists.isEmpty(items)}" class="row g-4">
+                <div th:each="item : ${items}" class="col-md-6 col-lg-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <div class="display-4 mb-2" th:if="${item.iconName}" th:text="${item.iconName}">🎁</div>
+                            <div class="display-4 mb-2" th:unless="${item.iconName}">🎁</div>
+                            <h5 class="fw-bold" th:text="${item.title}">Товар</h5>
+                            <p class="text-muted small" th:text="${item.description}" th:if="${item.description}">Описание</p>
+                            <div class="mb-3">
+                                <span class="badge bg-warning text-dark fs-6" th:text="${item.priceCoins} + ' коинов'">10 коинов</span>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent border-0 pb-3 px-3">
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-outline-primary btn-sm flex-fill"
+                                        onclick="openEditItemModal(this)"
+                                        th:attr="data-id=${item.id}, data-title=${item.title}, data-description=${item.description},
+                                                 data-priceCoins=${item.priceCoins}, data-iconName=${item.iconName}">
+                                    <i class="bi bi-pencil me-1"></i>Изменить
+                                </button>
+                                <form th:action="@{/parent/shop/{id}/delete(id=${item.id})}" method="post" class="flex-fill">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm w-100"
+                                            onclick="return confirm('Удалить товар?')">
+                                        <i class="bi bi-trash me-1"></i>Удалить
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Purchase history -->
+            <div class="mt-5" th:if="${allPurchases != null and !allPurchases.isEmpty()}">
+                <h5 class="fw-semibold mb-3"><i class="bi bi-clock-history me-2"></i>История операций</h5>
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                <tr>
+                                    <th>Ребёнок</th>
+                                    <th>Товар</th>
+                                    <th>Цена</th>
+                                    <th>Статус</th>
+                                    <th>Дата запроса</th>
+                                    <th>Дата решения</th>
+                                    <th>Комментарий</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="p : ${allPurchases}">
+                                    <td th:text="${p.childFirstName}">Имя</td>
+                                    <td>
+                                        <span th:if="${p.shopItem?.iconName}" th:text="${p.shopItem.iconName}" class="me-1"></span>
+                                        <span th:text="${p.shopItem?.title}">Товар</span>
+                                    </td>
+                                    <td><span class="badge bg-warning text-dark" th:text="${p.shopItem?.priceCoins} + ' коинов'">10</span></td>
+                                    <td>
+                                        <span class="badge"
+                                              th:classappend="${p.status == 'PENDING' ? 'bg-warning text-dark' :
+                                                               p.status == 'APPROVED' ? 'bg-success' : 'bg-danger'}"
+                                              th:text="${p.status == 'PENDING' ? 'Ожидает' :
+                                                         p.status == 'APPROVED' ? 'Одобрено' : 'Отклонено'}">Статус</span>
+                                    </td>
+                                    <td><small class="text-muted" th:text="${#temporals.format(p.createdAt, 'dd.MM.yyyy HH:mm')}">01.01.2025</small></td>
+                                    <td>
+                                        <small class="text-muted"
+                                               th:if="${p.reviewedAt}"
+                                               th:text="${#temporals.format(p.reviewedAt, 'dd.MM.yyyy HH:mm')}">01.01.2025</small>
+                                        <small class="text-muted" th:unless="${p.reviewedAt}">—</small>
+                                    </td>
+                                    <td><small class="text-muted" th:text="${p.parentComment ?: '—'}">—</small></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+
+<!-- Modal: Add item -->
+<div class="modal fade" id="addItemModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form th:action="@{/parent/shop/add}" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-bag-plus me-2"></i>Добавить товар</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Название</label>
+                        <input type="text" class="form-control" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Описание</label>
+                        <textarea class="form-control" name="description" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Цена (коины)</label>
+                        <input type="number" class="form-control" name="priceCoins" min="1" value="10" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Иконка (эмодзи)</label>
+                        <div class="d-flex flex-wrap gap-2 mb-2">
+                            <button type="button" class="btn btn-outline-secondary icon-btn" onclick="selectIcon(this, '🎁')">🎁</button>
+                            <button type="button" class="btn btn-outline-secondary icon-btn" onclick="selectIcon(this, '🎮')">🎮</button>
+                            <button type="button" class="btn btn-outline-secondary icon-btn" onclick="selectIcon(this, '🍕')">🍕</button>
+                            <button type="button" class="btn btn-outline-secondary icon-btn" onclick="selectIcon(this, '🎬')">🎬</button>
+                            <button type="button" class="btn btn-outline-secondary icon-btn" onclick="selectIcon(this, '📱')">📱</button>
+                            <button type="button" class="btn btn-outline-secondary icon-btn" onclick="selectIcon(this, '⭐')">⭐</button>
+                            <button type="button" class="btn btn-outline-secondary icon-btn" onclick="selectIcon(this, '🏆')">🏆</button>
+                            <button type="button" class="btn btn-outline-secondary icon-btn" onclick="selectIcon(this, '🎪')">🎪</button>
+                        </div>
+                        <input type="text" class="form-control" id="iconInput" name="iconName" placeholder="Или введите свой эмодзи" maxlength="4">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Доступен для</label>
+                        <div th:each="child : ${children}" class="form-check">
+                            <input class="form-check-input" type="checkbox" name="childIds" th:value="${child.id}" th:id="'child-' + ${child.id}" checked>
+                            <label class="form-check-label" th:for="'child-' + ${child.id}" th:text="${child.firstName + ' ' + child.surname}">Ребёнок</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Добавить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Edit item -->
+<div class="modal fade" id="editItemModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="editItemForm" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-pencil me-2"></i>Редактировать товар</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Название</label>
+                        <input type="text" class="form-control" id="editItemTitle" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Описание</label>
+                        <textarea class="form-control" id="editItemDescription" name="description" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Цена (коины)</label>
+                        <input type="number" class="form-control" id="editItemPrice" name="priceCoins" min="1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Иконка (эмодзи)</label>
+                        <div class="d-flex flex-wrap gap-2 mb-2">
+                            <button type="button" class="btn btn-outline-secondary edit-icon-btn" onclick="selectEditIcon(this, '🎁')">🎁</button>
+                            <button type="button" class="btn btn-outline-secondary edit-icon-btn" onclick="selectEditIcon(this, '🎮')">🎮</button>
+                            <button type="button" class="btn btn-outline-secondary edit-icon-btn" onclick="selectEditIcon(this, '🍕')">🍕</button>
+                            <button type="button" class="btn btn-outline-secondary edit-icon-btn" onclick="selectEditIcon(this, '🎬')">🎬</button>
+                            <button type="button" class="btn btn-outline-secondary edit-icon-btn" onclick="selectEditIcon(this, '📱')">📱</button>
+                            <button type="button" class="btn btn-outline-secondary edit-icon-btn" onclick="selectEditIcon(this, '⭐')">⭐</button>
+                            <button type="button" class="btn btn-outline-secondary edit-icon-btn" onclick="selectEditIcon(this, '🏆')">🏆</button>
+                            <button type="button" class="btn btn-outline-secondary edit-icon-btn" onclick="selectEditIcon(this, '🎪')">🎪</button>
+                        </div>
+                        <input type="text" class="form-control" id="editItemIcon" name="iconName" placeholder="Или введите свой эмодзи" maxlength="4">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Доступен для</label>
+                        <div th:each="child : ${children}" class="form-check">
+                            <input class="form-check-input edit-child-check" type="checkbox" name="childIds" th:value="${child.id}" th:id="'edit-child-' + ${child.id}" checked>
+                            <label class="form-check-label" th:for="'edit-child-' + ${child.id}" th:text="${child.firstName + ' ' + child.surname}">Ребёнок</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+<script>
+    function selectIcon(btn, icon) {
+        document.getElementById('iconInput').value = icon;
+        document.querySelectorAll('.icon-btn').forEach(b => b.classList.remove('btn-primary'));
+        btn.classList.remove('btn-outline-secondary');
+        btn.classList.add('btn-primary');
+    }
+
+    function selectEditIcon(btn, icon) {
+        document.getElementById('editItemIcon').value = icon;
+        document.querySelectorAll('.edit-icon-btn').forEach(b => {
+            b.classList.remove('btn-primary');
+            b.classList.add('btn-outline-secondary');
+        });
+        btn.classList.remove('btn-outline-secondary');
+        btn.classList.add('btn-primary');
+    }
+
+    function openEditItemModal(el) {
+        const id = el.getAttribute('data-id');
+        const form = document.getElementById('editItemForm');
+        form.action = '/parent/shop/' + id + '/edit';
+        document.getElementById('editItemTitle').value = el.getAttribute('data-title') || '';
+        document.getElementById('editItemDescription').value = el.getAttribute('data-description') || '';
+        document.getElementById('editItemPrice').value = el.getAttribute('data-priceCoins') || '10';
+        document.getElementById('editItemIcon').value = el.getAttribute('data-iconName') || '';
+        // Reset icon buttons
+        document.querySelectorAll('.edit-icon-btn').forEach(b => {
+            b.classList.remove('btn-primary');
+            b.classList.add('btn-outline-secondary');
+        });
+        new bootstrap.Modal(document.getElementById('editItemModal')).show();
+    }
+</script>
+</body>
+</html>

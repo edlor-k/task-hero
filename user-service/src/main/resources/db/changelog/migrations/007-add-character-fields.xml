@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="007-add-character-fields" author="task-hero">
+        <!-- Тип персонажа (WARRIOR, MAGE, ARCHER, HEALER, ROGUE, KNIGHT) -->
+        <addColumn tableName="children">
+            <column name="character_type" type="varchar(16)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <!-- Флаг: выбрал ли ребёнок персонажа -->
+        <addColumn tableName="children">
+            <column name="character_selected" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

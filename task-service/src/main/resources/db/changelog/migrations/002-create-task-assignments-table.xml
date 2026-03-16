@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="002-create-task-assignments-table" author="Vladlen Korablev">
+        <createTable tableName="task_assignments">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="template_id" type="uuid">
+                <constraints nullable="false"
+                             foreignKeyName="fk_assignment_template"
+                             references="task_templates(id)"/>
+            </column>
+            <column name="child_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(32)" defaultValue="CREATED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="due_date" type="date"/>
+            <column name="child_comment" type="varchar(512)"/>
+            <column name="parent_comment" type="varchar(512)"/>
+            <column name="submitted_at" type="timestamp"/>
+            <column name="reviewed_at" type="timestamp"/>
+            <column name="exp_earned" type="int"/>
+            <column name="coins_earned" type="int"/>
+            <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp"/>
+        </createTable>
+
+        <createIndex tableName="task_assignments" indexName="idx_task_assignments_template_id">
+            <column name="template_id"/>
+        </createIndex>
+
+        <createIndex tableName="task_assignments" indexName="idx_task_assignments_child_id">
+            <column name="child_id"/>
+        </createIndex>
+
+        <createIndex tableName="task_assignments" indexName="idx_task_assignments_status">
+            <column name="status"/>
+        </createIndex>
+
+        <createIndex tableName="task_assignments" indexName="idx_task_assignments_child_status">
+            <column name="child_id"/>
+            <column name="status"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

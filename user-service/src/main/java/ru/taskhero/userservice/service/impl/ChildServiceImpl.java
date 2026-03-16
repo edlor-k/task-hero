@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.taskhero.common.aop.LogMethod;
 import ru.taskhero.common.exception.ResourceNotFoundException;
 import ru.taskhero.common.exception.ValidationException;
+import ru.taskhero.common.model.enums.CharacterType;
+import ru.taskhero.common.model.enums.DifficultyTrajectory;
 import ru.taskhero.userservice.dto.ChildCreateRequestDto;
 import ru.taskhero.userservice.dto.ChildDetailDto;
 import ru.taskhero.userservice.dto.ChildResponseDto;
@@ -20,6 +22,7 @@ import ru.taskhero.userservice.mapper.ParentMapper;
 import ru.taskhero.userservice.repository.ChildRepository;
 import ru.taskhero.userservice.repository.ParentRepository;
 import ru.taskhero.userservice.service.ChildService;
+import ru.taskhero.userservice.service.LevelRewardService;
 import ru.taskhero.userservice.util.TokenGenerator;
 
 import java.util.List;
@@ -37,6 +40,7 @@ public class ChildServiceImpl implements ChildService {
     private final ParentRepository parentRepository;
     private final ChildMapper childMapper;
     private final ParentMapper parentMapper;
+    private final LevelRewardService levelRewardService;
 
     /**
      * Добавить нового ребёнка к родителю.
@@ -59,6 +63,10 @@ public class ChildServiceImpl implements ChildService {
         // Генерация уникального loginToken
         String loginToken = generateUniqueLoginToken();
 
+        // Определяем траекторию: если не указана, NORMAL по умолчанию
+        DifficultyTrajectory trajectory = request.difficultyTrajectory() != null
+                ? request.difficultyTrajectory() : DifficultyTrajectory.NORMAL;
+
         Child child = Child.builder()
                 .parent(parent)
                 .firstName(request.firstName())
@@ -67,12 +75,13 @@ public class ChildServiceImpl implements ChildService {
                 .coins(0)
                 .level(1)
                 .loginToken(loginToken)
+                .difficultyTrajectory(trajectory)
                 .build();
 
         child = childRepository.save(child);
         log.info("Создан ребёнок: {} {} с loginToken: {}", child.getFirstName(), child.getSurname(), loginToken);
 
-        return childMapper.toDto(child);
+        return toChildResponseDto(child);
     }
 
     /**
@@ -89,7 +98,7 @@ public class ChildServiceImpl implements ChildService {
         log.debug("Найдено {} детей для родителя с ID: {}", children.size(), parentId);
 
         return children.stream()
-                .map(childMapper::toDto)
+                .map(this::toChildResponseDto)
                 .toList();
     }
 
@@ -111,7 +120,7 @@ public class ChildServiceImpl implements ChildService {
                 });
 
         log.debug("Найден ребёнок: {} {} по токену", child.getFirstName(), child.getSurname());
-        return childMapper.toDto(child);
+        return toChildResponseDto(child);
     }
 
     /**
@@ -127,7 +136,7 @@ public class ChildServiceImpl implements ChildService {
         log.info("Получение списка всех детей, page={}", pageable.getPageNumber());
 
         return childRepository.findAll(pageable)
-                .map(childMapper::toDto);
+                .map(this::toChildResponseDto);
     }
 
     /**
@@ -177,7 +186,7 @@ public class ChildServiceImpl implements ChildService {
         Child child = childRepository.findById(childId)
                 .orElseThrow(() -> new ResourceNotFoundException("Ребенок с ID " + childId + " не найден"));
 
-        return childMapper.toDto(child);
+        return toChildResponseDto(child);
     }
 
     /**
@@ -212,7 +221,7 @@ public class ChildServiceImpl implements ChildService {
         child = childRepository.save(child);
         log.info("Данные ребенка {} обновлены", childId);
 
-        return childMapper.toDto(child);
+        return toChildResponseDto(child);
     }
 
     /**
@@ -248,6 +257,147 @@ public class ChildServiceImpl implements ChildService {
                 .orElseThrow(() -> new ResourceNotFoundException("Ребенок с ID " + childId + " не найден"));
 
         return child.getParent() != null && child.getParent().getId().equals(parentId);
+    }
+
+    /**
+     * Начислить награду ребёнку (EXP и коины).
+     *
+     * @param childId ID ребёнка
+     * @param exp     количество EXP для начисления
+     * @param coins   количество коинов для начисления
+     * @return обновленные данные ребёнка
+     */
+    @Override
+    @Transactional
+    @LogMethod("child-add-reward")
+    public ChildResponseDto addReward(UUID childId, int exp, int coins) {
+        log.info("Начисление награды ребёнку {}: {} EXP, {} коинов", childId, exp, coins);
+
+        Child child = childRepository.findById(childId)
+                .orElseThrow(() -> {
+                    log.error("Ребёнок с ID {} не найден при начислении награды", childId);
+                    return new ResourceNotFoundException("Ребёнок с ID " + childId + " не найден");
+                });
+
+        // Применяем множитель траектории к EXP
+        DifficultyTrajectory trajectory = child.getDifficultyTrajectory() != null
+                ? child.getDifficultyTrajectory() : DifficultyTrajectory.NORMAL;
+        int adjustedExp = (int) Math.round(exp * trajectory.getExpMultiplier());
+
+        // Начисляем награды
+        child.setExp(child.getExp() + adjustedExp);
+        child.setCoins(child.getCoins() + coins);
+
+        // Пересчитываем уровень
+        int newLevel = calculateLevel(child.getExp());
+        if (newLevel > child.getLevel()) {
+            log.info("Ребёнок {} повысил уровень: {} -> {}", childId, child.getLevel(), newLevel);
+            child.setLevel(newLevel);
+
+            // Проверяем и начисляем награды за достигнутые уровни
+            levelRewardService.checkAndClaimRewards(childId, newLevel);
+        }
+
+        child = childRepository.save(child);
+        log.info("Награда начислена ребёнку {}. Новый EXP: {}, коины: {}, уровень: {}",
+                childId, child.getExp(), child.getCoins(), child.getLevel());
+
+        return toChildResponseDto(child);
+    }
+
+    /**
+     * Выбрать персонажа для ребёнка (при первом входе).
+     *
+     * @param childId       ID ребёнка
+     * @param characterType тип персонажа
+     * @return обновленные данные ребёнка
+     */
+    @Override
+    @Transactional
+    @LogMethod("child-select-character")
+    public ChildResponseDto selectCharacter(UUID childId, CharacterType characterType) {
+        log.info("Выбор персонажа {} для ребёнка {}", characterType, childId);
+
+        Child child = childRepository.findById(childId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ребёнок с ID " + childId + " не найден"));
+
+        if (child.isCharacterSelected()) {
+            throw new ValidationException("Персонаж уже выбран");
+        }
+
+        child.setCharacterType(characterType);
+        child.setCharacterSelected(true);
+        child = childRepository.save(child);
+
+        log.info("Ребёнок {} выбрал персонажа {}", childId, characterType);
+        return toChildResponseDto(child);
+    }
+
+    /**
+     * Рассчитать уровень по количеству EXP.
+     * Формула: каждый уровень требует progressively больше EXP.
+     * Траектория теперь влияет на множитель получаемого EXP, а не на пороги.
+     *
+     * @param exp количество EXP
+     * @return уровень
+     */
+    private int calculateLevel(int exp) {
+        int baseExp = 100;
+        double multiplier = 1.5;
+
+        if (exp < baseExp) {
+            return 1;
+        }
+
+        int level = 1;
+        int expRequired = 0;
+
+        while (expRequired <= exp) {
+            level++;
+            expRequired += (int) (baseExp * Math.pow(multiplier, level - 2));
+        }
+
+        return level - 1;
+    }
+
+    /**
+     * Рассчитать общий EXP для достижения уровня.
+     *
+     * @param level целевой уровень
+     * @return необходимый EXP
+     */
+    private int getExpForLevel(int level) {
+        if (level <= 1) {
+            return 0;
+        }
+
+        int baseExp = 100;
+        double multiplier = 1.5;
+
+        double totalExp = 0;
+        for (int i = 2; i <= level; i++) {
+            totalExp += baseExp * Math.pow(multiplier, i - 2);
+        }
+
+        return (int) Math.round(totalExp);
+    }
+
+    /**
+     * Конвертировать Child в ChildResponseDto с расчётом EXP-прогресса.
+     * currentLevelExp — прогресс EXP внутри текущего уровня (от 0 до nextLevelExp).
+     * nextLevelExp — общее количество EXP, необходимое для перехода с текущего на следующий уровень.
+     *
+     * @param child сущность ребёнка
+     * @return DTO ребёнка
+     */
+    private ChildResponseDto toChildResponseDto(Child child) {
+        int currentLevelThreshold = getExpForLevel(child.getLevel());
+        int nextLevelThreshold = getExpForLevel(child.getLevel() + 1);
+        int levelRange = nextLevelThreshold - currentLevelThreshold;
+        int progressInLevel = Math.max(0, child.getExp() - currentLevelThreshold);
+        int expToNextLevel = Math.max(0, nextLevelThreshold - child.getExp());
+
+        return childMapper.toDto(child, expToNextLevel, progressInLevel, levelRange);
     }
 
     /**

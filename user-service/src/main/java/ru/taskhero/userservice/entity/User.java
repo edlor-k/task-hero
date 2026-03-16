@@ -2,6 +2,7 @@ package ru.taskhero.userservice.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import ru.taskhero.common.model.entity.BaseEntity;
 import ru.taskhero.common.model.enums.Role;
 
@@ -12,7 +13,7 @@ import ru.taskhero.common.model.enums.Role;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 @Entity
 @Table(name = "users")
 public class User extends BaseEntity {

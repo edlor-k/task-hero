@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Вход')}"></head>
+<body class="auth-wrapper d-flex align-items-center justify-content-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5 col-lg-4">
+                <div class="card shadow border-0">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="text-center mb-4">
+                            <a th:href="@{/}" class="text-decoration-none">
+                                <i class="bi bi-trophy-fill text-primary fs-1"></i>
+                                <h4 class="fw-bold text-dark mt-2">TaskHero</h4>
+                            </a>
+                            <p class="text-muted">Вход в систему</p>
+                        </div>
+
+                        <div th:if="${error}" class="alert alert-danger py-2">
+                            <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}">Ошибка</span>
+                        </div>
+                        <div th:if="${message}" class="alert alert-success py-2">
+                            <i class="bi bi-check-circle me-2"></i><span th:text="${message}">Сообщение</span>
+                        </div>
+
+                        <form th:action="@{/login}" method="post">
+                            <div class="mb-3">
+                                <label for="username" class="form-label fw-semibold">Email</label>
+                                <input type="email" class="form-control form-control-lg" id="username"
+                                       name="username" placeholder="parent@example.com" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="password" class="form-label fw-semibold">Пароль</label>
+                                <input type="password" class="form-control form-control-lg" id="password"
+                                       name="password" placeholder="Введите пароль" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">Войти</button>
+                            <div class="text-center mb-3">
+                                <span class="text-muted">Нет аккаунта?</span>
+                                <a th:href="@{/register}" class="fw-semibold text-decoration-none">Зарегистрироваться</a>
+                            </div>
+                            <hr>
+                            <a th:href="@{/login/child}" class="btn btn-outline-success w-100">
+                                <i class="bi bi-controller me-1"></i>Войти как ребёнок (по токену)
+                            </a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

@@ -9,7 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  * Конфигурация безопасности, предоставляющая общий PasswordEncoder
  * для всех модулей системы (например, user-service).
  */
-@Configuration
+@Configuration("commonSecurityConfig")
 public class SecurityConfig {
 
     /**

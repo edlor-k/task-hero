@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Мои дети')}"></head>
+<body>
+<div class="th-layout">
+    <nav th:replace="~{fragments/layout :: sidebar-parent}"></nav>
+    <div class="th-content">
+        <header th:replace="~{fragments/layout :: header}"></header>
+        <main class="th-main">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold mb-0"><i class="bi bi-people me-2"></i>Мои дети</h4>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addChildModal">
+                    <i class="bi bi-person-plus me-1"></i>Добавить ребёнка
+                </button>
+            </div>
+
+            <!-- Messages -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                <i class="bi bi-check-circle me-2"></i><span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Empty state -->
+            <div th:if="${#lists.isEmpty(children)}" class="text-center py-5">
+                <i class="bi bi-person-plus display-1 text-muted"></i>
+                <h4 class="mt-3 text-muted">У вас ещё нет детей</h4>
+                <p class="text-muted">Добавьте своего первого ребёнка, чтобы начать</p>
+                <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#addChildModal">
+                    <i class="bi bi-person-plus me-2"></i>Добавить ребёнка
+                </button>
+            </div>
+
+            <!-- Children grid -->
+            <div th:unless="${#lists.isEmpty(children)}" class="row g-4">
+                <div th:each="child : ${children}" class="col-md-6 col-lg-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                                 style="width: 72px; height: 72px; font-size: 1.75rem;">
+                                <span th:text="${#strings.substring(child.firstName, 0, 1)}">И</span>
+                            </div>
+                            <h5 class="fw-bold" th:text="${child.firstName + ' ' + child.surname}">Имя</h5>
+                            <div class="d-flex justify-content-center gap-2 my-3">
+                                <span class="badge bg-warning text-dark" th:text="'Ур. ' + ${child.level}">Ур. 1</span>
+                                <span class="badge bg-success" th:text="${child.exp} + ' EXP'">0 EXP</span>
+                                <span class="badge bg-info" th:text="${child.coins} + ' коинов'">0 коинов</span>
+                            </div>
+                            <div class="bg-body-secondary rounded-3 p-2 mb-3">
+                                <small class="text-muted d-block">Токен для входа</small>
+                                <code class="fs-5" th:text="${child.loginToken}">ABC123XY</code>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent border-0 pb-3 px-3">
+                            <a th:href="@{/parent/children/{id}(id=${child.id})}" class="btn btn-outline-primary w-100">
+                                <i class="bi bi-eye me-1"></i>Подробнее
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+
+<!-- Modal: Add child -->
+<div class="modal fade" id="addChildModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form th:action="@{/parent/children/add}" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-person-plus me-2"></i>Добавить ребёнка</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="firstName" class="form-label fw-semibold">Имя</label>
+                        <input type="text" class="form-control" id="firstName" name="firstName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="surname" class="form-label fw-semibold">Фамилия</label>
+                        <input type="text" class="form-control" id="surname" name="surname" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="difficultyTrajectory" class="form-label fw-semibold">Уровень сложности</label>
+                        <select class="form-select" id="difficultyTrajectory" name="difficultyTrajectory">
+                            <option value="EASY">Лёгкий (x3 EXP)</option>
+                            <option value="NORMAL" selected>Обычный (x2 EXP)</option>
+                            <option value="HARD">Сложный (x1 EXP)</option>
+                        </select>
+                        <div class="form-text">
+                            <i class="bi bi-info-circle me-1"></i>Определяет, сколько опыта ребёнок получает за задания.
+                        </div>
+                    </div>
+                    <div class="alert alert-info py-2">
+                        <i class="bi bi-info-circle me-2"></i>После добавления будет сгенерирован уникальный токен для входа.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Добавить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Dashboard родителя')}"></head>
+<body>
+<div class="th-layout">
+    <nav th:replace="~{fragments/layout :: sidebar-parent}"></nav>
+    <div class="th-content">
+        <header th:replace="~{fragments/layout :: header}"></header>
+        <main class="th-main">
+
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h4 class="fw-bold mb-0">Dashboard</h4>
+                <a th:href="@{/parent/assign}" class="btn btn-primary">
+                    <i class="bi bi-plus-lg me-1"></i>Назначить задание
+                </a>
+            </div>
+
+            <!-- Messages -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                <i class="bi bi-check-circle me-2"></i><span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Onboarding banner -->
+            <div th:if="${onboardingIncomplete}" class="alert alert-info alert-dismissible fade show">
+                <i class="bi bi-info-circle me-2"></i>
+                <strong>Настройка не завершена.</strong> Не все шаги онбординга пройдены.
+                <a th:href="@{/parent/onboarding}" class="alert-link ms-1">Перейти к настройке</a>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Level reward alerts -->
+            <div th:each="alert : ${childRewardAlerts}" class="alert alert-warning alert-dismissible fade show">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                У ребёнка <strong th:text="${alert.childName}">Имя</strong> осталось
+                <strong th:text="${alert.unfilledCount}">0</strong> незаполненных уровней с наградами.
+                <a th:href="@{/parent/level-rewards(childId=${alert.childId})}" class="alert-link ms-1">Добавить награды</a>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Stat cards -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                                    <i class="bi bi-people-fill"></i>
+                                </div>
+                                <div>
+                                    <h4 class="mb-0 fw-bold" th:text="${#lists.size(children)}">0</h4>
+                                    <small class="text-muted">Детей</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                                    <i class="bi bi-hourglass-split"></i>
+                                </div>
+                                <div>
+                                    <h4 class="mb-0 fw-bold" th:text="${pendingCount != null ? pendingCount : 0}">0</h4>
+                                    <small class="text-muted">На проверке</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="stat-icon bg-success bg-opacity-10 text-success">
+                                    <i class="bi bi-list-check"></i>
+                                </div>
+                                <div>
+                                    <h4 class="mb-0 fw-bold" th:text="${templates != null ? #lists.size(templates) : 0}">0</h4>
+                                    <small class="text-muted">Шаблонов</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <!-- Children table -->
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="fw-bold mb-3"><i class="bi bi-people me-2"></i>Мои дети</h5>
+                            <div th:if="${#lists.isEmpty(children)}" class="text-center py-4">
+                                <p class="text-muted">Нет добавленных детей</p>
+                                <a th:href="@{/parent/children}" class="btn btn-primary btn-sm">
+                                    <i class="bi bi-plus-lg me-1"></i>Добавить
+                                </a>
+                            </div>
+                            <div class="table-responsive" th:unless="${#lists.isEmpty(children)}">
+                                <table class="table align-middle mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Имя</th>
+                                            <th>Уровень</th>
+                                            <th>EXP</th>
+                                            <th>Коины</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="child : ${children}">
+                                            <td class="fw-semibold" th:text="${child.firstName + ' ' + child.surname}">Имя</td>
+                                            <td><span class="badge bg-primary bg-opacity-10 text-primary" th:text="'Ур. ' + ${child.level}">1</span></td>
+                                            <td th:text="${child.exp}">0</td>
+                                            <td th:text="${child.coins}">0</td>
+                                            <td>
+                                                <a th:href="@{/parent/children/{id}(id=${child.id})}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick actions -->
+                <div class="col-lg-4">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="fw-bold mb-3"><i class="bi bi-lightning me-2"></i>Быстрые действия</h5>
+                            <div class="d-grid gap-2">
+                                <a th:href="@{/parent/templates}" class="btn btn-outline-primary"><i class="bi bi-list-check me-1"></i>Шаблоны заданий</a>
+                                <a th:href="@{/parent/assign}" class="btn btn-outline-success"><i class="bi bi-send me-1"></i>Назначить задание</a>
+                                <a th:href="@{/parent/review}" class="btn btn-outline-warning"><i class="bi bi-clipboard-check me-1"></i>Проверить задания</a>
+                                <a th:href="@{/parent/shop}" class="btn btn-outline-info"><i class="bi bi-cart me-1"></i>Магазин наград</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div th:if="${!#lists.isEmpty(pendingReview)}" class="card">
+                        <div class="card-body">
+                            <h5 class="fw-bold mb-3"><i class="bi bi-hourglass-split text-warning me-2"></i>Ожидают проверки</h5>
+                            <div th:each="assignment : ${pendingReview}" class="d-flex align-items-center justify-content-between py-2 border-bottom">
+                                <div>
+                                    <p class="mb-0 fw-semibold small" th:text="${assignment.template.title}">Задание</p>
+                                    <small class="text-muted" th:if="${assignment.childComment}" th:text="${assignment.childComment}"></small>
+                                </div>
+                                <a th:href="@{/parent/review}" class="btn btn-sm btn-warning">Проверить</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

@@ -2,6 +2,7 @@ package ru.taskhero.userservice.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import ru.taskhero.common.model.entity.BaseEntity;
 
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 @Entity
 @Table(name = "parents")
 public class Parent extends BaseEntity {

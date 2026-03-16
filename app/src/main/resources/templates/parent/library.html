@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Библиотека шаблонов')}"></head>
+<body>
+<div class="th-layout">
+    <nav th:replace="~{fragments/layout :: sidebar-parent}"></nav>
+    <div class="th-content">
+        <header th:replace="~{fragments/layout :: header}"></header>
+        <main class="th-main">
+
+            <h4 class="fw-bold mb-4"><i class="bi bi-book me-2"></i>Библиотека шаблонов</h4>
+
+            <!-- Messages -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                <i class="bi bi-check-circle me-2"></i><span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Category filter -->
+            <div class="d-flex flex-wrap gap-2 mb-4">
+                <a th:href="@{/parent/library}"
+                   class="btn btn-sm"
+                   th:classappend="${selectedCategory == null} ? 'btn-primary' : 'btn-outline-primary'">Все</a>
+                <a th:href="@{/parent/library(category='STUDY')}"
+                   class="btn btn-sm"
+                   th:classappend="${selectedCategory == 'STUDY'} ? 'btn-primary' : 'btn-outline-primary'">📚 Учёба</a>
+                <a th:href="@{/parent/library(category='HOUSEHOLD')}"
+                   class="btn btn-sm"
+                   th:classappend="${selectedCategory == 'HOUSEHOLD'} ? 'btn-primary' : 'btn-outline-primary'">🏠 По дому</a>
+                <a th:href="@{/parent/library(category='SPORTS')}"
+                   class="btn btn-sm"
+                   th:classappend="${selectedCategory == 'SPORTS'} ? 'btn-primary' : 'btn-outline-primary'">🏆 Спорт</a>
+                <a th:href="@{/parent/library(category='CREATIVITY')}"
+                   class="btn btn-sm"
+                   th:classappend="${selectedCategory == 'CREATIVITY'} ? 'btn-primary' : 'btn-outline-primary'">🎨 Творчество</a>
+                <a th:href="@{/parent/library(category='HYGIENE')}"
+                   class="btn btn-sm"
+                   th:classappend="${selectedCategory == 'HYGIENE'} ? 'btn-primary' : 'btn-outline-primary'">💧 Гигиена</a>
+                <a th:href="@{/parent/library(category='SOCIAL')}"
+                   class="btn btn-sm"
+                   th:classappend="${selectedCategory == 'SOCIAL'} ? 'btn-primary' : 'btn-outline-primary'">🤝 Общение</a>
+                <a th:href="@{/parent/library(category='READING')}"
+                   class="btn btn-sm"
+                   th:classappend="${selectedCategory == 'READING'} ? 'btn-primary' : 'btn-outline-primary'">📖 Чтение</a>
+                <a th:href="@{/parent/library(category='OTHER')}"
+                   class="btn btn-sm"
+                   th:classappend="${selectedCategory == 'OTHER'} ? 'btn-primary' : 'btn-outline-primary'">📌 Другое</a>
+            </div>
+
+            <!-- Empty state -->
+            <div th:if="${#lists.isEmpty(libraryTemplates)}" class="text-center py-5">
+                <i class="bi bi-search display-1 text-muted"></i>
+                <h4 class="mt-3 text-muted">Шаблоны не найдены</h4>
+                <p class="text-muted">Попробуйте другую категорию</p>
+            </div>
+
+            <!-- Templates -->
+            <div th:unless="${#lists.isEmpty(libraryTemplates)}" class="row g-4">
+                <div th:each="t : ${libraryTemplates}" class="col-md-6 col-lg-4">
+                    <div class="card template-card h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="fw-bold mb-0" th:text="${t.title}">Шаблон</h5>
+                                <span class="badge bg-body-secondary text-body" th:if="${t.category}"
+                                      th:text="${t.category == 'STUDY' ? 'Учёба' :
+                                                 t.category == 'HOUSEHOLD' ? 'По дому' :
+                                                 t.category == 'SPORTS' ? 'Спорт' :
+                                                 t.category == 'CREATIVITY' ? 'Творчество' :
+                                                 t.category == 'HYGIENE' ? 'Гигиена' :
+                                                 t.category == 'SOCIAL' ? 'Общение' :
+                                                 t.category == 'READING' ? 'Чтение' :
+                                                 t.category == 'OTHER' ? 'Другое' : t.category}">Категория</span>
+                            </div>
+                            <p class="text-muted small mb-3" th:text="${t.description}" th:if="${t.description}">Описание</p>
+
+                            <div class="d-flex flex-wrap gap-2 mb-3">
+                                <span class="badge"
+                                      th:if="${t.difficulty}"
+                                      th:classappend="${t.difficulty == 'EASY' ? 'bg-success' :
+                                                        t.difficulty == 'NORMAL' ? 'bg-warning text-dark' :
+                                                        t.difficulty == 'HARD' ? 'bg-danger' : 'bg-secondary'}"
+                                      th:text="${t.difficulty}">EASY</span>
+                                <span class="text-success small" th:if="${t.expReward}">
+                                    <i class="bi bi-star-fill me-1"></i><span th:text="${t.expReward}">10</span> EXP
+                                </span>
+                                <span class="text-warning small" th:if="${t.coinsReward}">
+                                    <i class="bi bi-coin me-1"></i><span th:text="${t.coinsReward}">5</span>
+                                </span>
+                            </div>
+
+                            <!-- Sub-items preview -->
+                            <div th:if="${t.subItems != null and !t.subItems.isEmpty()}" class="mb-3">
+                                <small class="text-muted fw-semibold">Подзадачи:</small>
+                                <ul class="list-unstyled mb-0 mt-1">
+                                    <li th:each="sub : ${t.subItems}" class="small text-muted">
+                                        <i class="bi bi-check2-square me-1"></i><span th:text="${sub.title}">Подзадача</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent border-0 pb-3 px-3">
+                            <form th:action="@{/parent/library/copy}" method="post">
+                                <input type="hidden" name="templateId" th:value="${t.id}">
+                                <button type="submit" class="btn btn-outline-primary w-100">
+                                    <i class="bi bi-plus-circle me-1"></i>Добавить к себе
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

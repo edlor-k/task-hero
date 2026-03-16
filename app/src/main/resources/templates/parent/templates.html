@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Шаблоны заданий')}"></head>
+<body>
+<div class="th-layout">
+    <nav th:replace="~{fragments/layout :: sidebar-parent}"></nav>
+    <div class="th-content">
+        <header th:replace="~{fragments/layout :: header}"></header>
+        <main class="th-main">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold mb-0"><i class="bi bi-journal-text me-2"></i>Мои шаблоны</h4>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTemplateModal">
+                    <i class="bi bi-plus-lg me-1"></i>Создать шаблон
+                </button>
+            </div>
+
+            <!-- Messages -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                <i class="bi bi-check-circle me-2"></i><span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Empty state -->
+            <div th:if="${#lists.isEmpty(templates)}" class="text-center py-5">
+                <i class="bi bi-journal-plus display-1 text-muted"></i>
+                <h4 class="mt-3 text-muted">Нет шаблонов</h4>
+                <p class="text-muted">Создайте шаблон задания или выберите из библиотеки</p>
+                <div class="d-flex gap-2 justify-content-center">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTemplateModal">
+                        <i class="bi bi-plus-lg me-1"></i>Создать шаблон
+                    </button>
+                    <a th:href="@{/parent/library}" class="btn btn-outline-primary">
+                        <i class="bi bi-book me-1"></i>Библиотека
+                    </a>
+                </div>
+            </div>
+
+            <!-- Templates grid -->
+            <div th:unless="${#lists.isEmpty(templates)}" class="row g-4">
+                <div th:each="t : ${templates}" class="col-md-6 col-lg-4">
+                    <div class="card template-card h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="fw-bold mb-0" th:text="${t.title}">Шаблон</h5>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-link text-muted p-0" data-bs-toggle="dropdown">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="#" onclick="openEditModal(this)"
+                                               th:attr="data-id=${t.id}, data-title=${t.title}, data-description=${t.description},
+                                                        data-category=${t.category}, data-expReward=${t.expReward},
+                                                        data-coinsReward=${t.coinsReward}, data-difficulty=${t.difficulty}">
+                                            <i class="bi bi-pencil me-2"></i>Редактировать</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <form th:action="@{/parent/templates/{id}/delete(id=${t.id})}" method="post">
+                                                <button type="submit" class="dropdown-item text-danger"
+                                                        onclick="return confirm('Удалить шаблон?')">
+                                                    <i class="bi bi-trash me-2"></i>Удалить
+                                                </button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <p class="text-muted small mb-3" th:text="${t.description}" th:if="${t.description}">Описание</p>
+
+                            <div class="d-flex flex-wrap gap-2 mb-3">
+                                <span class="badge bg-body-secondary text-body" th:if="${t.category}"
+                                      th:text="${t.category == 'STUDY' ? 'Учёба' :
+                                                 t.category == 'HOUSEHOLD' ? 'По дому' :
+                                                 t.category == 'SPORTS' ? 'Спорт' :
+                                                 t.category == 'CREATIVITY' ? 'Творчество' :
+                                                 t.category == 'HYGIENE' ? 'Гигиена' :
+                                                 t.category == 'SOCIAL' ? 'Общение' :
+                                                 t.category == 'READING' ? 'Чтение' :
+                                                 t.category == 'OTHER' ? 'Другое' : t.category}">Категория</span>
+                                <span class="badge"
+                                      th:if="${t.difficulty}"
+                                      th:classappend="${t.difficulty == 'EASY' ? 'bg-success' :
+                                                        t.difficulty == 'NORMAL' ? 'bg-warning text-dark' :
+                                                        t.difficulty == 'HARD' ? 'bg-danger' : 'bg-secondary'}"
+                                      th:text="${t.difficulty}">EASY</span>
+                            </div>
+
+                            <div class="d-flex gap-3">
+                                <span class="text-success" th:if="${t.expReward}">
+                                    <i class="bi bi-star-fill me-1"></i><span th:text="${t.expReward}">10</span> EXP
+                                </span>
+                                <span class="text-warning" th:if="${t.coinsReward}">
+                                    <i class="bi bi-coin me-1"></i><span th:text="${t.coinsReward}">5</span> коинов
+                                </span>
+                            </div>
+
+                            <!-- Sub-items preview -->
+                            <div th:if="${t.subItems != null and !t.subItems.isEmpty()}" class="mt-3 pt-3 border-top">
+                                <small class="text-muted fw-semibold">Подзадачи:</small>
+                                <ul class="list-unstyled mb-0 mt-1">
+                                    <li th:each="sub : ${t.subItems}" class="small text-muted">
+                                        <i class="bi bi-check2-square me-1"></i><span th:text="${sub.title}">Подзадача</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+
+<!-- Modal: Add Template -->
+<div class="modal fade" id="addTemplateModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form th:action="@{/parent/templates/add}" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-journal-plus me-2"></i>Новый шаблон</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Название</label>
+                            <input type="text" class="form-control" name="title" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Описание</label>
+                            <textarea class="form-control" name="description" rows="2"></textarea>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Категория</label>
+                            <select class="form-select" name="category">
+                                <option value="">Без категории</option>
+                                <option value="STUDY">Учёба</option>
+                                <option value="HOUSEHOLD">По дому</option>
+                                <option value="SPORTS">Спорт</option>
+                                <option value="CREATIVITY">Творчество</option>
+                                <option value="HYGIENE">Гигиена</option>
+                                <option value="SOCIAL">Общение</option>
+                                <option value="READING">Чтение</option>
+                                <option value="OTHER">Другое</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">EXP награда</label>
+                            <input type="number" class="form-control" name="expReward" min="0" value="10">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Коины</label>
+                            <input type="number" class="form-control" name="coinsReward" min="0" value="5">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Сложность</label>
+                            <select class="form-select" name="difficulty">
+                                <option value="EASY">Лёгкая</option>
+                                <option value="NORMAL" selected>Средняя</option>
+                                <option value="HARD">Сложная</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Sub-items -->
+                    <div class="mt-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="form-label fw-semibold mb-0">Подзадачи</label>
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="addSubItem('add')">
+                                <i class="bi bi-plus me-1"></i>Добавить
+                            </button>
+                        </div>
+                        <div id="subItemsContainer-add"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>Создать</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Edit Template -->
+<div class="modal fade" id="editTemplateModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form id="editTemplateForm" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-pencil me-2"></i>Редактировать шаблон</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Название</label>
+                            <input type="text" class="form-control" id="editTitle" name="title" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Описание</label>
+                            <textarea class="form-control" id="editDescription" name="description" rows="2"></textarea>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Категория</label>
+                            <select class="form-select" id="editCategory" name="category">
+                                <option value="">Без категории</option>
+                                <option value="STUDY">Учёба</option>
+                                <option value="HOUSEHOLD">По дому</option>
+                                <option value="SPORTS">Спорт</option>
+                                <option value="CREATIVITY">Творчество</option>
+                                <option value="HYGIENE">Гигиена</option>
+                                <option value="SOCIAL">Общение</option>
+                                <option value="READING">Чтение</option>
+                                <option value="OTHER">Другое</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">EXP награда</label>
+                            <input type="number" class="form-control" id="editExpReward" name="expReward" min="0">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Коины</label>
+                            <input type="number" class="form-control" id="editCoinsReward" name="coinsReward" min="0">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Сложность</label>
+                            <select class="form-select" id="editDifficulty" name="difficulty">
+                                <option value="EASY">Лёгкая</option>
+                                <option value="NORMAL">Средняя</option>
+                                <option value="HARD">Сложная</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Sub-items -->
+                    <div class="mt-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="form-label fw-semibold mb-0">Подзадачи</label>
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="addSubItem('edit')">
+                                <i class="bi bi-plus me-1"></i>Добавить
+                            </button>
+                        </div>
+                        <div id="subItemsContainer-edit"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+<script>
+    let subItemCounters = { add: 0, edit: 0 };
+
+    function addSubItem(prefix) {
+        const container = document.getElementById('subItemsContainer-' + prefix);
+        const index = subItemCounters[prefix]++;
+        const div = document.createElement('div');
+        div.className = 'input-group mb-2';
+        div.innerHTML = '<input type="text" class="form-control" name="subItems" placeholder="Название подзадачи" required>' +
+            '<button type="button" class="btn btn-outline-danger" onclick="this.parentElement.remove()"><i class="bi bi-x-lg"></i></button>';
+        container.appendChild(div);
+    }
+
+    function openEditModal(el) {
+        const id = el.getAttribute('data-id');
+        const form = document.getElementById('editTemplateForm');
+        form.action = '/parent/templates/' + id + '/edit';
+        document.getElementById('editTitle').value = el.getAttribute('data-title') || '';
+        document.getElementById('editDescription').value = el.getAttribute('data-description') || '';
+        document.getElementById('editCategory').value = el.getAttribute('data-category') || '';
+        document.getElementById('editExpReward').value = el.getAttribute('data-expReward') || '0';
+        document.getElementById('editCoinsReward').value = el.getAttribute('data-coinsReward') || '0';
+        document.getElementById('editDifficulty').value = el.getAttribute('data-difficulty') || 'NORMAL';
+        document.getElementById('subItemsContainer-edit').innerHTML = '';
+        subItemCounters.edit = 0;
+        new bootstrap.Modal(document.getElementById('editTemplateModal')).show();
+    }
+
+    // === Bug fix #2: Update rewards when difficulty changes ===
+    const difficultyMultipliers = { EASY: 0.8, NORMAL: 1.0, HARD: 1.5 };
+    const baseRewards = { add: { exp: 10, coins: 5 }, edit: { exp: 10, coins: 5 } };
+
+    function updateRewardsForDifficulty(prefix) {
+        let difficultySelect, expInput, coinsInput;
+        if (prefix === 'add') {
+            difficultySelect = document.querySelector('#addTemplateModal select[name="difficulty"]');
+            expInput = document.querySelector('#addTemplateModal input[name="expReward"]');
+            coinsInput = document.querySelector('#addTemplateModal input[name="coinsReward"]');
+        } else {
+            difficultySelect = document.getElementById('editDifficulty');
+            expInput = document.getElementById('editExpReward');
+            coinsInput = document.getElementById('editCoinsReward');
+        }
+        const multiplier = difficultyMultipliers[difficultySelect.value] || 1.0;
+        const base = baseRewards[prefix];
+        expInput.value = Math.round(base.exp * multiplier);
+        coinsInput.value = Math.round(base.coins * multiplier);
+    }
+
+    // Track base rewards when user manually edits them
+    function trackBaseReward(prefix) {
+        let difficultySelect, expInput, coinsInput;
+        if (prefix === 'add') {
+            difficultySelect = document.querySelector('#addTemplateModal select[name="difficulty"]');
+            expInput = document.querySelector('#addTemplateModal input[name="expReward"]');
+            coinsInput = document.querySelector('#addTemplateModal input[name="coinsReward"]');
+        } else {
+            difficultySelect = document.getElementById('editDifficulty');
+            expInput = document.getElementById('editExpReward');
+            coinsInput = document.getElementById('editCoinsReward');
+        }
+        const multiplier = difficultyMultipliers[difficultySelect.value] || 1.0;
+        baseRewards[prefix] = {
+            exp: Math.round(parseInt(expInput.value || '0') / multiplier),
+            coins: Math.round(parseInt(coinsInput.value || '0') / multiplier)
+        };
+    }
+
+    // Attach event listeners for Add modal
+    document.querySelector('#addTemplateModal select[name="difficulty"]').addEventListener('change', function() {
+        updateRewardsForDifficulty('add');
+    });
+    document.querySelector('#addTemplateModal input[name="expReward"]').addEventListener('input', function() {
+        trackBaseReward('add');
+    });
+    document.querySelector('#addTemplateModal input[name="coinsReward"]').addEventListener('input', function() {
+        trackBaseReward('add');
+    });
+
+    // Attach event listeners for Edit modal
+    document.getElementById('editDifficulty').addEventListener('change', function() {
+        updateRewardsForDifficulty('edit');
+    });
+    document.getElementById('editExpReward').addEventListener('input', function() {
+        trackBaseReward('edit');
+    });
+    document.getElementById('editCoinsReward').addEventListener('input', function() {
+        trackBaseReward('edit');
+    });
+
+    // When edit modal opens, capture current base rewards
+    var origOpenEditModal = openEditModal;
+    openEditModal = function(el) {
+        origOpenEditModal(el);
+        var diff = el.getAttribute('data-difficulty') || 'NORMAL';
+        var mult = difficultyMultipliers[diff] || 1.0;
+        baseRewards.edit = {
+            exp: Math.round(parseInt(el.getAttribute('data-expReward') || '0') / mult),
+            coins: Math.round(parseInt(el.getAttribute('data-coinsReward') || '0') / mult)
+        };
+    };
+</script>
+</body>
+</html>

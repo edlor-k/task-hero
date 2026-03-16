@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Вход для ребёнка')}"></head>
+<body class="auth-wrapper d-flex align-items-center justify-content-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5 col-lg-4">
+                <div class="card shadow border-0">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="text-center mb-4">
+                            <a th:href="@{/}" class="text-decoration-none">
+                                <i class="bi bi-trophy-fill text-primary fs-1"></i>
+                                <h4 class="fw-bold text-dark mt-2">TaskHero</h4>
+                            </a>
+                            <p class="text-muted">Вход по токену</p>
+                        </div>
+
+                        <div th:if="${error}" class="alert alert-danger py-2">
+                            <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}">Ошибка</span>
+                        </div>
+
+                        <form th:action="@{/login/child}" method="post">
+                            <div class="mb-4">
+                                <label for="loginToken" class="form-label fw-semibold">Твой секретный токен</label>
+                                <input type="text" class="form-control form-control-lg text-center text-uppercase"
+                                       id="loginToken" name="loginToken"
+                                       placeholder="ABC123XY" required autofocus
+                                       style="letter-spacing: 0.3em; font-weight: 700;">
+                                <div class="form-text text-center">Спроси токен у родителей</div>
+                            </div>
+                            <button type="submit" class="btn btn-success btn-lg w-100 mb-3">
+                                <i class="bi bi-controller me-1"></i>Войти и играть!
+                            </button>
+                            <div class="text-center">
+                                <a th:href="@{/login}" class="text-decoration-none">
+                                    <i class="bi bi-arrow-left me-1"></i>Назад к входу для родителей
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

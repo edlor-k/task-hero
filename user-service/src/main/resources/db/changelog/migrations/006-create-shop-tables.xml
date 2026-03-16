@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="006-create-shop-tables" author="task-hero">
+        <!-- Таблица товаров магазина -->
+        <createTable tableName="shop_items">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="parent_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="varchar(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(512)"/>
+            <column name="price_coins" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="icon_name" type="varchar(64)" defaultValue="bi-gift">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_active" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp"/>
+        </createTable>
+
+        <createIndex tableName="shop_items" indexName="idx_shop_items_parent_id">
+            <column name="parent_id"/>
+        </createIndex>
+
+        <!-- Связь товаров с детьми (для каких детей доступен товар) -->
+        <createTable tableName="shop_item_children">
+            <column name="shop_item_id" type="uuid">
+                <constraints nullable="false"
+                             foreignKeyName="fk_shop_item_children_item"
+                             references="shop_items(id)"/>
+            </column>
+            <column name="child_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="shop_item_children"
+                       columnNames="shop_item_id, child_id"
+                       constraintName="pk_shop_item_children"/>
+
+        <createIndex tableName="shop_item_children" indexName="idx_shop_item_children_child_id">
+            <column name="child_id"/>
+        </createIndex>
+
+        <!-- Таблица покупок -->
+        <createTable tableName="shop_purchases">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="child_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shop_item_id" type="uuid">
+                <constraints nullable="false"
+                             foreignKeyName="fk_shop_purchase_item"
+                             references="shop_items(id)"/>
+            </column>
+            <column name="status" type="varchar(16)" defaultValue="PENDING">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_comment" type="varchar(512)"/>
+            <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reviewed_at" type="timestamp"/>
+            <column name="updated_at" type="timestamp"/>
+        </createTable>
+
+        <createIndex tableName="shop_purchases" indexName="idx_shop_purchases_child_id">
+            <column name="child_id"/>
+        </createIndex>
+
+        <createIndex tableName="shop_purchases" indexName="idx_shop_purchases_status">
+            <column name="status"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

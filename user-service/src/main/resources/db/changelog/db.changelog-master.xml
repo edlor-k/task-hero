@@ -8,4 +8,10 @@
     <include file="db/changelog/migrations/001-create-users-table.xml"/>
     <include file="db/changelog/migrations/002-create-parents-table.xml"/>
     <include file="db/changelog/migrations/003-create-children-table.xml"/>
+    <include file="db/changelog/migrations/004-add-age-to-children.xml"/>
+    <include file="db/changelog/migrations/005-add-difficulty-trajectory.xml"/>
+    <include file="db/changelog/migrations/006-create-shop-tables.xml"/>
+    <include file="db/changelog/migrations/007-add-character-fields.xml"/>
+    <include file="db/changelog/migrations/008-add-marketplace-to-shop.xml"/>
+    <include file="db/changelog/migrations/009-create-level-rewards.xml"/>
 </databaseChangeLog>

@@ -2,6 +2,7 @@ package ru.taskhero.userservice.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import ru.taskhero.common.model.enums.CharacterType;
 import ru.taskhero.userservice.dto.ChildCreateRequestDto;
 import ru.taskhero.userservice.dto.ChildDetailDto;
 import ru.taskhero.userservice.dto.ChildResponseDto;
@@ -56,4 +57,23 @@ public interface ChildService {
      * Проверка, принадлежит ли ребенок родителю.
      */
     boolean isChildBelongsToParent(UUID childId, UUID parentId);
+
+    /**
+     * Начислить награду ребёнку (EXP и коины).
+     *
+     * @param childId ID ребёнка
+     * @param exp     количество EXP для начисления
+     * @param coins   количество коинов для начисления
+     * @return обновленные данные ребёнка
+     */
+    ChildResponseDto addReward(UUID childId, int exp, int coins);
+
+    /**
+     * Выбрать персонажа для ребёнка (при первом входе).
+     *
+     * @param childId       ID ребёнка
+     * @param characterType тип персонажа
+     * @return обновленные данные ребёнка
+     */
+    ChildResponseDto selectCharacter(UUID childId, CharacterType characterType);
 }

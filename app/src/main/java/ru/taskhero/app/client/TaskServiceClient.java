@@ -1,0 +1,152 @@
+package ru.taskhero.app.client;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import ru.taskhero.app.dto.TaskAssignmentDto;
+import ru.taskhero.app.dto.TaskTemplateDto;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+/**
+ * Feign клиент для Task Service.
+ */
+@FeignClient(
+        name = "task-service",
+        url = "${services.task-service.url}"
+)
+public interface TaskServiceClient {
+
+    // ==================== Templates ====================
+
+    /**
+     * Получить список шаблонов родителя.
+     */
+    @GetMapping("/templates")
+    Map<String, Object> getTemplates(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    );
+
+    /**
+     * Получить активные шаблоны.
+     */
+    @GetMapping("/templates/active")
+    List<TaskTemplateDto> getActiveTemplates();
+
+    /**
+     * Получить шаблон по ID.
+     */
+    @GetMapping("/templates/{id}")
+    TaskTemplateDto getTemplateById(@PathVariable("id") UUID id);
+
+    /**
+     * Создать шаблон.
+     */
+    @PostMapping("/templates")
+    TaskTemplateDto createTemplate(@RequestBody Map<String, Object> request);
+
+    /**
+     * Обновить шаблон.
+     */
+    @PutMapping("/templates/{id}")
+    TaskTemplateDto updateTemplate(@PathVariable("id") UUID id, @RequestBody Map<String, Object> request);
+
+    /**
+     * Удалить шаблон.
+     */
+    @DeleteMapping("/templates/{id}")
+    void deleteTemplate(@PathVariable("id") UUID id);
+
+    /**
+     * Получить шаблоны из библиотеки.
+     */
+    @GetMapping("/templates/library")
+    List<TaskTemplateDto> getLibraryTemplates(@RequestParam(required = false) String category);
+
+    /**
+     * Скопировать шаблон из библиотеки.
+     */
+    @PostMapping("/templates/library/{id}/copy")
+    TaskTemplateDto copyFromLibrary(@PathVariable("id") UUID id);
+
+    // ==================== Assignments ====================
+
+    /**
+     * Получить назначения родителя.
+     */
+    @GetMapping("/assignments")
+    Map<String, Object> getAssignments(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    );
+
+    /**
+     * Получить задания на проверку.
+     */
+    @GetMapping("/assignments/pending-review")
+    List<TaskAssignmentDto> getPendingReview();
+
+    /**
+     * Получить задания ребёнка (для родителя).
+     */
+    @GetMapping("/assignments/child/{childId}")
+    List<TaskAssignmentDto> getChildAssignments(
+            @PathVariable("childId") UUID childId,
+            @RequestParam(required = false) String status
+    );
+
+    /**
+     * Назначить задание.
+     */
+    @PostMapping("/assignments")
+    TaskAssignmentDto assignTask(@RequestBody Map<String, Object> request);
+
+    /**
+     * Одобрить задание.
+     */
+    @PostMapping("/assignments/{id}/approve")
+    TaskAssignmentDto approveTask(
+            @PathVariable("id") UUID id,
+            @RequestBody(required = false) Map<String, Object> request
+    );
+
+    /**
+     * Отклонить задание.
+     */
+    @PostMapping("/assignments/{id}/reject")
+    TaskAssignmentDto rejectTask(
+            @PathVariable("id") UUID id,
+            @RequestBody(required = false) Map<String, Object> request
+    );
+
+    // ==================== Child endpoints ====================
+
+    /**
+     * Получить свои задания (для ребёнка).
+     */
+    @GetMapping("/assignments/my")
+    List<TaskAssignmentDto> getMyAssignments(@RequestParam(required = false) String status);
+
+    /**
+     * Получить активные задания (для ребёнка).
+     */
+    @GetMapping("/assignments/my/active")
+    List<TaskAssignmentDto> getMyActiveAssignments();
+
+    /**
+     * Сдать задание.
+     */
+    @PostMapping("/assignments/{id}/submit")
+    TaskAssignmentDto submitTask(
+            @PathVariable("id") UUID id,
+            @RequestBody(required = false) Map<String, Object> request
+    );
+}

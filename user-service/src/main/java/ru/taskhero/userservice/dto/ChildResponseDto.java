@@ -1,6 +1,9 @@
 package ru.taskhero.userservice.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import ru.taskhero.common.model.enums.CharacterType;
+import ru.taskhero.common.model.enums.DifficultyTrajectory;
+
 import java.util.UUID;
 
 /**
@@ -23,5 +26,19 @@ public record ChildResponseDto(
         @Schema(description = "Ссылка на аватар")
         String avatarUrl,
         @Schema(description = "Уникальный токен для входа ребёнка")
-        String loginToken
+        String loginToken,
+        @Schema(description = "Траектория сложности")
+        DifficultyTrajectory difficultyTrajectory,
+        @Schema(description = "Тип персонажа")
+        CharacterType characterType,
+        @Schema(description = "Выбран ли персонаж")
+        boolean characterSelected,
+        @Schema(description = "Путь к изображению персонажа")
+        String characterImagePath,
+        @Schema(description = "EXP до следующего уровня")
+        int expToNextLevel,
+        @Schema(description = "EXP текущего уровня (начало)")
+        int currentLevelExp,
+        @Schema(description = "EXP следующего уровня (порог)")
+        int nextLevelExp
 ) {}

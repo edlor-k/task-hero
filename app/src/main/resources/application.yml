@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: taskhero-app
+
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    encoding: UTF-8
+
+  # Отключаем datasource - app только вызывает API
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+
+server:
+  port: 8080
+  servlet:
+    session:
+      timeout: 30m
+      cookie:
+        name: TASKHERO_SESSION
+
+# API сервисов
+services:
+  user-service:
+    url: ${USER_SERVICE_URL:http://localhost:8081/users}
+  task-service:
+    url: ${TASK_SERVICE_URL:http://localhost:8082/tasks}
+
+logging:
+  level:
+    root: ${LOGGING_LEVEL_ROOT:INFO}
+    ru.taskhero.app: ${LOGGING_LEVEL_RU_TASKHERO:DEBUG}
+    org.springframework.security: ${LOGGING_LEVEL_SPRING_SECURITY:DEBUG}
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

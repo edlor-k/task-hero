@@ -1,0 +1,322 @@
+/* TaskHero Custom Styles — Modern Purple Theme */
+
+:root {
+    --th-primary: #667eea;
+    --th-secondary: #764ba2;
+    --th-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --th-gradient-soft: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+    --th-bg: #f4f6fb;
+    --th-card-radius: 1rem;
+    --th-btn-radius: 0.75rem;
+}
+
+body {
+    background-color: var(--th-bg);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* Hero Section */
+.hero-section {
+    background: var(--th-gradient);
+    min-height: 55vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 80% 50%, rgba(255,255,255,0.12) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+/* Cards */
+.card {
+    border: none;
+    border-radius: var(--th-card-radius);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 12px rgba(102, 126, 234, 0.08);
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.15);
+}
+
+.card-header {
+    border-radius: var(--th-card-radius) var(--th-card-radius) 0 0 !important;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    background: #fff;
+}
+
+.card-footer {
+    border-radius: 0 0 var(--th-card-radius) var(--th-card-radius) !important;
+    border-top: 1px solid rgba(0,0,0,0.06);
+}
+
+/* Template cards */
+.template-card .card-header {
+    background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
+}
+
+/* Badges */
+.badge {
+    font-weight: 600;
+    padding: 0.4em 0.8em;
+    border-radius: 2rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+}
+
+/* Buttons */
+.btn {
+    font-weight: 600;
+    border-radius: var(--th-btn-radius);
+    transition: all 0.2s ease;
+    letter-spacing: 0.01em;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn-primary {
+    background: var(--th-gradient);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #5a72d4 0%, #6a4296 100%);
+}
+
+.btn-outline-primary {
+    color: var(--th-primary);
+    border-color: var(--th-primary);
+}
+
+.btn-outline-primary:hover {
+    background: var(--th-gradient);
+    border-color: transparent;
+}
+
+/* Navbar */
+.navbar {
+    box-shadow: 0 2px 20px rgba(102, 126, 234, 0.2);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: -0.02em;
+}
+
+.navbar .nav-link {
+    font-weight: 500;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem !important;
+    transition: background 0.2s ease;
+}
+
+.navbar .nav-link:hover {
+    background: rgba(255,255,255,0.15);
+}
+
+/* Stats Cards */
+.card.bg-primary,
+.card.bg-success,
+.card.bg-warning,
+.card.bg-info {
+    border: none;
+    transition: transform 0.3s ease;
+}
+
+.card.bg-primary { background: linear-gradient(135deg, #667eea, #764ba2) !important; }
+.card.bg-success { background: linear-gradient(135deg, #11998e, #38ef7d) !important; }
+.card.bg-warning { background: linear-gradient(135deg, #f093fb, #f5576c) !important; }
+.card.bg-info { background: linear-gradient(135deg, #4facfe, #00f2fe) !important; }
+
+.card.bg-primary:hover,
+.card.bg-success:hover,
+.card.bg-warning:hover,
+.card.bg-info:hover {
+    transform: scale(1.04);
+}
+
+/* Forms */
+.form-control, .form-select {
+    border-radius: var(--th-btn-radius);
+    border: 1px solid #dde2f1;
+    padding: 0.6rem 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--th-primary);
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.2);
+}
+
+.form-label {
+    font-weight: 600;
+    color: #4a4a6a;
+    font-size: 0.9rem;
+}
+
+/* Nav pills (tabs) */
+.nav-pills .nav-link {
+    color: var(--th-primary);
+    border-radius: 2rem;
+    padding: 0.5rem 1.25rem;
+    font-weight: 600;
+}
+
+.nav-pills .nav-link.active {
+    background: var(--th-gradient);
+}
+
+/* List Groups */
+.list-group-item-action:hover {
+    background-color: #f0f2ff;
+}
+
+/* Alerts */
+.alert {
+    border-radius: var(--th-card-radius);
+    border: none;
+    font-weight: 500;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+}
+
+/* Footer */
+.footer {
+    font-size: 0.9rem;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.card {
+    animation: fadeInUp 0.35s ease-out;
+}
+
+/* Child Dashboard - Fun Styles */
+.child-theme .card {
+    border-radius: 1.25rem;
+}
+
+.child-theme .btn {
+    border-radius: 2rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero-section {
+        min-height: 45vh;
+        text-align: center;
+    }
+
+    .hero-section h1 {
+        font-size: 2rem;
+    }
+
+    .display-4 {
+        font-size: 2rem;
+    }
+}
+
+/* Token Input Style */
+#loginToken {
+    font-family: 'Courier New', monospace;
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+/* Progress Bar for Level */
+.level-progress {
+    height: 1.5rem;
+    border-radius: 1rem;
+    overflow: hidden;
+    background: #e9ecf5;
+}
+
+.level-progress .progress-bar {
+    font-weight: 600;
+    line-height: 1.5rem;
+    background: var(--th-gradient);
+}
+
+/* Task Status Colors */
+.status-created { color: var(--th-primary); }
+.status-submitted { color: #f5a623; }
+.status-approved { color: #38ef7d; }
+.status-rejected { color: #f5576c; }
+
+/* Coin/EXP Icons */
+.reward-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.65rem;
+    border-radius: 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.reward-exp {
+    background: linear-gradient(135deg, #ffecd2, #fcb69f);
+    color: #7c4a1e;
+}
+
+.reward-coins {
+    background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+    color: #1a3a5c;
+}
+
+/* Page headings */
+h2 {
+    color: #3a3a5c;
+    font-weight: 700;
+}
+
+/* Modal improvements */
+.modal-content {
+    border: none;
+    border-radius: var(--th-card-radius);
+    overflow: hidden;
+}
+
+.modal-header.bg-primary {
+    background: var(--th-gradient) !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--th-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c5cbe8;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--th-primary);
+}

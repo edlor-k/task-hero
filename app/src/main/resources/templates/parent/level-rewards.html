@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Награды за уровни')}"></head>
+<body>
+<div class="th-layout">
+    <nav th:replace="~{fragments/layout :: sidebar-parent}"></nav>
+    <div class="th-content">
+        <header th:replace="~{fragments/layout :: header}"></header>
+        <main class="th-main">
+
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h4 class="fw-bold mb-0"><i class="bi bi-trophy me-2"></i>Награды за уровни</h4>
+                <a th:href="@{/parent/onboarding}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i>Назад к настройке
+                </a>
+            </div>
+
+            <!-- Messages -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                <i class="bi bi-check-circle me-2"></i><span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Child selector (if multiple children) -->
+            <div th:if="${#lists.size(children) > 1}" class="card mb-4">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3">Выберите ребёнка</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a th:each="child : ${children}"
+                           th:href="@{/parent/level-rewards(childId=${child.id})}"
+                           class="btn"
+                           th:classappend="${selectedChild != null && selectedChild.id == child.id} ? 'btn-primary' : 'btn-outline-primary'"
+                           th:text="${child.firstName}">Имя</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content (shown when child selected) -->
+            <div th:if="${selectedChild != null}">
+
+                <!-- Child info -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-0" th:text="${selectedChild.firstName + ' ' + selectedChild.surname}">Имя</h5>
+                                <small class="text-muted" th:text="'Уровень ' + ${selectedChild.level} + ' | ' + ${selectedChild.exp} + ' EXP'">Уровень 1</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Existing rewards -->
+                <div th:if="${rewards != null && !rewards.isEmpty()}" class="card mb-4">
+                    <div class="card-header bg-transparent">
+                        <h5 class="fw-bold mb-0"><i class="bi bi-list-stars me-2"></i>Настроенные награды</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Уровень</th>
+                                        <th>Награда</th>
+                                        <th>Статус</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="reward : ${rewards}">
+                                        <td>
+                                            <span class="badge bg-primary bg-opacity-10 text-primary" th:text="'Ур. ' + ${reward.level()}">2</span>
+                                        </td>
+                                        <td>
+                                            <div class="fw-semibold" th:text="${reward.title()}">Награда</div>
+                                            <small th:if="${reward.description()}" class="text-muted" th:text="${reward.description()}"></small>
+                                            <small th:if="${reward.shopItemTitle()}" class="text-info d-block">
+                                                <i class="bi bi-cart me-1"></i><span th:text="${reward.shopItemTitle()}">Товар</span>
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <span th:if="${!reward.claimed()}" class="badge bg-secondary">Ожидает</span>
+                                            <span th:if="${reward.claimed() && !reward.issued()}" class="badge bg-warning text-dark">Получена</span>
+                                            <span th:if="${reward.issued()}" class="badge bg-success">Выдана</span>
+                                        </td>
+                                        <td>
+                                            <!-- Mark as issued -->
+                                            <form th:if="${reward.claimed() && !reward.issued()}"
+                                                  th:action="@{/parent/level-rewards/{id}/issued(id=${reward.id()})}"
+                                                  method="post" class="d-inline">
+                                                <input type="hidden" name="childId" th:value="${selectedChild.id}"/>
+                                                <button type="submit" class="btn btn-sm btn-success" title="Отметить как выданную">
+                                                    <i class="bi bi-check-lg"></i>
+                                                </button>
+                                            </form>
+                                            <!-- Delete (only unclaimed) -->
+                                            <form th:if="${!reward.claimed()}"
+                                                  th:action="@{/parent/level-rewards/{id}/delete(id=${reward.id()})}"
+                                                  method="post" class="d-inline">
+                                                <input type="hidden" name="childId" th:value="${selectedChild.id}"/>
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Удалить">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add rewards form -->
+                <div class="card mb-4">
+                    <div class="card-header bg-transparent">
+                        <h5 class="fw-bold mb-0"><i class="bi bi-plus-circle me-2"></i>Добавить награды</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Level info table -->
+                        <div th:if="${levelInfoList != null && !levelInfoList.isEmpty()}" class="mb-4">
+                            <h6 class="fw-semibold mb-3">Информация об уровнях</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Уровень</th>
+                                            <th>XP для уровня</th>
+                                            <th title="Простые задания">Лёгких</th>
+                                            <th title="Средние задания">Средних</th>
+                                            <th title="Сложные задания">Сложных</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="info : ${levelInfoList}">
+                                            <td><span class="fw-semibold" th:text="'Ур. ' + ${info.level()}">2</span></td>
+                                            <td th:text="${info.expRequired()}">100</td>
+                                            <td class="text-success" th:text="'~' + ${info.approxEasyTasks()}">~12</td>
+                                            <td class="text-primary" th:text="'~' + ${info.approxNormalTasks()}">~10</td>
+                                            <td class="text-danger" th:text="'~' + ${info.approxHardTasks()}">~7</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <small class="text-muted">Примерное количество заданий учитывает трек сложности ребёнка.</small>
+                        </div>
+
+                        <form th:action="@{/parent/level-rewards/{childId}/add(childId=${selectedChild.id})}" method="post">
+                            <div id="rewardsContainer">
+                                <div class="reward-row row g-2 mb-3 align-items-end" th:each="info : ${levelInfoList}" th:if="${!rewardedLevels.contains(info.level())}">
+                                    <div class="col-md-1">
+                                        <label class="form-label small">Уровень</label>
+                                        <input type="number" class="form-control form-control-sm" name="levels" th:value="${info.level()}" readonly/>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small">Название награды *</label>
+                                        <input type="text" class="form-control form-control-sm" name="titles" placeholder="Например: Поход в кино" maxlength="128"/>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small">Описание</label>
+                                        <input type="text" class="form-control form-control-sm" name="descriptions" placeholder="Подробнее о награде" maxlength="512"/>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small">Из магазина</label>
+                                        <select class="form-select form-select-sm" name="shopItemIds">
+                                            <option value="">-- Свой вариант --</option>
+                                            <option th:each="item : ${shopItems}" th:value="${item.id()}" th:text="${item.title()}">Товар</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-2 mt-3">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-save me-1"></i>Сохранить награды
+                                </button>
+                                <a th:href="@{/parent/level-rewards(childId=${selectedChild.id})}" class="btn btn-outline-secondary">Отмена</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- No child selected -->
+            <div th:if="${selectedChild == null && !children.isEmpty()}" class="text-center py-5">
+                <div class="display-4 mb-3"><i class="bi bi-person-check"></i></div>
+                <h5>Выберите ребёнка для настройки наград</h5>
+                <p class="text-muted">Нажмите на имя ребёнка выше, чтобы начать.</p>
+            </div>
+
+            <!-- No children at all -->
+            <div th:if="${children.isEmpty()}" class="text-center py-5">
+                <div class="display-4 mb-3"><i class="bi bi-person-plus"></i></div>
+                <h5>Сначала добавьте ребёнка</h5>
+                <a th:href="@{/parent/children}" class="btn btn-primary mt-2">
+                    <i class="bi bi-plus-lg me-1"></i>Добавить ребёнка
+                </a>
+            </div>
+
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+<script th:inline="javascript">
+    // Auto-fill title when shop item selected
+    document.querySelectorAll('select[name="shopItemIds"]').forEach(function(select) {
+        select.addEventListener('change', function() {
+            var row = this.closest('.reward-row');
+            var titleInput = row.querySelector('input[name="titles"]');
+            if (this.value && this.selectedOptions[0].text) {
+                titleInput.value = this.selectedOptions[0].text;
+            }
+        });
+    });
+</script>
+</body>
+</html>

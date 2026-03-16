@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="009-create-level-rewards" author="task-hero">
+        <createTable tableName="level_rewards">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="child_id" type="uuid">
+                <constraints nullable="false"
+                             foreignKeyName="fk_level_rewards_child"
+                             references="children(id)"
+                             deleteCascade="true"/>
+            </column>
+            <column name="level" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="varchar(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(512)"/>
+            <column name="shop_item_id" type="uuid">
+                <constraints foreignKeyName="fk_level_rewards_shop_item"
+                             references="shop_items(id)"/>
+            </column>
+            <column name="is_claimed" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="claimed_at" type="timestamp"/>
+            <column name="is_issued" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="issued_at" type="timestamp"/>
+            <column name="is_seen" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp"/>
+        </createTable>
+
+        <addUniqueConstraint tableName="level_rewards"
+                             columnNames="child_id, level"
+                             constraintName="uq_level_rewards_child_level"/>
+
+        <createIndex tableName="level_rewards" indexName="idx_level_rewards_child_id">
+            <column name="child_id"/>
+        </createIndex>
+
+        <createIndex tableName="level_rewards" indexName="idx_level_rewards_child_claimed">
+            <column name="child_id"/>
+            <column name="is_claimed"/>
+        </createIndex>
+
+        <createIndex tableName="level_rewards" indexName="idx_level_rewards_child_seen">
+            <column name="child_id"/>
+            <column name="is_seen"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="008-add-marketplace-column" author="task-hero">
+        <!-- Добавляем флаг маркетплейса в shop_items -->
+        <addColumn tableName="shop_items">
+            <column name="is_marketplace" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <createIndex tableName="shop_items" indexName="idx_shop_items_marketplace">
+            <column name="is_marketplace"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="008-seed-marketplace-items" author="task-hero">
+        <!-- Системный UUID родителя для маркетплейс-товаров (00000000-0000-0000-0000-000000000001) -->
+
+        <insert tableName="shop_items">
+            <column name="id" value="a1000000-0000-0000-0000-000000000001"/>
+            <column name="parent_id" value="00000000-0000-0000-0000-000000000001"/>
+            <column name="title" value="Поход в кино"/>
+            <column name="description" value="Семейный поход в кинотеатр на любой фильм по выбору ребёнка"/>
+            <column name="price_coins" valueNumeric="50"/>
+            <column name="icon_name" value="🎬"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="is_marketplace" valueBoolean="true"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+
+        <insert tableName="shop_items">
+            <column name="id" value="a1000000-0000-0000-0000-000000000002"/>
+            <column name="parent_id" value="00000000-0000-0000-0000-000000000001"/>
+            <column name="title" value="Час видеоигр"/>
+            <column name="description" value="Дополнительный час игры в любимые видеоигры"/>
+            <column name="price_coins" valueNumeric="20"/>
+            <column name="icon_name" value="🎮"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="is_marketplace" valueBoolean="true"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+
+        <insert tableName="shop_items">
+            <column name="id" value="a1000000-0000-0000-0000-000000000003"/>
+            <column name="parent_id" value="00000000-0000-0000-0000-000000000001"/>
+            <column name="title" value="Пицца на ужин"/>
+            <column name="description" value="Заказать пиццу на ужин по выбору ребёнка"/>
+            <column name="price_coins" valueNumeric="35"/>
+            <column name="icon_name" value="🍕"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="is_marketplace" valueBoolean="true"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+
+        <insert tableName="shop_items">
+            <column name="id" value="a1000000-0000-0000-0000-000000000004"/>
+            <column name="parent_id" value="00000000-0000-0000-0000-000000000001"/>
+            <column name="title" value="Поездка в парк развлечений"/>
+            <column name="description" value="Поездка в парк аттракционов или развлекательный центр"/>
+            <column name="price_coins" valueNumeric="100"/>
+            <column name="icon_name" value="🎡"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="is_marketplace" valueBoolean="true"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+
+        <insert tableName="shop_items">
+            <column name="id" value="a1000000-0000-0000-0000-000000000005"/>
+            <column name="parent_id" value="00000000-0000-0000-0000-000000000001"/>
+            <column name="title" value="Новая книга"/>
+            <column name="description" value="Любая книга по выбору ребёнка"/>
+            <column name="price_coins" valueNumeric="40"/>
+            <column name="icon_name" value="📚"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="is_marketplace" valueBoolean="true"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+
+        <insert tableName="shop_items">
+            <column name="id" value="a1000000-0000-0000-0000-000000000006"/>
+            <column name="parent_id" value="00000000-0000-0000-0000-000000000001"/>
+            <column name="title" value="Сладкий десерт"/>
+            <column name="description" value="Любимый десерт или мороженое"/>
+            <column name="price_coins" valueNumeric="15"/>
+            <column name="icon_name" value="🍦"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="is_marketplace" valueBoolean="true"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+
+        <insert tableName="shop_items">
+            <column name="id" value="a1000000-0000-0000-0000-000000000007"/>
+            <column name="parent_id" value="00000000-0000-0000-0000-000000000001"/>
+            <column name="title" value="Поздний отбой"/>
+            <column name="description" value="Разрешение лечь спать на 1 час позже обычного"/>
+            <column name="price_coins" valueNumeric="25"/>
+            <column name="icon_name" value="🌙"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="is_marketplace" valueBoolean="true"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+
+        <insert tableName="shop_items">
+            <column name="id" value="a1000000-0000-0000-0000-000000000008"/>
+            <column name="parent_id" value="00000000-0000-0000-0000-000000000001"/>
+            <column name="title" value="Выбор ужина"/>
+            <column name="description" value="Ребёнок сам выбирает, что будет на ужин"/>
+            <column name="price_coins" valueNumeric="20"/>
+            <column name="icon_name" value="🍽️"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="is_marketplace" valueBoolean="true"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+
+        <insert tableName="shop_items">
+            <column name="id" value="a1000000-0000-0000-0000-000000000009"/>
+            <column name="parent_id" value="00000000-0000-0000-0000-000000000001"/>
+            <column name="title" value="Новая игрушка"/>
+            <column name="description" value="Небольшая игрушка или подарок по выбору ребёнка"/>
+            <column name="price_coins" valueNumeric="80"/>
+            <column name="icon_name" value="🧸"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="is_marketplace" valueBoolean="true"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+
+        <insert tableName="shop_items">
+            <column name="id" value="a1000000-0000-0000-0000-000000000010"/>
+            <column name="parent_id" value="00000000-0000-0000-0000-000000000001"/>
+            <column name="title" value="Совместный поход"/>
+            <column name="description" value="Совместная прогулка или поход в любимое место ребёнка"/>
+            <column name="price_coins" valueNumeric="30"/>
+            <column name="icon_name" value="🚶"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="is_marketplace" valueBoolean="true"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

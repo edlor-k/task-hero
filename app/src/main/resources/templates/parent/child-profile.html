@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Профиль ребёнка')}"></head>
+<body>
+<div class="th-layout">
+    <nav th:replace="~{fragments/layout :: sidebar-parent}"></nav>
+    <div class="th-content">
+        <header th:replace="~{fragments/layout :: header}"></header>
+        <main class="th-main">
+
+            <div class="mb-4">
+                <a th:href="@{/parent/children}" class="text-decoration-none">
+                    <i class="bi bi-arrow-left me-1"></i>Назад к списку
+                </a>
+            </div>
+
+            <!-- Profile Card -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center"
+                                 style="width: 80px; height: 80px; font-size: 2rem;">
+                                <span th:text="${#strings.substring(child.firstName, 0, 1)}">И</span>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <h4 class="fw-bold mb-1" th:text="${child.firstName + ' ' + child.surname}">Имя</h4>
+                            <div class="d-flex flex-wrap gap-2 mb-2">
+                                <span class="badge bg-warning text-dark fs-6" th:text="'Уровень ' + ${child.level}">Уровень 1</span>
+                                <span class="badge bg-primary fs-6" th:if="${child.characterType}" th:text="${child.characterType}">WARRIOR</span>
+                            </div>
+                            <div class="d-flex gap-4 text-muted">
+                                <span><i class="bi bi-star me-1"></i><strong th:text="${child.exp}">0</strong> EXP</span>
+                                <span><i class="bi bi-coin me-1"></i><strong th:text="${child.coins}">0</strong> коинов</span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="bg-body-secondary rounded-3 p-3 text-center">
+                                <small class="text-muted d-block mb-1">Токен для входа</small>
+                                <code class="fs-4 fw-bold" th:text="${child.loginToken}">ABC123XY</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Level Progress -->
+            <div class="card mb-4" th:if="${child.currentLevelExp != null}">
+                <div class="card-body">
+                    <h6 class="fw-semibold mb-3"><i class="bi bi-graph-up me-2"></i>Прогресс уровня</h6>
+                    <div class="d-flex justify-content-between small text-muted mb-1">
+                        <span th:text="${child.currentLevelExp} + ' / ' + ${child.nextLevelExp} + ' EXP'">0 / 100 EXP</span>
+                        <span th:text="${child.nextLevelExp > 0 ? #numbers.formatDecimal(child.currentLevelExp * 100.0 / child.nextLevelExp, 0, 0) + '%' : '0%'}">0%</span>
+                    </div>
+                    <div class="progress" style="height: 10px;">
+                        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated"
+                             th:style="'width: ' + (${child.nextLevelExp > 0 ? child.currentLevelExp * 100.0 / child.nextLevelExp : 0}) + '%'"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assignments -->
+            <div class="card">
+                <div class="card-header bg-transparent">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-list-check me-2"></i>Задания</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div th:if="${#lists.isEmpty(assignments)}" class="text-center py-5 text-muted">
+                        <i class="bi bi-inbox display-4"></i>
+                        <p class="mt-2">Нет заданий</p>
+                    </div>
+                    <div class="table-responsive" th:unless="${#lists.isEmpty(assignments)}">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Задание</th>
+                                <th>Статус</th>
+                                <th>Награда</th>
+                                <th>Дата</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="a : ${assignments}">
+                                <td>
+                                    <div class="fw-semibold" th:text="${a.template?.title}">Задание</div>
+                                    <small class="text-muted" th:text="${a.template?.description}" th:if="${a.template?.description}">Описание</small>
+                                </td>
+                                <td>
+                                    <span class="badge"
+                                          th:classappend="${a.status == 'CREATED' ? 'bg-primary' :
+                                                            a.status == 'SUBMITTED' ? 'bg-warning text-dark' :
+                                                            a.status == 'APPROVED' ? 'bg-success' :
+                                                            a.status == 'REJECTED' ? 'bg-danger' : 'bg-secondary'}"
+                                          th:text="${a.status == 'CREATED' ? 'Назначено' : a.status == 'SUBMITTED' ? 'На проверке' : a.status == 'APPROVED' ? 'Одобрено' : a.status == 'REJECTED' ? 'Отклонено' : a.status}">CREATED</span>
+                                </td>
+                                <td>
+                                    <span class="text-success me-2" th:if="${a.template?.expReward}"><i class="bi bi-star-fill me-1"></i><span th:text="${a.template.expReward}">10</span></span>
+                                    <span class="text-warning" th:if="${a.template?.coinsReward}"><i class="bi bi-coin me-1"></i><span th:text="${a.template.coinsReward}">5</span></span>
+                                </td>
+                                <td>
+                                    <small class="text-muted" th:text="${#temporals.format(a.createdAt, 'dd.MM.yyyy')}">01.01.2025</small>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>
