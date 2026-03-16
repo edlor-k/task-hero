@@ -1,4 +1,4 @@
-task-gamer.ru {
+taskgamer.ru {
     reverse_proxy app:8080
 
     encode gzip
