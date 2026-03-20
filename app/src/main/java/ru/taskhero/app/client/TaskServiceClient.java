@@ -13,6 +13,7 @@ import ru.taskhero.app.dto.TaskTemplateDto;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -76,6 +77,12 @@ public interface TaskServiceClient {
      */
     @PostMapping("/templates/library/{id}/copy")
     TaskTemplateDto copyFromLibrary(@PathVariable("id") UUID id);
+
+    /**
+     * Получить ID скопированных из библиотеки шаблонов.
+     */
+    @GetMapping("/templates/library/copied-ids")
+    Set<UUID> getCopiedLibraryTemplateIds();
 
     // ==================== Assignments ====================
 

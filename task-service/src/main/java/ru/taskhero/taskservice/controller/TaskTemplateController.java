@@ -34,6 +34,7 @@ import ru.taskhero.taskservice.service.TaskTemplateService;
 import ru.taskhero.taskservice.util.SecurityUtils;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -291,5 +292,20 @@ public class TaskTemplateController {
 
         TaskTemplateResponseDto response = templateService.copyFromLibrary(id, parentId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    /**
+     * Получить ID библиотечных шаблонов, уже скопированных текущим родителем.
+     */
+    @GetMapping("/library/copied-ids")
+    @PreAuthorize("hasRole('PARENT')")
+    @Operation(summary = "Получить ID скопированных шаблонов",
+            description = "Возвращает множество ID библиотечных шаблонов, которые родитель уже копировал")
+    public ResponseEntity<Set<UUID>> getCopiedLibraryIds() {
+        UUID parentId = SecurityUtils.getCurrentUserId();
+        log.info("Запрос ID скопированных шаблонов библиотеки, родитель: {}", parentId);
+
+        Set<UUID> copiedIds = templateService.getCopiedLibraryTemplateIds(parentId);
+        return ResponseEntity.ok(copiedIds);
     }
 }

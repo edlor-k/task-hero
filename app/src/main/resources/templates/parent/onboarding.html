@@ -62,7 +62,7 @@
                                 <i class="bi bi-check-circle-fill me-1"></i>Выполнено!
                             </div>
 
-                            <a th:href="@{/parent/level-rewards}" class="btn btn-lg w-100"
+                            <a th:href="@{/parent/level-rewards(onboarding=true)}" class="btn btn-lg w-100"
                                th:classappend="${hasLevelRewards} ? 'btn-outline-success' : 'btn-info'">
                                 <i class="bi bi-trophy me-1"></i>
                                 <span th:text="${hasLevelRewards} ? 'Управление наградами' : 'Настроить награды'">Настроить награды</span>
@@ -90,7 +90,7 @@
                             </div>
 
                             <div th:unless="${hasShopItems}" class="d-flex flex-column gap-2 mb-3">
-                                <a th:href="@{/parent/shop/marketplace}" class="btn btn-warning">
+                                <a th:href="@{/parent/shop/marketplace(onboarding=true)}" class="btn btn-warning">
                                     <i class="bi bi-shop-window me-1"></i>Маркетплейс
                                 </a>
                                 <a th:href="@{/parent/shop}" class="btn btn-outline-warning">
@@ -123,7 +123,7 @@
                             </div>
 
                             <div th:unless="${hasTemplates}" class="d-flex flex-column gap-2 mb-3">
-                                <a th:href="@{/parent/library}" class="btn btn-secondary">
+                                <a th:href="@{/parent/library(onboarding=true)}" class="btn btn-secondary">
                                     <i class="bi bi-book me-1"></i>Библиотека
                                 </a>
                                 <a th:href="@{/parent/templates}" class="btn btn-outline-secondary">

@@ -24,6 +24,7 @@ public record TaskTemplateDto(
         String recurrenceRule,
         String category,
         boolean libraryTemplate,
+        UUID sourceTemplateId,
         List<TaskSubItemDto> subItems,
         Instant createdAt,
         Instant updatedAt

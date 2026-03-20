@@ -8,7 +8,12 @@
         <header th:replace="~{fragments/layout :: header}"></header>
         <main class="th-main">
 
-            <h4 class="fw-bold mb-4"><i class="bi bi-book me-2"></i>Библиотека шаблонов</h4>
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h4 class="fw-bold mb-0"><i class="bi bi-book me-2"></i>Библиотека шаблонов</h4>
+                <a th:if="${onboarding}" th:href="@{/parent/onboarding}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i>Назад к настройке
+                </a>
+            </div>
 
             <!-- Messages -->
             <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
@@ -22,93 +27,165 @@
 
             <!-- Category filter -->
             <div class="d-flex flex-wrap gap-2 mb-4">
-                <a th:href="@{/parent/library}"
+                <a th:href="@{/parent/library(onboarding=${onboarding ?: null})}"
                    class="btn btn-sm"
                    th:classappend="${selectedCategory == null} ? 'btn-primary' : 'btn-outline-primary'">Все</a>
-                <a th:href="@{/parent/library(category='STUDY')}"
+                <a th:href="@{/parent/library(category='STUDY', onboarding=${onboarding ?: null})}"
                    class="btn btn-sm"
                    th:classappend="${selectedCategory == 'STUDY'} ? 'btn-primary' : 'btn-outline-primary'">📚 Учёба</a>
-                <a th:href="@{/parent/library(category='HOUSEHOLD')}"
+                <a th:href="@{/parent/library(category='HOUSEHOLD', onboarding=${onboarding ?: null})}"
                    class="btn btn-sm"
                    th:classappend="${selectedCategory == 'HOUSEHOLD'} ? 'btn-primary' : 'btn-outline-primary'">🏠 По дому</a>
-                <a th:href="@{/parent/library(category='SPORTS')}"
+                <a th:href="@{/parent/library(category='SPORTS', onboarding=${onboarding ?: null})}"
                    class="btn btn-sm"
                    th:classappend="${selectedCategory == 'SPORTS'} ? 'btn-primary' : 'btn-outline-primary'">🏆 Спорт</a>
-                <a th:href="@{/parent/library(category='CREATIVITY')}"
+                <a th:href="@{/parent/library(category='CREATIVITY', onboarding=${onboarding ?: null})}"
                    class="btn btn-sm"
                    th:classappend="${selectedCategory == 'CREATIVITY'} ? 'btn-primary' : 'btn-outline-primary'">🎨 Творчество</a>
-                <a th:href="@{/parent/library(category='HYGIENE')}"
+                <a th:href="@{/parent/library(category='HYGIENE', onboarding=${onboarding ?: null})}"
                    class="btn btn-sm"
                    th:classappend="${selectedCategory == 'HYGIENE'} ? 'btn-primary' : 'btn-outline-primary'">💧 Гигиена</a>
-                <a th:href="@{/parent/library(category='SOCIAL')}"
+                <a th:href="@{/parent/library(category='SOCIAL', onboarding=${onboarding ?: null})}"
                    class="btn btn-sm"
                    th:classappend="${selectedCategory == 'SOCIAL'} ? 'btn-primary' : 'btn-outline-primary'">🤝 Общение</a>
-                <a th:href="@{/parent/library(category='READING')}"
+                <a th:href="@{/parent/library(category='READING', onboarding=${onboarding ?: null})}"
                    class="btn btn-sm"
                    th:classappend="${selectedCategory == 'READING'} ? 'btn-primary' : 'btn-outline-primary'">📖 Чтение</a>
-                <a th:href="@{/parent/library(category='OTHER')}"
+                <a th:href="@{/parent/library(category='OTHER', onboarding=${onboarding ?: null})}"
                    class="btn btn-sm"
                    th:classappend="${selectedCategory == 'OTHER'} ? 'btn-primary' : 'btn-outline-primary'">📌 Другое</a>
             </div>
 
-            <!-- Empty state -->
-            <div th:if="${#lists.isEmpty(libraryTemplates)}" class="text-center py-5">
-                <i class="bi bi-search display-1 text-muted"></i>
-                <h4 class="mt-3 text-muted">Шаблоны не найдены</h4>
-                <p class="text-muted">Попробуйте другую категорию</p>
-            </div>
+            <!-- Tabs: Available / Added -->
+            <ul class="nav nav-tabs mb-4" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="available-tab" data-bs-toggle="tab" data-bs-target="#available-pane"
+                            type="button" role="tab" aria-controls="available-pane" aria-selected="true">
+                        Доступные
+                        <span class="badge bg-primary ms-1" th:text="${#lists.size(libraryTemplates)}">0</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="added-tab" data-bs-toggle="tab" data-bs-target="#added-pane"
+                            type="button" role="tab" aria-controls="added-pane" aria-selected="false">
+                        Добавленные
+                        <span class="badge bg-success ms-1" th:text="${#lists.size(addedTemplates)}">0</span>
+                    </button>
+                </li>
+            </ul>
 
-            <!-- Templates -->
-            <div th:unless="${#lists.isEmpty(libraryTemplates)}" class="row g-4">
-                <div th:each="t : ${libraryTemplates}" class="col-md-6 col-lg-4">
-                    <div class="card template-card h-100">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h5 class="fw-bold mb-0" th:text="${t.title}">Шаблон</h5>
-                                <span class="badge bg-body-secondary text-body" th:if="${t.category}"
-                                      th:text="${t.category == 'STUDY' ? 'Учёба' :
-                                                 t.category == 'HOUSEHOLD' ? 'По дому' :
-                                                 t.category == 'SPORTS' ? 'Спорт' :
-                                                 t.category == 'CREATIVITY' ? 'Творчество' :
-                                                 t.category == 'HYGIENE' ? 'Гигиена' :
-                                                 t.category == 'SOCIAL' ? 'Общение' :
-                                                 t.category == 'READING' ? 'Чтение' :
-                                                 t.category == 'OTHER' ? 'Другое' : t.category}">Категория</span>
-                            </div>
-                            <p class="text-muted small mb-3" th:text="${t.description}" th:if="${t.description}">Описание</p>
+            <div class="tab-content">
+                <!-- Available templates -->
+                <div class="tab-pane fade show active" id="available-pane" role="tabpanel" aria-labelledby="available-tab">
+                    <!-- Empty state -->
+                    <div th:if="${#lists.isEmpty(libraryTemplates)}" class="text-center py-5">
+                        <i class="bi bi-search display-1 text-muted"></i>
+                        <h4 class="mt-3 text-muted">Шаблоны не найдены</h4>
+                        <p class="text-muted">Попробуйте другую категорию или посмотрите вкладку «Добавленные»</p>
+                    </div>
 
-                            <div class="d-flex flex-wrap gap-2 mb-3">
-                                <span class="badge"
-                                      th:if="${t.difficulty}"
-                                      th:classappend="${t.difficulty == 'EASY' ? 'bg-success' :
-                                                        t.difficulty == 'NORMAL' ? 'bg-warning text-dark' :
-                                                        t.difficulty == 'HARD' ? 'bg-danger' : 'bg-secondary'}"
-                                      th:text="${t.difficulty}">EASY</span>
-                                <span class="text-success small" th:if="${t.expReward}">
-                                    <i class="bi bi-star-fill me-1"></i><span th:text="${t.expReward}">10</span> EXP
-                                </span>
-                                <span class="text-warning small" th:if="${t.coinsReward}">
-                                    <i class="bi bi-coin me-1"></i><span th:text="${t.coinsReward}">5</span>
-                                </span>
-                            </div>
+                    <!-- Templates -->
+                    <div th:unless="${#lists.isEmpty(libraryTemplates)}" class="row g-4">
+                        <div th:each="t : ${libraryTemplates}" class="col-md-6 col-lg-4">
+                            <div class="card template-card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="fw-bold mb-0" th:text="${t.title}">Шаблон</h5>
+                                        <span class="badge bg-body-secondary text-body" th:if="${t.category}"
+                                              th:text="${t.category == 'STUDY' ? 'Учёба' :
+                                                         t.category == 'HOUSEHOLD' ? 'По дому' :
+                                                         t.category == 'SPORTS' ? 'Спорт' :
+                                                         t.category == 'CREATIVITY' ? 'Творчество' :
+                                                         t.category == 'HYGIENE' ? 'Гигиена' :
+                                                         t.category == 'SOCIAL' ? 'Общение' :
+                                                         t.category == 'READING' ? 'Чтение' :
+                                                         t.category == 'OTHER' ? 'Другое' : t.category}">Категория</span>
+                                    </div>
+                                    <p class="text-muted small mb-3" th:text="${t.description}" th:if="${t.description}">Описание</p>
 
-                            <!-- Sub-items preview -->
-                            <div th:if="${t.subItems != null and !t.subItems.isEmpty()}" class="mb-3">
-                                <small class="text-muted fw-semibold">Подзадачи:</small>
-                                <ul class="list-unstyled mb-0 mt-1">
-                                    <li th:each="sub : ${t.subItems}" class="small text-muted">
-                                        <i class="bi bi-check2-square me-1"></i><span th:text="${sub.title}">Подзадача</span>
-                                    </li>
-                                </ul>
+                                    <div class="d-flex flex-wrap gap-2 mb-3">
+                                        <span class="badge"
+                                              th:if="${t.difficulty}"
+                                              th:classappend="${t.difficulty == 'EASY' ? 'bg-success' :
+                                                                t.difficulty == 'NORMAL' ? 'bg-warning text-dark' :
+                                                                t.difficulty == 'HARD' ? 'bg-danger' : 'bg-secondary'}"
+                                              th:text="${t.difficulty}">EASY</span>
+                                        <span class="text-success small" th:if="${t.expReward}">
+                                            <i class="bi bi-star-fill me-1"></i><span th:text="${t.expReward}">10</span> EXP
+                                        </span>
+                                        <span class="text-warning small" th:if="${t.coinsReward}">
+                                            <i class="bi bi-coin me-1"></i><span th:text="${t.coinsReward}">5</span>
+                                        </span>
+                                    </div>
+
+                                    <!-- Sub-items preview -->
+                                    <div th:if="${t.subItems != null and !t.subItems.isEmpty()}" class="mb-3">
+                                        <small class="text-muted fw-semibold">Подзадачи:</small>
+                                        <ul class="list-unstyled mb-0 mt-1">
+                                            <li th:each="sub : ${t.subItems}" class="small text-muted">
+                                                <i class="bi bi-check2-square me-1"></i><span th:text="${sub.title}">Подзадача</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-transparent border-0 pb-3 px-3">
+                                    <form th:action="@{/parent/library/copy}" method="post">
+                                        <input type="hidden" name="templateId" th:value="${t.id}">
+                                        <input type="hidden" name="onboarding" th:value="${onboarding}">
+                                        <button type="submit" class="btn btn-outline-primary w-100">
+                                            <i class="bi bi-plus-circle me-1"></i>Добавить к себе
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
-                        <div class="card-footer bg-transparent border-0 pb-3 px-3">
-                            <form th:action="@{/parent/library/copy}" method="post">
-                                <input type="hidden" name="templateId" th:value="${t.id}">
-                                <button type="submit" class="btn btn-outline-primary w-100">
-                                    <i class="bi bi-plus-circle me-1"></i>Добавить к себе
-                                </button>
-                            </form>
+                    </div>
+                </div>
+
+                <!-- Added templates -->
+                <div class="tab-pane fade" id="added-pane" role="tabpanel" aria-labelledby="added-tab">
+                    <div th:if="${#lists.isEmpty(addedTemplates)}" class="text-center py-5">
+                        <i class="bi bi-clipboard-check display-1 text-muted"></i>
+                        <h4 class="mt-3 text-muted">Нет добавленных шаблонов</h4>
+                        <p class="text-muted">Добавляйте шаблоны из вкладки «Доступные»</p>
+                    </div>
+
+                    <div th:unless="${#lists.isEmpty(addedTemplates)}" class="row g-4">
+                        <div th:each="t : ${addedTemplates}" class="col-md-6 col-lg-4">
+                            <div class="card template-card h-100 border-success">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="fw-bold mb-0" th:text="${t.title}">Шаблон</h5>
+                                        <span class="badge bg-success"><i class="bi bi-check-lg me-1"></i>Добавлен</span>
+                                    </div>
+                                    <p class="text-muted small mb-3" th:text="${t.description}" th:if="${t.description}">Описание</p>
+
+                                    <div class="d-flex flex-wrap gap-2 mb-3">
+                                        <span class="badge"
+                                              th:if="${t.difficulty}"
+                                              th:classappend="${t.difficulty == 'EASY' ? 'bg-success' :
+                                                                t.difficulty == 'NORMAL' ? 'bg-warning text-dark' :
+                                                                t.difficulty == 'HARD' ? 'bg-danger' : 'bg-secondary'}"
+                                              th:text="${t.difficulty}">EASY</span>
+                                        <span class="text-success small" th:if="${t.expReward}">
+                                            <i class="bi bi-star-fill me-1"></i><span th:text="${t.expReward}">10</span> EXP
+                                        </span>
+                                        <span class="text-warning small" th:if="${t.coinsReward}">
+                                            <i class="bi bi-coin me-1"></i><span th:text="${t.coinsReward}">5</span>
+                                        </span>
+                                    </div>
+
+                                    <!-- Sub-items preview -->
+                                    <div th:if="${t.subItems != null and !t.subItems.isEmpty()}" class="mb-3">
+                                        <small class="text-muted fw-semibold">Подзадачи:</small>
+                                        <ul class="list-unstyled mb-0 mt-1">
+                                            <li th:each="sub : ${t.subItems}" class="small text-muted">
+                                                <i class="bi bi-check2-square me-1"></i><span th:text="${sub.title}">Подзадача</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

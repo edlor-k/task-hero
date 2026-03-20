@@ -12,6 +12,16 @@
           <package value="ru.taskhero.common.config" />
         </packages>
       </persistence-unit>
+      <persistence-unit moduleName="app" name="Default">
+        <packages>
+          <package value="ru.taskhero.app" />
+        </packages>
+      </persistence-unit>
+      <persistence-unit moduleName="task-service" name="Default">
+        <packages>
+          <package value="ru.taskhero.taskservice" />
+        </packages>
+      </persistence-unit>
     </persistence-units>
   </component>
 </project>

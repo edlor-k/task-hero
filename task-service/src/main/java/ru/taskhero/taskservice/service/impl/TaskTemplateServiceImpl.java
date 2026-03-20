@@ -21,7 +21,9 @@ import ru.taskhero.taskservice.service.TaskTemplateService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -199,6 +201,7 @@ public class TaskTemplateServiceImpl implements TaskTemplateService {
         copy.setLibraryTemplate(false);
         copy.setCategory(libraryTemplate.getCategory());
         copy.setRecurrenceRule(libraryTemplate.getRecurrenceRule());
+        copy.setSourceTemplateId(libraryTemplateId);
 
         copy = templateRepository.save(copy);
 
@@ -218,6 +221,17 @@ public class TaskTemplateServiceImpl implements TaskTemplateService {
 
         log.info("Шаблон скопирован из библиотеки, новый ID: {}", copy.getId());
         return templateMapper.toDto(copy);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @LogMethod("library-get-copied-ids")
+    public Set<UUID> getCopiedLibraryTemplateIds(UUID parentId) {
+        log.debug("Получение ID скопированных шаблонов библиотеки для родителя: {}", parentId);
+        return templateRepository.findAllByParentIdAndSourceTemplateIdIsNotNull(parentId)
+                .stream()
+                .map(TaskTemplate::getSourceTemplateId)
+                .collect(Collectors.toSet());
     }
 
     /**

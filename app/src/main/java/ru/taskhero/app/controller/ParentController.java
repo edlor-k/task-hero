@@ -57,7 +57,7 @@ public class ParentController {
                 hasLevelRewards = children.stream().allMatch(child -> {
                     try {
                         List<LevelRewardDto> rewards = userServiceClient.getLevelRewards(child.id());
-                        return rewards != null && rewards.size() >= 10;
+                        return rewards != null && rewards.size() >= 9;
                     } catch (Exception e) {
                         return false;
                     }
@@ -104,7 +104,7 @@ public class ParentController {
                     hasLevelRewards = children.stream().allMatch(child -> {
                         try {
                             List<LevelRewardDto> rewards = userServiceClient.getLevelRewards(child.id());
-                            return rewards != null && rewards.size() >= 10;
+                            return rewards != null && rewards.size() >= 9;
                         } catch (Exception ex) {
                             return false;
                         }
@@ -363,11 +363,24 @@ public class ParentController {
      * Страница библиотеки заданий.
      */
     @GetMapping("/library")
-    public String libraryPage(@RequestParam(required = false) String category, Model model) {
+    public String libraryPage(@RequestParam(required = false) String category,
+                              @RequestParam(required = false) boolean onboarding,
+                              Model model) {
         try {
             List<TaskTemplateDto> libraryTemplates = taskServiceClient.getLibraryTemplates(category);
-            model.addAttribute("libraryTemplates", libraryTemplates);
+            Set<UUID> copiedIds = taskServiceClient.getCopiedLibraryTemplateIds();
+
+            List<TaskTemplateDto> availableTemplates = libraryTemplates.stream()
+                    .filter(t -> !copiedIds.contains(t.id()))
+                    .toList();
+            List<TaskTemplateDto> addedTemplates = libraryTemplates.stream()
+                    .filter(t -> copiedIds.contains(t.id()))
+                    .toList();
+
+            model.addAttribute("libraryTemplates", availableTemplates);
+            model.addAttribute("addedTemplates", addedTemplates);
             model.addAttribute("selectedCategory", category);
+            model.addAttribute("onboarding", onboarding);
         } catch (Exception e) {
             log.error("Error loading library: {}", e.getMessage());
             model.addAttribute("error", "Ошибка загрузки библиотеки");
@@ -381,6 +394,7 @@ public class ParentController {
     @PostMapping("/library/copy")
     public String copyFromLibrary(
             @RequestParam UUID templateId,
+            @RequestParam(required = false) boolean onboarding,
             RedirectAttributes redirectAttributes
     ) {
         try {
@@ -390,7 +404,7 @@ public class ParentController {
             log.error("Error copying from library: {}", e.getMessage());
             redirectAttributes.addFlashAttribute("error", "Ошибка копирования шаблона");
         }
-        return "redirect:/parent/library";
+        return "redirect:/parent/library" + (onboarding ? "?onboarding=true" : "");
     }
 
     // ==================== Assignments ====================
@@ -698,10 +712,13 @@ public class ParentController {
      * Страница управления наградами за уровни.
      */
     @GetMapping("/level-rewards")
-    public String levelRewards(@RequestParam(required = false) UUID childId, Model model) {
+    public String levelRewards(@RequestParam(required = false) UUID childId,
+                               @RequestParam(required = false) boolean onboarding,
+                               Model model) {
         try {
             List<ChildDto> children = userServiceClient.getChildren();
             model.addAttribute("children", children);
+            model.addAttribute("onboarding", onboarding);
 
             // Auto-select first child if only one, or use provided childId
             ChildDto selectedChild = null;
@@ -834,12 +851,14 @@ public class ParentController {
      * Страница маркетплейса готовых наград.
      */
     @GetMapping("/shop/marketplace")
-    public String marketplace(Model model) {
+    public String marketplace(@RequestParam(required = false) boolean onboarding,
+                              Model model) {
         try {
             List<ShopItemDto> marketplaceItems = userServiceClient.getMarketplaceItems();
             List<ChildDto> children = userServiceClient.getChildren();
             model.addAttribute("marketplaceItems", marketplaceItems);
             model.addAttribute("children", children);
+            model.addAttribute("onboarding", onboarding);
         } catch (Exception e) {
             log.error("Error loading marketplace: {}", e.getMessage());
             model.addAttribute("error", "Ошибка загрузки маркетплейса");
@@ -854,6 +873,7 @@ public class ParentController {
     public String copyFromMarketplace(
             @PathVariable UUID id,
             @RequestParam List<UUID> childIds,
+            @RequestParam(required = false) boolean onboarding,
             RedirectAttributes redirectAttributes
     ) {
         try {
@@ -866,6 +886,6 @@ public class ParentController {
             String msg = e.getMessage() != null ? e.getMessage() : "Ошибка добавления награды";
             redirectAttributes.addFlashAttribute("error", msg);
         }
-        return "redirect:/parent/shop/marketplace";
+        return "redirect:/parent/shop/marketplace" + (onboarding ? "?onboarding=true" : "");
     }
 }

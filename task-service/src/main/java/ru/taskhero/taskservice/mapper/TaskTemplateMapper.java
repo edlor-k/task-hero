@@ -45,6 +45,7 @@ public interface TaskTemplateMapper {
     @Mapping(target = "coinsReward", defaultValue = "5")
     @Mapping(target = "repeatable", defaultValue = "false")
     @Mapping(target = "libraryTemplate", constant = "false")
+    @Mapping(target = "sourceTemplateId", ignore = true)
     @Mapping(target = "difficulty", defaultExpression = "java(ru.taskhero.common.model.enums.TaskDifficulty.NORMAL)")
     TaskTemplate toEntity(TaskTemplateCreateRequest request);
 
@@ -58,6 +59,7 @@ public interface TaskTemplateMapper {
     @Mapping(target = "assignments", ignore = true)
     @Mapping(target = "subItems", ignore = true)
     @Mapping(target = "libraryTemplate", ignore = true)
+    @Mapping(target = "sourceTemplateId", ignore = true)
     void updateFromRequest(TaskTemplateUpdateRequest request, @MappingTarget TaskTemplate entity);
 
     /**

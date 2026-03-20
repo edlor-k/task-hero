@@ -11,4 +11,5 @@
     <include file="db/changelog/migrations/004-add-category-subitems-rrule.xml"/>
     <include file="db/changelog/migrations/005-seed-library-templates.xml"/>
     <include file="db/changelog/migrations/006-fix-library-templates-encoding.xml"/>
+    <include file="db/changelog/migrations/007-add-source-template-id.xml"/>
 </databaseChangeLog>

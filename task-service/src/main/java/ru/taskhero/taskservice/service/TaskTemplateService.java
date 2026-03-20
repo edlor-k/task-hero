@@ -8,6 +8,7 @@ import ru.taskhero.taskservice.dto.TaskTemplateResponseDto;
 import ru.taskhero.taskservice.dto.TaskTemplateUpdateRequest;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -90,4 +91,12 @@ public interface TaskTemplateService {
      * @return скопированный шаблон
      */
     TaskTemplateResponseDto copyFromLibrary(UUID libraryTemplateId, UUID parentId);
+
+    /**
+     * Получить ID библиотечных шаблонов, уже скопированных родителем.
+     *
+     * @param parentId ID родителя
+     * @return множество ID исходных библиотечных шаблонов
+     */
+    Set<UUID> getCopiedLibraryTemplateIds(UUID parentId);
 }

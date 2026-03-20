@@ -141,6 +141,12 @@ public class TaskTemplate extends BaseEntity {
     private boolean active = true;
 
     /**
+     * ID исходного шаблона библиотеки, из которого был скопирован этот шаблон.
+     */
+    @Column(name = "source_template_id")
+    private UUID sourceTemplateId;
+
+    /**
      * Назначения заданий на основе этого шаблона.
      */
     @OneToMany(mappedBy = "template")
