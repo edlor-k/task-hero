@@ -16,4 +16,5 @@
     <include file="db/changelog/migrations/009-create-level-rewards.xml"/>
     <include file="db/changelog/migrations/010-create-audit-log.xml"/>
     <include file="db/changelog/migrations/011-seed-master-admin.xml"/>
+    <include file="db/changelog/migrations/012-fix-admin-email.xml"/>
 </databaseChangeLog>

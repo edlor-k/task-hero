@@ -35,11 +35,11 @@ public class MasterAdminInitializer implements ApplicationRunner {
             return;
         }
 
-        userRepository.findByEmail("admin").ifPresent(admin -> {
+        userRepository.findByEmail("admin@taskhero.local").ifPresent(admin -> {
             String encoded = passwordEncoder.encode(adminPassword);
             admin.setPassword(encoded);
             userRepository.save(admin);
-            log.info("Пароль мастер-администратора (admin) обновлён из переменной окружения.");
+            log.info("Пароль мастер-администратора (admin@taskhero.local) обновлён из переменной окружения.");
         });
     }
 }
