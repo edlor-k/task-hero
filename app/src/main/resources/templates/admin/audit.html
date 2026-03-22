@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Журнал аудита')}"></head>
+<body>
+<div class="th-layout">
+    <nav th:replace="~{fragments/layout :: sidebar-admin}"></nav>
+    <div class="th-content">
+        <header th:replace="~{fragments/layout :: header}"></header>
+        <main class="th-main">
+
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h4 class="fw-bold mb-0"><i class="bi bi-journal-text me-2"></i>Журнал аудита</h4>
+            </div>
+
+            <!-- Messages -->
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Audit log table -->
+            <div class="card">
+                <div class="card-body">
+                    <div th:if="${auditLogs == null || #lists.isEmpty(auditLogs)}" class="text-center py-4">
+                        <p class="text-muted mb-0">Нет записей в журнале</p>
+                    </div>
+                    <div class="table-responsive" th:unless="${auditLogs == null || #lists.isEmpty(auditLogs)}">
+                        <table class="table align-middle mb-0">
+                            <thead>
+                            <tr>
+                                <th>Время</th>
+                                <th>Администратор</th>
+                                <th>Действие</th>
+                                <th>Тип объекта</th>
+                                <th>Детали</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="log : ${auditLogs}">
+                                <td class="text-nowrap">
+                                    <small th:text="${log['createdAt'] != null ? #strings.substring(log['createdAt'], 0, 19).replace('T', ' ') : '-'}">-</small>
+                                </td>
+                                <td>
+                                    <small class="fw-semibold" th:text="${log['adminEmail']}">admin</small>
+                                </td>
+                                <td>
+                                    <span class="badge"
+                                          th:classappend="${log['action'].toString().contains('BLOCK') ? 'bg-warning text-dark' :
+                                                          (log['action'].toString().contains('DELETE') ? 'bg-danger' :
+                                                          (log['action'].toString().contains('CREATE') ? 'bg-success' : 'bg-secondary'))}"
+                                          th:text="${log['action']}">ACTION</span>
+                                </td>
+                                <td>
+                                    <small th:text="${log['targetType']}">-</small>
+                                </td>
+                                <td>
+                                    <small class="text-muted" th:text="${log['details']}">-</small>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <nav th:if="${totalPages != null && totalPages > 1}" class="mt-3">
+                        <ul class="pagination pagination-sm justify-content-center mb-0">
+                            <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+                                <a class="page-link" th:href="@{/admin/audit(page=${currentPage - 1})}">«</a>
+                            </li>
+                            <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}" class="page-item"
+                                th:classappend="${i == currentPage ? 'active' : ''}">
+                                <a class="page-link" th:href="@{/admin/audit(page=${i})}" th:text="${i + 1}">1</a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
+                                <a class="page-link" th:href="@{/admin/audit(page=${currentPage + 1})}">»</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

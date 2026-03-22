@@ -24,6 +24,10 @@ jwt:
   secret: ${JWT_SECRET:taskhero-super-secret-key-change-me-in-production-must-be-at-least-256-bits-long}
   expiration: 86400000 # 24 hours in milliseconds
 
+# Master Admin
+admin:
+  password: ${ADMIN_PASSWORD:}
+
 server:
   port: 8081
   servlet:

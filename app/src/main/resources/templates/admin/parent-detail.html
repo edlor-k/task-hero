@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Профиль родителя')}"></head>
+<body>
+<div class="th-layout">
+    <nav th:replace="~{fragments/layout :: sidebar-admin}"></nav>
+    <div class="th-content">
+        <header th:replace="~{fragments/layout :: header}"></header>
+        <main class="th-main">
+
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div class="d-flex align-items-center gap-2">
+                    <a th:href="@{/admin/parents}" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i>
+                    </a>
+                    <h4 class="fw-bold mb-0"><i class="bi bi-person-badge-fill me-2"></i>Профиль родителя</h4>
+                </div>
+            </div>
+
+            <!-- Messages -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                <i class="bi bi-check-circle me-2"></i><span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div th:if="${parent != null}">
+                <div class="row g-4">
+                    <!-- Parent Info -->
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="fw-bold mb-3">Информация</h5>
+                                <form method="post" th:action="@{/admin/parents/{id}/edit(id=${parent.id()})}">
+                                    <div class="mb-3">
+                                        <label class="form-label">Имя</label>
+                                        <input type="text" name="firstName" class="form-control"
+                                               th:value="${parent.firstName()}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Фамилия</label>
+                                        <input type="text" name="surname" class="form-control"
+                                               th:value="${parent.surname()}" required>
+                                    </div>
+                                    <div class="mb-3" th:if="${parent.user() != null}">
+                                        <label class="form-label">Email</label>
+                                        <input type="text" class="form-control" th:value="${parent.user().email()}" disabled>
+                                    </div>
+                                    <div class="mb-3" th:if="${parent.user() != null}">
+                                        <label class="form-label">Статус</label>
+                                        <span class="badge ms-2"
+                                              th:classappend="${parent.user().active() ? 'bg-success' : 'bg-secondary'}"
+                                              th:text="${parent.user().active() ? 'Активен' : 'Заблокирован'}">Status</span>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-check-lg me-1"></i>Сохранить
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Children -->
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="fw-bold mb-3">Дети</h5>
+                                <div th:if="${parent.children() == null || #lists.isEmpty(parent.children())}" class="text-center py-3">
+                                    <p class="text-muted mb-0">Нет добавленных детей</p>
+                                </div>
+                                <div class="table-responsive" th:unless="${parent.children() == null || #lists.isEmpty(parent.children())}">
+                                    <table class="table table-sm align-middle mb-0">
+                                        <thead>
+                                        <tr>
+                                            <th>Имя</th>
+                                            <th>Уровень</th>
+                                            <th>EXP</th>
+                                            <th>Коины</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr th:each="child : ${parent.children()}">
+                                            <td class="fw-semibold" th:text="${child['firstName'] + ' ' + child['surname']}">Имя</td>
+                                            <td><span class="badge bg-primary bg-opacity-10 text-primary" th:text="'Ур. ' + ${child['level']}">1</span></td>
+                                            <td th:text="${child['exp']}">0</td>
+                                            <td th:text="${child['coins']}">0</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

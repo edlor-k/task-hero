@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Статистика')}"></head>
+<body>
+<div class="th-layout">
+    <nav th:replace="~{fragments/layout :: sidebar-admin}"></nav>
+    <div class="th-content">
+        <header th:replace="~{fragments/layout :: header}"></header>
+        <main class="th-main">
+
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h4 class="fw-bold mb-0"><i class="bi bi-bar-chart-fill me-2"></i>Статистика</h4>
+            </div>
+
+            <!-- Messages -->
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div th:if="${stats != null}">
+                <!-- Main stats -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                                        <i class="bi bi-people-fill"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="mb-0 fw-bold" th:text="${stats.totalUsers()}">0</h3>
+                                        <small class="text-muted">Всего пользователей</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="stat-icon bg-info bg-opacity-10 text-info">
+                                        <i class="bi bi-person-badge-fill"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="mb-0 fw-bold" th:text="${stats.totalParents()}">0</h3>
+                                        <small class="text-muted">Родителей</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                                        <i class="bi bi-person-hearts"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="mb-0 fw-bold" th:text="${stats.totalChildren()}">0</h3>
+                                        <small class="text-muted">Детей</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="stat-icon bg-success bg-opacity-10 text-success">
+                                        <i class="bi bi-check-circle-fill"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="mb-0 fw-bold" th:text="${stats.activeUsers()}">0</h3>
+                                        <small class="text-muted">Активных</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity overview -->
+                <div class="row g-4">
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="fw-bold mb-3">Активность</h5>
+                                <div class="d-flex align-items-center justify-content-between py-2 border-bottom">
+                                    <span class="text-muted">Активные пользователи</span>
+                                    <span class="fw-bold text-success" th:text="${stats.activeUsers()}">0</span>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-between py-2">
+                                    <span class="text-muted">Заблокированные пользователи</span>
+                                    <span class="fw-bold text-danger" th:text="${stats.inactiveUsers()}">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="fw-bold mb-3">Распределение по ролям</h5>
+                                <div th:if="${stats.usersByRole() != null}">
+                                    <div th:each="entry : ${stats.usersByRole()}"
+                                         class="d-flex align-items-center justify-content-between py-2 border-bottom">
+                                        <span>
+                                            <span class="badge me-2"
+                                                  th:classappend="${entry.key == 'ADMIN' ? 'bg-danger' : (entry.key == 'PARENT' ? 'bg-primary' : 'bg-warning text-dark')}"
+                                                  th:text="${entry.key}">ROLE</span>
+                                        </span>
+                                        <span class="fw-bold" th:text="${entry.value}">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

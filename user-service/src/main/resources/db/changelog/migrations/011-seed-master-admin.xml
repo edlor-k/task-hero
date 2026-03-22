@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.8.xsd">
+
+    <!--
+        Создание мастер-администратора.
+        Настоящий пароль устанавливается при старте приложения из переменной ADMIN_PASSWORD
+        через MasterAdminInitializer. Здесь используется временный пароль-заглушка.
+    -->
+    <changeSet id="011-seed-master-admin" author="admin">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM users WHERE email = 'admin'
+            </sqlCheck>
+        </preConditions>
+
+        <!-- Placeholder password — будет заменён при старте приложения -->
+        <insert tableName="users">
+            <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="email" value="admin"/>
+            <column name="password" value="$PLACEHOLDER$"/>
+            <column name="role" value="ADMIN"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="created_at" valueComputed="now()"/>
+            <column name="updated_at" valueComputed="now()"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

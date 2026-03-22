@@ -72,6 +72,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: postgres
       JWT_SECRET: mySecretKeyForJWTTokenGenerationThatIsLongEnough256bits
       JWT_EXPIRATION_MS: 86400000
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
       LOGGING_LEVEL_ROOT: INFO
     networks:
       - taskhero-network

@@ -94,6 +94,63 @@
     </div>
 </nav>
 
+<!-- ========== SIDEBAR — ADMIN ========== -->
+<nav th:fragment="sidebar-admin" class="th-sidebar d-flex flex-column" id="sidebar">
+    <div class="sidebar-header px-3 py-3 mb-2">
+        <a th:href="@{/admin/dashboard}" class="text-decoration-none d-flex align-items-center gap-2">
+            <span class="sidebar-logo-icon bg-danger rounded-3 d-flex align-items-center justify-content-center"
+                  style="width:36px;height:36px;">
+                <i class="bi bi-shield-lock-fill text-white fs-5"></i>
+            </span>
+            <span class="fw-bold fs-5 text-white">Admin Panel</span>
+        </a>
+    </div>
+    <ul class="nav flex-column px-2 flex-grow-1">
+        <li class="sidebar-section-label">Главное</li>
+        <li class="nav-item">
+            <a class="nav-link sidebar-link" th:href="@{/admin/dashboard}">
+                <i class="bi bi-speedometer2"></i><span>Dashboard</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link sidebar-link" th:href="@{/admin/statistics}">
+                <i class="bi bi-bar-chart-fill"></i><span>Статистика</span>
+            </a>
+        </li>
+
+        <li class="sidebar-section-label">Управление</li>
+        <li class="nav-item">
+            <a class="nav-link sidebar-link" th:href="@{/admin/users}">
+                <i class="bi bi-people-fill"></i><span>Пользователи</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link sidebar-link" th:href="@{/admin/parents}">
+                <i class="bi bi-person-badge-fill"></i><span>Родители</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link sidebar-link" th:href="@{/admin/children}">
+                <i class="bi bi-person-hearts"></i><span>Дети</span>
+            </a>
+        </li>
+
+        <li class="sidebar-section-label">Журнал</li>
+        <li class="nav-item">
+            <a class="nav-link sidebar-link" th:href="@{/admin/audit}">
+                <i class="bi bi-journal-text"></i><span>Аудит</span>
+            </a>
+        </li>
+    </ul>
+    <div class="sidebar-footer px-3 py-3 border-top border-secondary border-opacity-25">
+        <form th:action="@{/logout}" method="post" class="m-0">
+            <button type="submit" class="btn btn-sm btn-outline-light w-100 rounded-3">
+                <i class="bi bi-box-arrow-left me-1"></i>Выйти
+            </button>
+        </form>
+    </div>
+</nav>
+
 <!-- ========== SIDEBAR — CHILD ========== -->
 <nav th:fragment="sidebar-child" class="th-sidebar d-flex flex-column" id="sidebar">
     <div class="sidebar-header px-3 py-3 mb-2">

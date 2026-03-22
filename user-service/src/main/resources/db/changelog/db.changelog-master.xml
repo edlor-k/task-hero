@@ -14,4 +14,6 @@
     <include file="db/changelog/migrations/007-add-character-fields.xml"/>
     <include file="db/changelog/migrations/008-add-marketplace-to-shop.xml"/>
     <include file="db/changelog/migrations/009-create-level-rewards.xml"/>
+    <include file="db/changelog/migrations/010-create-audit-log.xml"/>
+    <include file="db/changelog/migrations/011-seed-master-admin.xml"/>
 </databaseChangeLog>

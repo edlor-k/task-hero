@@ -19,12 +19,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.taskhero.common.exception.ExceptionBody;
+import ru.taskhero.common.exception.ValidationException;
 import ru.taskhero.common.model.enums.Role;
 import ru.taskhero.userservice.dto.*;
+import ru.taskhero.userservice.entity.AuditAction;
 import ru.taskhero.userservice.service.AdminService;
+import ru.taskhero.userservice.service.AuditService;
 import ru.taskhero.userservice.service.ChildService;
 import ru.taskhero.userservice.service.ParentService;
 import ru.taskhero.userservice.service.UserService;
+import ru.taskhero.userservice.util.SecurityUtils;
 
 import java.util.UUID;
 
@@ -45,6 +49,7 @@ public class AdminController {
     private final ParentService parentService;
     private final ChildService childService;
     private final AdminService adminService;
+    private final AuditService auditService;
 
     /**
      * Получить список всех пользователей с пагинацией и фильтрами.
@@ -114,8 +119,15 @@ public class AdminController {
             )
     })
     public ResponseEntity<UserResponseDto> toggleUserActive(@PathVariable UUID id) {
+        UUID currentAdminId = SecurityUtils.getCurrentUserId();
+        if (currentAdminId.equals(id)) {
+            throw new ValidationException("Нельзя заблокировать самого себя");
+        }
         log.info("Админ: переключение активности пользователя: {}", id);
         UserResponseDto user = userService.toggleActive(id);
+        UserResponseDto admin = userService.getById(currentAdminId);
+        AuditAction action = user.isActive() ? AuditAction.USER_UNBLOCKED : AuditAction.USER_BLOCKED;
+        auditService.log(currentAdminId, admin.email(), action, "USER", id, null);
         return ResponseEntity.ok(user);
     }
 
@@ -148,8 +160,15 @@ public class AdminController {
             @PathVariable UUID id,
             @Valid @RequestBody UpdateRoleRequest request
     ) {
+        UUID currentAdminId = SecurityUtils.getCurrentUserId();
+        if (currentAdminId.equals(id)) {
+            throw new ValidationException("Нельзя изменить роль самому себе");
+        }
         log.info("Админ: изменение роли пользователя {}: новая роль={}", id, request.newRole());
         UserResponseDto user = userService.updateRole(id, request.newRole());
+        UserResponseDto admin = userService.getById(currentAdminId);
+        auditService.log(currentAdminId, admin.email(), AuditAction.USER_ROLE_CHANGED, "USER", id,
+                "Новая роль: " + request.newRole());
         return ResponseEntity.ok(user);
     }
 
@@ -170,8 +189,14 @@ public class AdminController {
             )
     })
     public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
+        UUID currentAdminId = SecurityUtils.getCurrentUserId();
+        if (currentAdminId.equals(id)) {
+            throw new ValidationException("Нельзя удалить самого себя");
+        }
         log.info("Админ: удаление пользователя: {}", id);
+        UserResponseDto admin = userService.getById(currentAdminId);
         userService.deleteUser(id);
+        auditService.log(currentAdminId, admin.email(), AuditAction.USER_DELETED, "USER", id, null);
         return ResponseEntity.noContent().build();
     }
 
@@ -229,8 +254,11 @@ public class AdminController {
             @PathVariable UUID id,
             @Valid @RequestBody UpdateParentRequest request
     ) {
+        UUID currentAdminId = SecurityUtils.getCurrentUserId();
         log.info("Админ: обновление профиля родителя: {}", id);
         ParentResponseDto parent = parentService.updateParent(id, request);
+        UserResponseDto admin = userService.getById(currentAdminId);
+        auditService.log(currentAdminId, admin.email(), AuditAction.PARENT_UPDATED, "PARENT", id, null);
         return ResponseEntity.ok(parent);
     }
 
@@ -288,8 +316,11 @@ public class AdminController {
             @PathVariable UUID id,
             @Valid @RequestBody UpdateChildRequest request
     ) {
+        UUID currentAdminId = SecurityUtils.getCurrentUserId();
         log.info("Админ: обновление данных ребенка: {}", id);
         ChildResponseDto child = childService.updateChild(id, request);
+        UserResponseDto admin = userService.getById(currentAdminId);
+        auditService.log(currentAdminId, admin.email(), AuditAction.CHILD_UPDATED, "CHILD", id, null);
         return ResponseEntity.ok(child);
     }
 
@@ -334,5 +365,23 @@ public class AdminController {
         log.info("Админ: запрос статистики системы");
         SystemStatisticsDto statistics = adminService.getSystemStatistics();
         return ResponseEntity.ok(statistics);
+    }
+
+    // ==================== Audit Log ====================
+
+    /**
+     * Получить журнал аудита.
+     */
+    @GetMapping("/audit")
+    @Operation(
+            summary = "Получить журнал аудита",
+            description = "Возвращает пагинированный список действий администраторов"
+    )
+    public ResponseEntity<Page<AuditLogDto>> getAuditLogs(
+            @ParameterObject @PageableDefault(size = 20) Pageable pageable
+    ) {
+        log.info("Админ: запрос журнала аудита, page={}", pageable.getPageNumber());
+        Page<AuditLogDto> logs = auditService.getAuditLogs(pageable);
+        return ResponseEntity.ok(logs);
     }
 }

@@ -1,0 +1,102 @@
+package ru.taskhero.app.client;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.*;
+import ru.taskhero.app.dto.*;
+
+import java.util.Map;
+import java.util.UUID;
+
+/**
+ * Feign клиент для административных эндпоинтов User Service.
+ */
+@FeignClient(
+        name = "user-service-admin",
+        url = "${services.user-service.url}"
+)
+public interface AdminServiceClient {
+
+    // ==================== Users ====================
+
+    /** Получить всех пользователей. */
+    @GetMapping("/admin/users")
+    Map<String, Object> getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String role,
+            @RequestParam(required = false) Boolean active
+    );
+
+    /** Поиск пользователей. */
+    @GetMapping("/admin/users/search")
+    Map<String, Object> searchUsers(
+            @RequestParam String q,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    );
+
+    /** Заблокировать/разблокировать пользователя. */
+    @PatchMapping("/admin/users/{id}/toggle-active")
+    AdminUserDto toggleUserActive(@PathVariable("id") UUID id);
+
+    /** Изменить роль пользователя. */
+    @PatchMapping("/admin/users/{id}/role")
+    AdminUserDto updateUserRole(@PathVariable("id") UUID id, @RequestBody Map<String, String> request);
+
+    /** Удалить пользователя. */
+    @DeleteMapping("/admin/users/{id}")
+    void deleteUser(@PathVariable("id") UUID id);
+
+    // ==================== Parents ====================
+
+    /** Получить всех родителей. */
+    @GetMapping("/admin/parents")
+    Map<String, Object> getAllParents(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    );
+
+    /** Получить детали родителя. */
+    @GetMapping("/admin/parents/{id}")
+    AdminParentDetailDto getParentDetail(@PathVariable("id") UUID id);
+
+    /** Обновить данные родителя. */
+    @PutMapping("/admin/parents/{id}")
+    Map<String, Object> updateParent(@PathVariable("id") UUID id, @RequestBody Map<String, String> request);
+
+    // ==================== Children ====================
+
+    /** Получить всех детей. */
+    @GetMapping("/admin/children")
+    Map<String, Object> getAllChildren(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    );
+
+    /** Получить детали ребёнка. */
+    @GetMapping("/admin/children/{id}")
+    Map<String, Object> getChildDetail(@PathVariable("id") UUID id);
+
+    /** Обновить данные ребёнка. */
+    @PutMapping("/admin/children/{id}")
+    Map<String, Object> updateChild(@PathVariable("id") UUID id, @RequestBody Map<String, Object> request);
+
+    /** Удалить ребёнка. */
+    @DeleteMapping("/admin/children/{id}")
+    void deleteChild(@PathVariable("id") UUID id);
+
+    // ==================== Statistics ====================
+
+    /** Получить статистику системы. */
+    @GetMapping("/admin/statistics")
+    AdminStatisticsDto getStatistics();
+
+    // ==================== Audit ====================
+
+    /** Получить журнал аудита. */
+    @GetMapping("/admin/audit")
+    Map<String, Object> getAuditLogs(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    );
+}

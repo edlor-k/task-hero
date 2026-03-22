@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Профиль ребёнка')}"></head>
+<body>
+<div class="th-layout">
+    <nav th:replace="~{fragments/layout :: sidebar-admin}"></nav>
+    <div class="th-content">
+        <header th:replace="~{fragments/layout :: header}"></header>
+        <main class="th-main">
+
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div class="d-flex align-items-center gap-2">
+                    <a th:href="@{/admin/children}" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i>
+                    </a>
+                    <h4 class="fw-bold mb-0"><i class="bi bi-person-hearts me-2"></i>Профиль ребёнка</h4>
+                </div>
+            </div>
+
+            <!-- Messages -->
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div th:if="${child != null}">
+                <div class="row g-4">
+                    <!-- Child Info -->
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="fw-bold mb-3">Информация</h5>
+                                <table class="table table-borderless mb-0">
+                                    <tr>
+                                        <td class="text-muted" style="width:40%">Имя</td>
+                                        <td class="fw-semibold" th:text="${child['firstName'] + ' ' + child['surname']}">Имя</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Уровень</td>
+                                        <td><span class="badge bg-primary bg-opacity-10 text-primary" th:text="'Ур. ' + ${child['level']}">1</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Опыт</td>
+                                        <td th:text="${child['exp']}">0</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Коины</td>
+                                        <td th:text="${child['coins']}">0</td>
+                                    </tr>
+                                    <tr th:if="${child['loginToken'] != null}">
+                                        <td class="text-muted">Токен входа</td>
+                                        <td><code th:text="${child['loginToken']}">token</code></td>
+                                    </tr>
+                                    <tr th:if="${child['characterType'] != null}">
+                                        <td class="text-muted">Персонаж</td>
+                                        <td th:text="${child['characterType']}">-</td>
+                                    </tr>
+                                    <tr th:if="${child['difficultyTrajectory'] != null}">
+                                        <td class="text-muted">Сложность</td>
+                                        <td th:text="${child['difficultyTrajectory']}">NORMAL</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Parent Info -->
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="fw-bold mb-3">Родитель</h5>
+                                <div th:if="${child['parent'] != null}">
+                                    <table class="table table-borderless mb-0">
+                                        <tr>
+                                            <td class="text-muted" style="width:40%">Имя</td>
+                                            <td class="fw-semibold"
+                                                th:text="${child['parent']['firstName'] + ' ' + child['parent']['surname']}">Имя</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div th:unless="${child['parent'] != null}" class="text-center py-3">
+                                    <p class="text-muted mb-0">Родитель не найден</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>
