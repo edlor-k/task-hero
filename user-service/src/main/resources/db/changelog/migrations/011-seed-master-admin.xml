@@ -13,14 +13,14 @@
     <changeSet id="011-seed-master-admin" author="admin">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
-                SELECT COUNT(*) FROM users WHERE email = 'admin@taskhero.local'
+                SELECT COUNT(*) FROM users WHERE email = 'admin'
             </sqlCheck>
         </preConditions>
 
         <!-- Placeholder password — будет заменён при старте приложения -->
         <insert tableName="users">
             <column name="id" valueComputed="gen_random_uuid()"/>
-            <column name="email" value="admin@taskhero.local"/>
+            <column name="email" value="admin"/>
             <column name="password" value="$PLACEHOLDER$"/>
             <column name="role" value="ADMIN"/>
             <column name="is_active" valueBoolean="true"/>
