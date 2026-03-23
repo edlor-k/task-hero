@@ -62,11 +62,13 @@
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label fw-semibold">Дедлайн (необязательно)</label>
-                                        <input type="datetime-local" class="form-control" name="dueDate">
+                                        <input type="datetime-local" class="form-control" id="templateDueDate" name="dueDate"
+                                               onchange="toggleDeadlineRecurrence()">
+                                        <small class="text-muted" id="dueDateHint" style="display:none;">Очистите дедлайн, чтобы выбрать повторение</small>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label fw-semibold">Повторение</label>
-                                        <select class="form-select" id="recurrenceSelect" name="recurrencePreset" onchange="updateRecurrenceRule()">
+                                        <select class="form-select" id="recurrenceSelect" name="recurrencePreset" onchange="updateRecurrenceRule(); toggleDeadlineRecurrence();">
                                             <option value="">Без повторения</option>
                                             <option value="DAILY">Ежедневно</option>
                                             <option value="WEEKLY">Еженедельно</option>
@@ -231,6 +233,30 @@
         }
 
         document.getElementById('recurrenceRule').value = rule;
+    }
+
+    function toggleDeadlineRecurrence() {
+        var dueDate = document.getElementById('templateDueDate');
+        var recurrence = document.getElementById('recurrenceSelect');
+        var hint = document.getElementById('dueDateHint');
+        var customDiv = document.getElementById('customRecurrence');
+        var ruleInput = document.getElementById('recurrenceRule');
+
+        if (dueDate.value) {
+            recurrence.value = '';
+            recurrence.disabled = true;
+            ruleInput.value = '';
+            customDiv.style.display = 'none';
+            hint.style.display = 'block';
+        } else if (recurrence.value) {
+            dueDate.value = '';
+            dueDate.disabled = true;
+            hint.style.display = 'none';
+        } else {
+            recurrence.disabled = false;
+            dueDate.disabled = false;
+            hint.style.display = 'none';
+        }
     }
 </script>
 </body>

@@ -36,6 +36,7 @@
                                 <th>Уровень</th>
                                 <th>EXP</th>
                                 <th>Коины</th>
+                                <th>Токен входа</th>
                                 <th>Родитель</th>
                                 <th class="text-end">Действия</th>
                             </tr>
@@ -48,6 +49,11 @@
                                 </td>
                                 <td th:text="${child['exp']}">0</td>
                                 <td th:text="${child['coins']}">0</td>
+                                <td>
+                                    <code class="user-select-all small" th:if="${child['loginToken'] != null}"
+                                          th:text="${child['loginToken']}">token</code>
+                                    <span th:unless="${child['loginToken'] != null}" class="text-muted">—</span>
+                                </td>
                                 <td>
                                     <span th:if="${child['parent'] != null}"
                                           th:text="${child['parent']['firstName'] + ' ' + child['parent']['surname']}">Родитель</span>

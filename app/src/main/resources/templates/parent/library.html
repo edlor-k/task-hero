@@ -132,6 +132,7 @@
                                     <form th:action="@{/parent/library/copy}" method="post">
                                         <input type="hidden" name="templateId" th:value="${t.id}">
                                         <input type="hidden" name="onboarding" th:value="${onboarding}">
+                                        <input type="hidden" name="category" th:value="${selectedCategory}">
                                         <button type="submit" class="btn btn-outline-primary w-100">
                                             <i class="bi bi-plus-circle me-1"></i>Добавить к себе
                                         </button>

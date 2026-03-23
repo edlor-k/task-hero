@@ -411,4 +411,28 @@ public class TaskAssignmentController {
         TaskAssignmentResponseDto response = assignmentService.getById(id);
         return ResponseEntity.ok(response);
     }
+
+    // ==================== EXPIRED TASKS ====================
+
+    @GetMapping("/expired")
+    @PreAuthorize("hasRole('PARENT')")
+    @Operation(summary = "Получить просроченные задания", description = "Задания с истёкшим дедлайном")
+    public ResponseEntity<List<TaskAssignmentResponseDto>> getExpired() {
+        UUID parentId = SecurityUtils.getCurrentUserId();
+        List<TaskAssignmentResponseDto> response = assignmentService.getExpiredByParent(parentId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{id}/extend-deadline")
+    @PreAuthorize("hasRole('PARENT')")
+    @Operation(summary = "Продлить дедлайн", description = "Переназначить просроченное задание с новым дедлайном")
+    public ResponseEntity<TaskAssignmentResponseDto> extendDeadline(
+            @PathVariable UUID id,
+            @RequestParam String newDueDate
+    ) {
+        UUID parentId = SecurityUtils.getCurrentUserId();
+        TaskAssignmentResponseDto response = assignmentService.extendDeadline(
+                id, parentId, java.time.LocalDate.parse(newDueDate));
+        return ResponseEntity.ok(response);
+    }
 }

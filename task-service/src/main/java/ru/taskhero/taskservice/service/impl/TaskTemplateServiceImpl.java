@@ -234,6 +234,85 @@ public class TaskTemplateServiceImpl implements TaskTemplateService {
                 .collect(Collectors.toSet());
     }
 
+    @Override
+    @Transactional
+    @LogMethod("library-admin-create")
+    public TaskTemplateResponseDto createLibraryTemplate(TaskTemplateCreateRequest request) {
+        log.info("Админ: создание шаблона библиотеки: {}", request.title());
+
+        TaskTemplate template = templateMapper.toEntity(request);
+        template.setLibraryTemplate(true);
+        template.setActive(true);
+
+        if (request.expReward() != null) template.setExpReward(request.expReward());
+        if (request.coinsReward() != null) template.setCoinsReward(request.coinsReward());
+        if (request.repeatable() != null) template.setRepeatable(request.repeatable());
+
+        template = templateRepository.save(template);
+
+        if (request.subItems() != null && !request.subItems().isEmpty()) {
+            List<TaskSubItem> subItems = new ArrayList<>();
+            for (int i = 0; i < request.subItems().size(); i++) {
+                TaskSubItem subItem = new TaskSubItem();
+                subItem.setTemplate(template);
+                subItem.setTitle(request.subItems().get(i));
+                subItem.setOrderIndex(i);
+                subItems.add(subItem);
+            }
+            template.setSubItems(subItems);
+            template = templateRepository.save(template);
+        }
+
+        log.info("Шаблон библиотеки создан: {}", template.getId());
+        return templateMapper.toDto(template);
+    }
+
+    @Override
+    @Transactional
+    @LogMethod("library-admin-update")
+    public TaskTemplateResponseDto updateLibraryTemplate(UUID id, TaskTemplateUpdateRequest request) {
+        log.info("Админ: обновление шаблона библиотеки: {}", id);
+
+        TaskTemplate template = templateRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Шаблон библиотеки не найден: " + id));
+        if (!template.isLibraryTemplate()) {
+            throw new IllegalArgumentException("Шаблон не является шаблоном библиотеки");
+        }
+
+        templateMapper.updateFromRequest(request, template);
+
+        if (request.subItems() != null) {
+            template.getSubItems().clear();
+            for (int i = 0; i < request.subItems().size(); i++) {
+                TaskSubItem subItem = new TaskSubItem();
+                subItem.setTemplate(template);
+                subItem.setTitle(request.subItems().get(i));
+                subItem.setOrderIndex(i);
+                template.getSubItems().add(subItem);
+            }
+        }
+
+        template = templateRepository.save(template);
+        log.info("Шаблон библиотеки обновлён: {}", id);
+        return templateMapper.toDto(template);
+    }
+
+    @Override
+    @Transactional
+    @LogMethod("library-admin-delete")
+    public void deleteLibraryTemplate(UUID id) {
+        log.info("Админ: удаление шаблона библиотеки: {}", id);
+
+        TaskTemplate template = templateRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Шаблон библиотеки не найден: " + id));
+        if (!template.isLibraryTemplate()) {
+            throw new IllegalArgumentException("Шаблон не является шаблоном библиотеки");
+        }
+
+        templateRepository.delete(template);
+        log.info("Шаблон библиотеки удалён: {}", id);
+    }
+
     /**
      * Найти шаблон и проверить, что он принадлежит указанному родителю.
      *

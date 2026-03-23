@@ -51,7 +51,14 @@
                         </div>
                         <div class="col">
                             <h3 class="fw-bold mb-1" th:text="${childProfile.firstName}">Герой</h3>
-                            <span class="badge bg-white bg-opacity-25 fs-6" th:text="${childProfile.characterType}" th:if="${childProfile.characterType}">WARRIOR</span>
+                            <span class="badge bg-white bg-opacity-25 fs-6"
+                                  th:if="${childProfile.characterType}"
+                                  th:text="${childProfile.characterType == 'WARRIOR' ? 'Воин' :
+                                            childProfile.characterType == 'MAGE' ? 'Маг' :
+                                            childProfile.characterType == 'ARCHER' ? 'Лучник' :
+                                            childProfile.characterType == 'HEALER' ? 'Целитель' :
+                                            childProfile.characterType == 'ROGUE' ? 'Разбойник' :
+                                            childProfile.characterType == 'KNIGHT' ? 'Рыцарь' : childProfile.characterType}">Воин</span>
                             <span class="badge bg-white bg-opacity-25 fs-6" th:text="'Уровень ' + ${childProfile.level}">Уровень 1</span>
                         </div>
                     </div>
@@ -65,6 +72,15 @@
                         <div class="progress" style="height: 8px; background: rgba(255,255,255,0.2);">
                             <div class="progress-bar bg-warning"
                                  th:style="'width: ' + (${childProfile.nextLevelExp > 0 ? childProfile.currentLevelExp * 100.0 / childProfile.nextLevelExp : 0}) + '%'"></div>
+                        </div>
+                        <div class="mt-2 small" style="opacity: 0.9;">
+                            <i class="bi bi-lightning-fill me-1"></i>
+                            <span>До следующего уровня осталось <strong th:text="${expRemaining}">80</strong> опыта</span>
+                        </div>
+                        <div th:if="${nextReward != null}" class="mt-1 small" style="opacity: 0.9;">
+                            <i class="bi bi-gift-fill me-1 text-warning"></i>
+                            <span>Следующая награда — <strong th:text="${nextReward.title()}">Награда</strong></span>
+                            <span class="badge bg-white bg-opacity-25 ms-1" th:text="'ур. ' + ${nextReward.level()}">ур. 3</span>
                         </div>
                     </div>
                 </div>

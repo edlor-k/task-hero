@@ -24,6 +24,7 @@ import ru.taskhero.taskservice.service.RewardService;
 import ru.taskhero.taskservice.service.TaskAssignmentService;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -243,6 +244,38 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
         assignment = assignmentRepository.save(assignment);
         log.info("Задание {} отклонено", assignmentId);
 
+        return assignmentMapper.toDto(assignment);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @LogMethod("assignment-get-expired-by-parent")
+    public List<TaskAssignmentResponseDto> getExpiredByParent(UUID parentId) {
+        log.debug("Получение просроченных заданий для родителя: {}", parentId);
+
+        return assignmentRepository.findAllByParentIdAndStatus(parentId, TaskStatus.EXPIRED)
+                .stream()
+                .map(assignmentMapper::toDto)
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    @LogMethod("assignment-extend-deadline")
+    public TaskAssignmentResponseDto extendDeadline(UUID assignmentId, UUID parentId, LocalDate newDueDate) {
+        log.info("Продление дедлайна задания {} родителем {}", assignmentId, parentId);
+
+        TaskAssignment assignment = findAssignmentAndVerifyParent(assignmentId, parentId);
+
+        if (assignment.getStatus() != TaskStatus.EXPIRED) {
+            throw new ValidationException("Продлить дедлайн можно только для просроченных заданий");
+        }
+
+        assignment.setDueDate(newDueDate);
+        assignment.setStatus(TaskStatus.CREATED);
+        assignment = assignmentRepository.save(assignment);
+
+        log.info("Дедлайн задания {} продлён до {}", assignmentId, newDueDate);
         return assignmentMapper.toDto(assignment);
     }
 

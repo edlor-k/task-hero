@@ -156,4 +156,37 @@ public interface TaskServiceClient {
             @PathVariable("id") UUID id,
             @RequestBody(required = false) Map<String, Object> request
     );
+
+    /**
+     * Получить просроченные задания.
+     */
+    @GetMapping("/assignments/expired")
+    List<TaskAssignmentDto> getExpiredAssignments();
+
+    /**
+     * Продлить дедлайн просроченного задания.
+     */
+    @PostMapping("/assignments/{id}/extend-deadline")
+    TaskAssignmentDto extendDeadline(
+            @PathVariable("id") UUID id,
+            @RequestParam("newDueDate") String newDueDate
+    );
+
+    // ==================== Admin Library Templates ====================
+
+    /** Получить все шаблоны библиотеки (админ). */
+    @GetMapping("/admin/templates/library")
+    List<TaskTemplateDto> getAdminLibraryTemplates();
+
+    /** Создать шаблон в библиотеке (админ). */
+    @PostMapping("/admin/templates/library")
+    TaskTemplateDto createLibraryTemplate(@RequestBody Map<String, Object> request);
+
+    /** Обновить шаблон библиотеки (админ). */
+    @PutMapping("/admin/templates/library/{id}")
+    TaskTemplateDto updateLibraryTemplate(@PathVariable("id") UUID id, @RequestBody Map<String, Object> request);
+
+    /** Удалить шаблон библиотеки (админ). */
+    @DeleteMapping("/admin/templates/library/{id}")
+    void deleteLibraryTemplate(@PathVariable("id") UUID id);
 }

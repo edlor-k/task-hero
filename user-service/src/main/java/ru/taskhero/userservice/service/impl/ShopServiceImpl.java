@@ -369,4 +369,63 @@ public class ShopServiceImpl implements ShopService {
                 purchase.getReviewedAt()
         );
     }
+
+    @Override
+    @Transactional
+    @LogMethod("shop-create-marketplace-item")
+    public ShopItemResponseDto createMarketplaceItem(ShopItemCreateRequest request) {
+        log.info("Создание товара маркетплейса: {}", request.title());
+
+        ShopItem item = ShopItem.builder()
+                .title(request.title())
+                .description(request.description())
+                .priceCoins(request.priceCoins())
+                .iconName(request.iconName() != null ? request.iconName() : "bi-gift")
+                .active(true)
+                .marketplaceItem(true)
+                .children(new HashSet<>())
+                .build();
+
+        item = shopItemRepository.save(item);
+        log.info("Товар маркетплейса создан: {}", item.getId());
+        return toItemDto(item);
+    }
+
+    @Override
+    @Transactional
+    @LogMethod("shop-update-marketplace-item")
+    public ShopItemResponseDto updateMarketplaceItem(UUID itemId, ShopItemUpdateRequest request) {
+        log.info("Обновление товара маркетплейса: {}", itemId);
+
+        ShopItem item = shopItemRepository.findById(itemId)
+                .orElseThrow(() -> new ResourceNotFoundException("Товар маркетплейса не найден"));
+        if (!item.isMarketplaceItem()) {
+            throw new ValidationException("Указанный товар не является элементом маркетплейса");
+        }
+
+        if (request.title() != null) item.setTitle(request.title());
+        if (request.description() != null) item.setDescription(request.description());
+        if (request.priceCoins() != null) item.setPriceCoins(request.priceCoins());
+        if (request.iconName() != null) item.setIconName(request.iconName());
+
+        item = shopItemRepository.save(item);
+        log.info("Товар маркетплейса обновлён: {}", item.getId());
+        return toItemDto(item);
+    }
+
+    @Override
+    @Transactional
+    @LogMethod("shop-delete-marketplace-item")
+    public void deleteMarketplaceItem(UUID itemId) {
+        log.info("Удаление товара маркетплейса: {}", itemId);
+
+        ShopItem item = shopItemRepository.findById(itemId)
+                .orElseThrow(() -> new ResourceNotFoundException("Товар маркетплейса не найден"));
+        if (!item.isMarketplaceItem()) {
+            throw new ValidationException("Указанный товар не является элементом маркетплейса");
+        }
+
+        shopItemRepository.delete(item);
+        log.info("Товар маркетплейса удалён: {}", itemId);
+    }
 }

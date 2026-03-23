@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import ru.taskhero.userservice.dto.AuditLogDto;
 import ru.taskhero.userservice.entity.AuditAction;
 
+import java.time.Instant;
 import java.util.UUID;
 
 /**
@@ -22,6 +23,12 @@ public interface AuditService {
      * Получить записи аудита с пагинацией.
      */
     Page<AuditLogDto> getAuditLogs(Pageable pageable);
+
+    /**
+     * Получить записи аудита с фильтрацией.
+     */
+    Page<AuditLogDto> getAuditLogs(Pageable pageable, AuditAction action,
+                                    Instant dateFrom, Instant dateTo);
 
     /**
      * Получить последние N записей.

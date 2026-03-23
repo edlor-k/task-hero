@@ -98,6 +98,13 @@
                                                 <i class="bi" th:classappend="${user['active'] == true ? 'bi-lock' : 'bi-unlock'}"></i>
                                             </button>
                                         </form>
+                                        <!-- Reset password -->
+                                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                data-bs-toggle="modal"
+                                                th:data-bs-target="'#passwordModal-' + ${user['id']}"
+                                                title="Сменить пароль">
+                                            <i class="bi bi-key"></i>
+                                        </button>
                                         <!-- Change role -->
                                         <button type="button" class="btn btn-sm btn-outline-info"
                                                 data-bs-toggle="modal"
@@ -137,8 +144,34 @@
                 </div>
             </div>
 
-            <!-- Role change modals -->
+            <!-- Role change / Password / Delete modals -->
             <div th:each="user : ${users}">
+                <!-- Password reset modal -->
+                <div class="modal fade" th:id="'passwordModal-' + ${user['id']}" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form method="post" th:action="@{/admin/users/{id}/password(id=${user['id']})}">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Сменить пароль</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Пользователь: <strong th:text="${user['email']}">email</strong></p>
+                                    <div class="mb-3">
+                                        <label class="form-label">Новый пароль</label>
+                                        <input type="password" name="password" class="form-control"
+                                               required minlength="6" placeholder="Минимум 6 символов"/>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                    <button type="submit" class="btn btn-primary">Установить пароль</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!-- Role change modal -->
                 <div class="modal fade" th:id="'roleModal-' + ${user['id']}" tabindex="-1">
                     <div class="modal-dialog">
                         <div class="modal-content">

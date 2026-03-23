@@ -8,6 +8,7 @@ import ru.taskhero.taskservice.dto.TaskAssignmentResponseDto;
 import ru.taskhero.taskservice.dto.TaskReviewRequest;
 import ru.taskhero.taskservice.dto.TaskSubmitRequest;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -104,4 +105,22 @@ public interface TaskAssignmentService {
      * @return обновленное назначение
      */
     TaskAssignmentResponseDto reject(UUID assignmentId, UUID parentId, TaskReviewRequest request);
+
+    /**
+     * Получить просроченные задания родителя (статус EXPIRED).
+     *
+     * @param parentId ID родителя
+     * @return список просроченных назначений
+     */
+    List<TaskAssignmentResponseDto> getExpiredByParent(UUID parentId);
+
+    /**
+     * Продлить дедлайн задания.
+     *
+     * @param assignmentId ID назначения
+     * @param parentId     ID родителя
+     * @param newDueDate   новый дедлайн
+     * @return обновленное назначение
+     */
+    TaskAssignmentResponseDto extendDeadline(UUID assignmentId, UUID parentId, LocalDate newDueDate);
 }

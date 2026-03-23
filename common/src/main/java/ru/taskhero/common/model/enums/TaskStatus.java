@@ -12,4 +12,6 @@ public enum TaskStatus {
     APPROVED,
     /** Статус отклоненной задачи. */
     REJECTED,
+    /** Статус просроченной задачи (дедлайн истёк). */
+    EXPIRED,
 }

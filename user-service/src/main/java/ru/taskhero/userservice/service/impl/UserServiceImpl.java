@@ -241,4 +241,19 @@ public class UserServiceImpl implements UserService {
         return userRepository.searchByEmail(search, pageable)
                 .map(userMapper::toDto);
     }
+
+    @Override
+    @Transactional
+    @LogMethod("user-reset-password")
+    public void resetPassword(UUID userId, String newPassword) {
+        log.info("Сброс пароля пользователя: {}", userId);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Пользователь с ID " + userId + " не найден"));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        log.info("Пароль пользователя {} успешно сброшен", userId);
+    }
 }

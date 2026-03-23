@@ -14,6 +14,7 @@ import ru.taskhero.userservice.entity.AuditLog;
 import ru.taskhero.userservice.repository.AuditLogRepository;
 import ru.taskhero.userservice.service.AuditService;
 
+import java.time.Instant;
 import java.util.UUID;
 
 /**
@@ -46,6 +47,14 @@ public class AuditServiceImpl implements AuditService {
     @Transactional(readOnly = true)
     public Page<AuditLogDto> getAuditLogs(Pageable pageable) {
         return auditLogRepository.findAllByOrderByCreatedAtDesc(pageable)
+                .map(this::toDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<AuditLogDto> getAuditLogs(Pageable pageable, AuditAction action,
+                                           Instant dateFrom, Instant dateTo) {
+        return auditLogRepository.findFiltered(action, dateFrom, dateTo, pageable)
                 .map(this::toDto);
     }
 

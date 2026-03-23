@@ -18,6 +18,51 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
 
+            <!-- Filter form -->
+            <div class="card mb-3">
+                <div class="card-body py-3">
+                    <form method="get" th:action="@{/admin/audit}" class="row g-2 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label small mb-1">Действие</label>
+                            <select name="action" class="form-select form-select-sm">
+                                <option value="">Все действия</option>
+                                <option value="USER_CREATED" th:selected="${selectedAction == 'USER_CREATED'}">USER_CREATED</option>
+                                <option value="USER_BLOCKED" th:selected="${selectedAction == 'USER_BLOCKED'}">USER_BLOCKED</option>
+                                <option value="USER_UNBLOCKED" th:selected="${selectedAction == 'USER_UNBLOCKED'}">USER_UNBLOCKED</option>
+                                <option value="USER_ROLE_CHANGED" th:selected="${selectedAction == 'USER_ROLE_CHANGED'}">USER_ROLE_CHANGED</option>
+                                <option value="USER_DELETED" th:selected="${selectedAction == 'USER_DELETED'}">USER_DELETED</option>
+                                <option value="USER_PASSWORD_RESET" th:selected="${selectedAction == 'USER_PASSWORD_RESET'}">USER_PASSWORD_RESET</option>
+                                <option value="PARENT_UPDATED" th:selected="${selectedAction == 'PARENT_UPDATED'}">PARENT_UPDATED</option>
+                                <option value="CHILD_UPDATED" th:selected="${selectedAction == 'CHILD_UPDATED'}">CHILD_UPDATED</option>
+                                <option value="CHILD_TOKEN_RESET" th:selected="${selectedAction == 'CHILD_TOKEN_RESET'}">CHILD_TOKEN_RESET</option>
+                                <option value="CHILD_EXP_ADJUSTED" th:selected="${selectedAction == 'CHILD_EXP_ADJUSTED'}">CHILD_EXP_ADJUSTED</option>
+                                <option value="CHILD_COINS_ADJUSTED" th:selected="${selectedAction == 'CHILD_COINS_ADJUSTED'}">CHILD_COINS_ADJUSTED</option>
+                                <option value="CHILD_LEVEL_ADJUSTED" th:selected="${selectedAction == 'CHILD_LEVEL_ADJUSTED'}">CHILD_LEVEL_ADJUSTED</option>
+                                <option value="MARKETPLACE_ITEM_CREATED" th:selected="${selectedAction == 'MARKETPLACE_ITEM_CREATED'}">MARKETPLACE_ITEM_CREATED</option>
+                                <option value="MARKETPLACE_ITEM_UPDATED" th:selected="${selectedAction == 'MARKETPLACE_ITEM_UPDATED'}">MARKETPLACE_ITEM_UPDATED</option>
+                                <option value="MARKETPLACE_ITEM_DELETED" th:selected="${selectedAction == 'MARKETPLACE_ITEM_DELETED'}">MARKETPLACE_ITEM_DELETED</option>
+                                <option value="TEMPLATE_LIBRARY_CREATED" th:selected="${selectedAction == 'TEMPLATE_LIBRARY_CREATED'}">TEMPLATE_LIBRARY_CREATED</option>
+                                <option value="TEMPLATE_LIBRARY_UPDATED" th:selected="${selectedAction == 'TEMPLATE_LIBRARY_UPDATED'}">TEMPLATE_LIBRARY_UPDATED</option>
+                                <option value="TEMPLATE_LIBRARY_DELETED" th:selected="${selectedAction == 'TEMPLATE_LIBRARY_DELETED'}">TEMPLATE_LIBRARY_DELETED</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small mb-1">Дата от</label>
+                            <input type="date" name="dateFrom" class="form-control form-control-sm" th:value="${dateFrom}"/>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small mb-1">Дата до</label>
+                            <input type="date" name="dateTo" class="form-control form-control-sm" th:value="${dateTo}"/>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-sm btn-primary w-100">
+                                <i class="bi bi-funnel me-1"></i>Фильтр
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             <!-- Audit log table -->
             <div class="card">
                 <div class="card-body">
@@ -47,7 +92,8 @@
                                     <span class="badge"
                                           th:classappend="${log['action'].toString().contains('BLOCK') ? 'bg-warning text-dark' :
                                                           (log['action'].toString().contains('DELETE') ? 'bg-danger' :
-                                                          (log['action'].toString().contains('CREATE') ? 'bg-success' : 'bg-secondary'))}"
+                                                          (log['action'].toString().contains('CREATE') ? 'bg-success' :
+                                                          (log['action'].toString().contains('RESET') ? 'bg-info' : 'bg-secondary')))}"
                                           th:text="${log['action']}">ACTION</span>
                                 </td>
                                 <td>
@@ -65,14 +111,18 @@
                     <nav th:if="${totalPages != null && totalPages > 1}" class="mt-3">
                         <ul class="pagination pagination-sm justify-content-center mb-0">
                             <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
-                                <a class="page-link" th:href="@{/admin/audit(page=${currentPage - 1})}">«</a>
+                                <a class="page-link"
+                                   th:href="@{/admin/audit(page=${currentPage - 1}, action=${selectedAction}, dateFrom=${dateFrom}, dateTo=${dateTo})}">«</a>
                             </li>
                             <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}" class="page-item"
                                 th:classappend="${i == currentPage ? 'active' : ''}">
-                                <a class="page-link" th:href="@{/admin/audit(page=${i})}" th:text="${i + 1}">1</a>
+                                <a class="page-link"
+                                   th:href="@{/admin/audit(page=${i}, action=${selectedAction}, dateFrom=${dateFrom}, dateTo=${dateTo})}"
+                                   th:text="${i + 1}">1</a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
-                                <a class="page-link" th:href="@{/admin/audit(page=${currentPage + 1})}">»</a>
+                                <a class="page-link"
+                                   th:href="@{/admin/audit(page=${currentPage + 1}, action=${selectedAction}, dateFrom=${dateFrom}, dateTo=${dateTo})}">»</a>
                             </li>
                         </ul>
                     </nav>

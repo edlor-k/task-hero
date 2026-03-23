@@ -77,4 +77,19 @@ public interface ShopService {
      * Скопировать товар из маркетплейса в магазин родителя.
      */
     ShopItemResponseDto copyFromMarketplace(UUID itemId, UUID parentId, List<UUID> childIds);
+
+    /**
+     * Создать системный товар в маркетплейсе (для админа).
+     */
+    ShopItemResponseDto createMarketplaceItem(ShopItemCreateRequest request);
+
+    /**
+     * Обновить системный товар маркетплейса (для админа).
+     */
+    ShopItemResponseDto updateMarketplaceItem(UUID itemId, ShopItemUpdateRequest request);
+
+    /**
+     * Удалить системный товар маркетплейса (для админа).
+     */
+    void deleteMarketplaceItem(UUID itemId);
 }

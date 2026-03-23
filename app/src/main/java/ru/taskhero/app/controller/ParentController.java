@@ -135,6 +135,14 @@ public class ParentController {
             }
             model.addAttribute("childRewardAlerts", childRewardAlerts);
 
+            // Check for expired (overdue) assignments
+            try {
+                List<TaskAssignmentDto> expiredAssignments = taskServiceClient.getExpiredAssignments();
+                model.addAttribute("expiredAssignments", expiredAssignments);
+            } catch (Exception ex) {
+                log.warn("Error loading expired assignments: {}", ex.getMessage());
+            }
+
         } catch (Exception e) {
             log.error("Error loading dashboard: {}", e.getMessage());
             model.addAttribute("error", "Ошибка загрузки данных");
@@ -167,11 +175,10 @@ public class ParentController {
     public String addChild(
             @RequestParam String firstName,
             @RequestParam String surname,
-            @RequestParam(defaultValue = "NORMAL") String difficultyTrajectory,
             RedirectAttributes redirectAttributes
     ) {
         try {
-            CreateChildRequest request = new CreateChildRequest(firstName, surname, difficultyTrajectory);
+            CreateChildRequest request = new CreateChildRequest(firstName, surname, "NORMAL");
             ChildDto child = userServiceClient.createChild(request);
 
             redirectAttributes.addFlashAttribute("success",
@@ -395,6 +402,7 @@ public class ParentController {
     public String copyFromLibrary(
             @RequestParam UUID templateId,
             @RequestParam(required = false) boolean onboarding,
+            @RequestParam(required = false) String category,
             RedirectAttributes redirectAttributes
     ) {
         try {
@@ -404,7 +412,11 @@ public class ParentController {
             log.error("Error copying from library: {}", e.getMessage());
             redirectAttributes.addFlashAttribute("error", "Ошибка копирования шаблона");
         }
-        return "redirect:/parent/library" + (onboarding ? "?onboarding=true" : "");
+        StringBuilder redirect = new StringBuilder("redirect:/parent/library");
+        String sep = "?";
+        if (onboarding) { redirect.append(sep).append("onboarding=true"); sep = "&"; }
+        if (category != null && !category.isBlank()) { redirect.append(sep).append("category=").append(category); }
+        return redirect.toString();
     }
 
     // ==================== Assignments ====================
@@ -559,6 +571,25 @@ public class ParentController {
         }
 
         return "redirect:/parent/review";
+    }
+
+    /**
+     * Продлить дедлайн просроченного задания.
+     */
+    @PostMapping("/assignments/{id}/extend-deadline")
+    public String extendDeadline(
+            @PathVariable UUID id,
+            @RequestParam String newDueDate,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            taskServiceClient.extendDeadline(id, newDueDate);
+            redirectAttributes.addFlashAttribute("success", "Дедлайн продлён");
+        } catch (Exception e) {
+            log.error("Error extending deadline: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Ошибка продления дедлайна");
+        }
+        return "redirect:/parent/dashboard";
     }
 
     // ==================== Shop ====================

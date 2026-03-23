@@ -80,6 +80,22 @@ public class ChildController {
                 log.warn("Error loading unseen rewards: {}", ex.getMessage());
             }
 
+            // Calculate EXP remaining to next level
+            int expRemaining = childProfile.nextLevelExp() - childProfile.currentLevelExp();
+            model.addAttribute("expRemaining", Math.max(expRemaining, 0));
+
+            // Load next unclaimed reward
+            try {
+                List<LevelRewardDto> allRewards = userServiceClient.getLevelRewards(childProfile.id());
+                LevelRewardDto nextReward = allRewards.stream()
+                        .filter(r -> !r.claimed() && r.level() > childProfile.level())
+                        .findFirst()
+                        .orElse(null);
+                model.addAttribute("nextReward", nextReward);
+            } catch (Exception ex) {
+                log.warn("Error loading next reward: {}", ex.getMessage());
+            }
+
         } catch (Exception e) {
             log.error("Error loading child dashboard: {}", e.getMessage());
             model.addAttribute("error", "Ошибка загрузки данных");

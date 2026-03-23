@@ -3,6 +3,7 @@ package ru.taskhero.taskservice;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * Главный класс приложения Task Service.
@@ -13,6 +14,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
         "ru.taskhero.common"
 })
 @EnableFeignClients
+@EnableScheduling
 public class TaskServiceApplication {
 
     public static void main(String[] args) {

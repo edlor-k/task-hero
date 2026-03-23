@@ -51,4 +51,9 @@ public interface UserService {
      * Поиск пользователей по email.
      */
     Page<UserResponseDto> searchByEmail(String search, Pageable pageable);
+
+    /**
+     * Сброс пароля пользователя администратором.
+     */
+    void resetPassword(UUID userId, String newPassword);
 }

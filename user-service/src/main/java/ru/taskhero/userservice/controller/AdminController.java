@@ -27,9 +27,11 @@ import ru.taskhero.userservice.service.AdminService;
 import ru.taskhero.userservice.service.AuditService;
 import ru.taskhero.userservice.service.ChildService;
 import ru.taskhero.userservice.service.ParentService;
+import ru.taskhero.userservice.service.ShopService;
 import ru.taskhero.userservice.service.UserService;
 import ru.taskhero.userservice.util.SecurityUtils;
 
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -50,6 +52,7 @@ public class AdminController {
     private final ChildService childService;
     private final AdminService adminService;
     private final AuditService auditService;
+    private final ShopService shopService;
 
     /**
      * Получить список всех пользователей с пагинацией и фильтрами.
@@ -101,7 +104,7 @@ public class AdminController {
     /**
      * Переключить активность пользователя (блокировка/разблокировка).
      */
-    @PatchMapping("/users/{id}/toggle-active")
+    @PostMapping("/users/{id}/toggle-active")
     @Operation(
             summary = "Заблокировать/разблокировать пользователя",
             description = "Переключает статус активности пользователя (is_active)"
@@ -134,7 +137,7 @@ public class AdminController {
     /**
      * Изменить роль пользователя.
      */
-    @PatchMapping("/users/{id}/role")
+    @PostMapping("/users/{id}/role")
     @Operation(
             summary = "Изменить роль пользователя",
             description = "Обновляет роль пользователя в системе"
@@ -375,13 +378,104 @@ public class AdminController {
     @GetMapping("/audit")
     @Operation(
             summary = "Получить журнал аудита",
-            description = "Возвращает пагинированный список действий администраторов"
+            description = "Возвращает пагинированный список действий администраторов с фильтрацией"
     )
     public ResponseEntity<Page<AuditLogDto>> getAuditLogs(
-            @ParameterObject @PageableDefault(size = 20) Pageable pageable
+            @ParameterObject @PageableDefault(size = 20) Pageable pageable,
+            @Parameter(description = "Фильтр по действию") @RequestParam(required = false) AuditAction action,
+            @Parameter(description = "Дата c (ISO)") @RequestParam(required = false) String dateFrom,
+            @Parameter(description = "Дата по (ISO)") @RequestParam(required = false) String dateTo
     ) {
-        log.info("Админ: запрос журнала аудита, page={}", pageable.getPageNumber());
-        Page<AuditLogDto> logs = auditService.getAuditLogs(pageable);
+        log.info("Админ: запрос журнала аудита, page={}, action={}", pageable.getPageNumber(), action);
+        java.time.Instant from = dateFrom != null ? java.time.Instant.parse(dateFrom) : null;
+        java.time.Instant to = dateTo != null ? java.time.Instant.parse(dateTo) : null;
+        Page<AuditLogDto> logs = auditService.getAuditLogs(pageable, action, from, to);
         return ResponseEntity.ok(logs);
+    }
+
+    // ==================== Password Reset ====================
+
+    /**
+     * Сбросить пароль пользователя.
+     */
+    @PostMapping("/users/{id}/password")
+    @Operation(
+            summary = "Сбросить пароль пользователя",
+            description = "Устанавливает новый пароль для пользователя"
+    )
+    public ResponseEntity<Void> resetPassword(
+            @PathVariable UUID id,
+            @RequestBody Map<String, String> request
+    ) {
+        String newPassword = request.get("password");
+        if (newPassword == null || newPassword.length() < 6) {
+            throw new ValidationException("Пароль должен содержать минимум 6 символов");
+        }
+        UUID currentAdminId = SecurityUtils.getCurrentUserId();
+        log.info("Админ: сброс пароля пользователя: {}", id);
+        userService.resetPassword(id, newPassword);
+        UserResponseDto admin = userService.getById(currentAdminId);
+        auditService.log(currentAdminId, admin.email(), AuditAction.USER_PASSWORD_RESET, "USER", id, null);
+        return ResponseEntity.ok().build();
+    }
+
+    // ==================== Marketplace Management ====================
+
+    /**
+     * Получить все товары маркетплейса.
+     */
+    @GetMapping("/marketplace")
+    @Operation(summary = "Получить товары маркетплейса", description = "Список всех системных наград из маркетплейса")
+    public ResponseEntity<java.util.List<ShopItemResponseDto>> getMarketplaceItems() {
+        log.info("Админ: запрос товаров маркетплейса");
+        return ResponseEntity.ok(shopService.getMarketplaceItems());
+    }
+
+    /**
+     * Создать товар в маркетплейсе.
+     */
+    @PostMapping("/marketplace")
+    @Operation(summary = "Создать товар в маркетплейсе")
+    public ResponseEntity<ShopItemResponseDto> createMarketplaceItem(@Valid @RequestBody ShopItemCreateRequest request) {
+        UUID currentAdminId = SecurityUtils.getCurrentUserId();
+        log.info("Админ: создание товара в маркетплейсе: {}", request.title());
+        ShopItemResponseDto item = shopService.createMarketplaceItem(request);
+        UserResponseDto admin = userService.getById(currentAdminId);
+        auditService.log(currentAdminId, admin.email(), AuditAction.MARKETPLACE_ITEM_CREATED,
+                "MARKETPLACE", item.id(), "Товар: " + request.title());
+        return ResponseEntity.status(org.springframework.http.HttpStatus.CREATED).body(item);
+    }
+
+    /**
+     * Обновить товар маркетплейса.
+     */
+    @PutMapping("/marketplace/{id}")
+    @Operation(summary = "Обновить товар маркетплейса")
+    public ResponseEntity<ShopItemResponseDto> updateMarketplaceItem(
+            @PathVariable UUID id,
+            @Valid @RequestBody ShopItemUpdateRequest request
+    ) {
+        UUID currentAdminId = SecurityUtils.getCurrentUserId();
+        log.info("Админ: обновление товара маркетплейса: {}", id);
+        ShopItemResponseDto item = shopService.updateMarketplaceItem(id, request);
+        UserResponseDto admin = userService.getById(currentAdminId);
+        auditService.log(currentAdminId, admin.email(), AuditAction.MARKETPLACE_ITEM_UPDATED,
+                "MARKETPLACE", id, null);
+        return ResponseEntity.ok(item);
+    }
+
+    /**
+     * Удалить товар маркетплейса.
+     */
+    @DeleteMapping("/marketplace/{id}")
+    @Operation(summary = "Удалить товар маркетплейса")
+    public ResponseEntity<Void> deleteMarketplaceItem(@PathVariable UUID id) {
+        UUID currentAdminId = SecurityUtils.getCurrentUserId();
+        log.info("Админ: удаление товара маркетплейса: {}", id);
+        shopService.deleteMarketplaceItem(id);
+        UserResponseDto admin = userService.getById(currentAdminId);
+        auditService.log(currentAdminId, admin.email(), AuditAction.MARKETPLACE_ITEM_DELETED,
+                "MARKETPLACE", id, null);
+        return ResponseEntity.noContent().build();
     }
 }

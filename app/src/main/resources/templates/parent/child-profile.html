@@ -28,7 +28,13 @@
                             <h4 class="fw-bold mb-1" th:text="${child.firstName + ' ' + child.surname}">Имя</h4>
                             <div class="d-flex flex-wrap gap-2 mb-2">
                                 <span class="badge bg-warning text-dark fs-6" th:text="'Уровень ' + ${child.level}">Уровень 1</span>
-                                <span class="badge bg-primary fs-6" th:if="${child.characterType}" th:text="${child.characterType}">WARRIOR</span>
+                                <span class="badge bg-primary fs-6" th:if="${child.characterType}"
+                                      th:text="${child.characterType == 'WARRIOR' ? 'Воин' :
+                                                child.characterType == 'MAGE' ? 'Маг' :
+                                                child.characterType == 'ARCHER' ? 'Лучник' :
+                                                child.characterType == 'HEALER' ? 'Целитель' :
+                                                child.characterType == 'ROGUE' ? 'Разбойник' :
+                                                child.characterType == 'KNIGHT' ? 'Рыцарь' : child.characterType}">Воин</span>
                             </div>
                             <div class="d-flex gap-4 text-muted">
                                 <span><i class="bi bi-star me-1"></i><strong th:text="${child.exp}">0</strong> EXP</span>

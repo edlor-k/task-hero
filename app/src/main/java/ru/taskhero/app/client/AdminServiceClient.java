@@ -4,6 +4,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 import ru.taskhero.app.dto.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -36,16 +37,20 @@ public interface AdminServiceClient {
     );
 
     /** Заблокировать/разблокировать пользователя. */
-    @PatchMapping("/admin/users/{id}/toggle-active")
+    @PostMapping("/admin/users/{id}/toggle-active")
     AdminUserDto toggleUserActive(@PathVariable("id") UUID id);
 
     /** Изменить роль пользователя. */
-    @PatchMapping("/admin/users/{id}/role")
+    @PostMapping("/admin/users/{id}/role")
     AdminUserDto updateUserRole(@PathVariable("id") UUID id, @RequestBody Map<String, String> request);
 
     /** Удалить пользователя. */
     @DeleteMapping("/admin/users/{id}")
     void deleteUser(@PathVariable("id") UUID id);
+
+    /** Сбросить пароль пользователя. */
+    @PostMapping("/admin/users/{id}/password")
+    void resetUserPassword(@PathVariable("id") UUID id, @RequestBody Map<String, String> request);
 
     // ==================== Parents ====================
 
@@ -93,10 +98,31 @@ public interface AdminServiceClient {
 
     // ==================== Audit ====================
 
-    /** Получить журнал аудита. */
+    /** Получить журнал аудита с фильтрами. */
     @GetMapping("/admin/audit")
     Map<String, Object> getAuditLogs(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String action,
+            @RequestParam(required = false) String dateFrom,
+            @RequestParam(required = false) String dateTo
     );
+
+    // ==================== Marketplace ====================
+
+    /** Получить все товары маркетплейса. */
+    @GetMapping("/admin/marketplace")
+    List<Map<String, Object>> getMarketplaceItems();
+
+    /** Создать товар в маркетплейсе. */
+    @PostMapping("/admin/marketplace")
+    Map<String, Object> createMarketplaceItem(@RequestBody Map<String, Object> request);
+
+    /** Обновить товар маркетплейса. */
+    @PutMapping("/admin/marketplace/{id}")
+    Map<String, Object> updateMarketplaceItem(@PathVariable("id") UUID id, @RequestBody Map<String, Object> request);
+
+    /** Удалить товар маркетплейса. */
+    @DeleteMapping("/admin/marketplace/{id}")
+    void deleteMarketplaceItem(@PathVariable("id") UUID id);
 }

@@ -99,4 +99,19 @@ public interface TaskTemplateService {
      * @return множество ID исходных библиотечных шаблонов
      */
     Set<UUID> getCopiedLibraryTemplateIds(UUID parentId);
+
+    /**
+     * Создать шаблон в библиотеке (админ).
+     */
+    TaskTemplateResponseDto createLibraryTemplate(TaskTemplateCreateRequest request);
+
+    /**
+     * Обновить шаблон библиотеки (админ).
+     */
+    TaskTemplateResponseDto updateLibraryTemplate(UUID id, TaskTemplateUpdateRequest request);
+
+    /**
+     * Удалить шаблон библиотеки (админ).
+     */
+    void deleteLibraryTemplate(UUID id);
 }

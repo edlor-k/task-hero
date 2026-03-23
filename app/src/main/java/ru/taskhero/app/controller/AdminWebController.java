@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.taskhero.app.client.AdminServiceClient;
+import ru.taskhero.app.client.TaskServiceClient;
 
 import java.util.Map;
 import java.util.UUID;
@@ -21,6 +22,7 @@ import java.util.UUID;
 public class AdminWebController {
 
     private final AdminServiceClient adminServiceClient;
+    private final TaskServiceClient taskServiceClient;
 
     // ==================== Dashboard ====================
 
@@ -31,7 +33,7 @@ public class AdminWebController {
             var stats = adminServiceClient.getStatistics();
             model.addAttribute("stats", stats);
 
-            var auditLogs = adminServiceClient.getAuditLogs(0, 10);
+            var auditLogs = adminServiceClient.getAuditLogs(0, 10, null, null, null);
             model.addAttribute("recentAudit", auditLogs.get("content"));
         } catch (Exception e) {
             log.error("Error loading admin dashboard: {}", e.getMessage());
@@ -240,14 +242,24 @@ public class AdminWebController {
     public String auditLog(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String action,
+            @RequestParam(required = false) String dateFrom,
+            @RequestParam(required = false) String dateTo,
             Model model
     ) {
         try {
-            var result = adminServiceClient.getAuditLogs(page, size);
+            String isoFrom = dateFrom != null && !dateFrom.isBlank() ? dateFrom + "T00:00:00Z" : null;
+            String isoTo = dateTo != null && !dateTo.isBlank() ? dateTo + "T23:59:59Z" : null;
+            String actionParam = action != null && !action.isBlank() ? action : null;
+
+            var result = adminServiceClient.getAuditLogs(page, size, actionParam, isoFrom, isoTo);
             model.addAttribute("auditLogs", result.get("content"));
             model.addAttribute("currentPage", result.get("number"));
             model.addAttribute("totalPages", result.get("totalPages"));
             model.addAttribute("totalElements", result.get("totalElements"));
+            model.addAttribute("selectedAction", action);
+            model.addAttribute("dateFrom", dateFrom);
+            model.addAttribute("dateTo", dateTo);
         } catch (Exception e) {
             log.error("Error loading audit log: {}", e.getMessage());
             model.addAttribute("error", "Ошибка загрузки журнала аудита");
@@ -266,5 +278,190 @@ public class AdminWebController {
             }
         }
         return msg != null ? msg : "Произошла ошибка";
+    }
+
+    // ==================== Password Reset ====================
+
+    /** Сброс пароля пользователя. */
+    @PostMapping("/users/{id}/password")
+    public String resetPassword(
+            @PathVariable UUID id,
+            @RequestParam String password,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            if (password == null || password.length() < 6) {
+                redirectAttributes.addFlashAttribute("error", "Пароль должен содержать минимум 6 символов");
+                return "redirect:/admin/users";
+            }
+            adminServiceClient.resetUserPassword(id, Map.of("password", password));
+            redirectAttributes.addFlashAttribute("success", "Пароль пользователя успешно изменён");
+        } catch (Exception e) {
+            log.error("Error resetting password: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", extractMessage(e));
+        }
+        return "redirect:/admin/users";
+    }
+
+    // ==================== Marketplace ====================
+
+    /** Страница маркетплейса наград. */
+    @GetMapping("/marketplace")
+    public String marketplace(Model model) {
+        try {
+            var items = adminServiceClient.getMarketplaceItems();
+            model.addAttribute("items", items);
+        } catch (Exception e) {
+            log.error("Error loading marketplace: {}", e.getMessage());
+            model.addAttribute("error", "Ошибка загрузки маркетплейса");
+        }
+        return "admin/marketplace";
+    }
+
+    /** Создание товара маркетплейса. */
+    @PostMapping("/marketplace")
+    public String createMarketplaceItem(
+            @RequestParam String title,
+            @RequestParam(required = false) String description,
+            @RequestParam int priceCoins,
+            @RequestParam(required = false) String iconName,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            adminServiceClient.createMarketplaceItem(Map.of(
+                    "title", title,
+                    "description", description != null ? description : "",
+                    "priceCoins", priceCoins,
+                    "iconName", iconName != null && !iconName.isBlank() ? iconName : "bi-gift"
+            ));
+            redirectAttributes.addFlashAttribute("success", "Товар создан");
+        } catch (Exception e) {
+            log.error("Error creating marketplace item: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", extractMessage(e));
+        }
+        return "redirect:/admin/marketplace";
+    }
+
+    /** Обновление товара маркетплейса. */
+    @PostMapping("/marketplace/{id}/edit")
+    public String updateMarketplaceItem(
+            @PathVariable UUID id,
+            @RequestParam String title,
+            @RequestParam(required = false) String description,
+            @RequestParam int priceCoins,
+            @RequestParam(required = false) String iconName,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            adminServiceClient.updateMarketplaceItem(id, Map.of(
+                    "title", title,
+                    "description", description != null ? description : "",
+                    "priceCoins", priceCoins,
+                    "iconName", iconName != null && !iconName.isBlank() ? iconName : "bi-gift"
+            ));
+            redirectAttributes.addFlashAttribute("success", "Товар обновлён");
+        } catch (Exception e) {
+            log.error("Error updating marketplace item: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", extractMessage(e));
+        }
+        return "redirect:/admin/marketplace";
+    }
+
+    /** Удаление товара маркетплейса. */
+    @PostMapping("/marketplace/{id}/delete")
+    public String deleteMarketplaceItem(@PathVariable UUID id, RedirectAttributes redirectAttributes) {
+        try {
+            adminServiceClient.deleteMarketplaceItem(id);
+            redirectAttributes.addFlashAttribute("success", "Товар удалён");
+        } catch (Exception e) {
+            log.error("Error deleting marketplace item: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", extractMessage(e));
+        }
+        return "redirect:/admin/marketplace";
+    }
+
+    // ==================== Template Library ====================
+
+    /** Страница библиотеки шаблонов. */
+    @GetMapping("/templates")
+    public String templates(Model model) {
+        try {
+            var templates = taskServiceClient.getAdminLibraryTemplates();
+            model.addAttribute("templates", templates);
+        } catch (Exception e) {
+            log.error("Error loading templates: {}", e.getMessage());
+            model.addAttribute("error", "Ошибка загрузки шаблонов");
+        }
+        return "admin/templates";
+    }
+
+    /** Создание шаблона в библиотеке. */
+    @PostMapping("/templates")
+    public String createTemplate(
+            @RequestParam String title,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) Integer expReward,
+            @RequestParam(required = false) Integer coinsReward,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String difficulty,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            java.util.HashMap<String, Object> req = new java.util.HashMap<>();
+            req.put("title", title);
+            if (description != null) req.put("description", description);
+            if (expReward != null) req.put("expReward", expReward);
+            if (coinsReward != null) req.put("coinsReward", coinsReward);
+            if (category != null && !category.isBlank()) req.put("category", category);
+            if (difficulty != null && !difficulty.isBlank()) req.put("difficulty", difficulty);
+            taskServiceClient.createLibraryTemplate(req);
+            redirectAttributes.addFlashAttribute("success", "Шаблон создан");
+        } catch (Exception e) {
+            log.error("Error creating template: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", extractMessage(e));
+        }
+        return "redirect:/admin/templates";
+    }
+
+    /** Обновление шаблона библиотеки. */
+    @PostMapping("/templates/{id}/edit")
+    public String updateTemplate(
+            @PathVariable UUID id,
+            @RequestParam String title,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) Integer expReward,
+            @RequestParam(required = false) Integer coinsReward,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String difficulty,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            java.util.HashMap<String, Object> req = new java.util.HashMap<>();
+            req.put("title", title);
+            if (description != null) req.put("description", description);
+            if (expReward != null) req.put("expReward", expReward);
+            if (coinsReward != null) req.put("coinsReward", coinsReward);
+            if (category != null && !category.isBlank()) req.put("category", category);
+            if (difficulty != null && !difficulty.isBlank()) req.put("difficulty", difficulty);
+            taskServiceClient.updateLibraryTemplate(id, req);
+            redirectAttributes.addFlashAttribute("success", "Шаблон обновлён");
+        } catch (Exception e) {
+            log.error("Error updating template: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", extractMessage(e));
+        }
+        return "redirect:/admin/templates";
+    }
+
+    /** Удаление шаблона библиотеки. */
+    @PostMapping("/templates/{id}/delete")
+    public String deleteTemplate(@PathVariable UUID id, RedirectAttributes redirectAttributes) {
+        try {
+            taskServiceClient.deleteLibraryTemplate(id);
+            redirectAttributes.addFlashAttribute("success", "Шаблон удалён");
+        } catch (Exception e) {
+            log.error("Error deleting template: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", extractMessage(e));
+        }
+        return "redirect:/admin/templates";
     }
 }

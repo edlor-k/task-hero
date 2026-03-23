@@ -42,6 +42,23 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
 
+            <!-- Expired task alerts -->
+            <div th:if="${expiredAssignments != null and !expiredAssignments.isEmpty()}" class="alert alert-danger alert-dismissible fade show">
+                <i class="bi bi-clock-history me-2"></i>
+                <strong>Просроченные задания:</strong>
+                <ul class="mb-2 mt-2">
+                    <li th:each="expired : ${expiredAssignments}">
+                        <strong th:text="${expired.template.title}">Задание</strong>
+                        — дедлайн <span th:text="${expired.dueDate}">---</span>
+                        <form th:action="@{/parent/assignments/{id}/extend-deadline(id=${expired.id})}" method="post" class="d-inline ms-2">
+                            <input type="date" name="newDueDate" required class="form-control form-control-sm d-inline-block" style="width: 160px;">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Продлить</button>
+                        </form>
+                    </li>
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
             <!-- Stat cards -->
             <div class="row g-3 mb-4">
                 <div class="col-md-4">
