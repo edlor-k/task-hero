@@ -117,7 +117,7 @@ services:
       JWT_EXPIRATION_MS: 86400000
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
       LOGGING_LEVEL_ROOT: INFO
-      JAVA_TOOL_OPTIONS: "-Xss512k -XX:MaxMetaspaceSize=96m -XX:ReservedCodeCacheSize=48m"
+      JAVA_TOOL_OPTIONS: "-Xss512k -XX:MaxMetaspaceSize=128m -XX:ReservedCodeCacheSize=48m"
     healthcheck:
       test: ["CMD", "curl", "-sf", "http://localhost:8081/users/actuator/health"]
       interval: 30s
@@ -161,7 +161,7 @@ services:
       USER_SERVICE_URL: http://user-service:8081/users
       JWT_SECRET: mySecretKeyForJWTTokenGenerationThatIsLongEnough256bits
       LOGGING_LEVEL_ROOT: INFO
-      JAVA_TOOL_OPTIONS: "-Xss512k -XX:MaxMetaspaceSize=96m -XX:ReservedCodeCacheSize=48m"
+      JAVA_TOOL_OPTIONS: "-Xss512k -XX:MaxMetaspaceSize=128m -XX:ReservedCodeCacheSize=48m"
     healthcheck:
       test: ["CMD", "curl", "-sf", "http://localhost:8082/tasks/actuator/health"]
       interval: 30s
@@ -200,7 +200,7 @@ services:
       USER_SERVICE_URL: http://user-service:8081/users
       TASK_SERVICE_URL: http://task-service:8082/tasks
       LOGGING_LEVEL_ROOT: INFO
-      JAVA_TOOL_OPTIONS: "-Xss512k -XX:MaxMetaspaceSize=80m -XX:ReservedCodeCacheSize=40m"
+      JAVA_TOOL_OPTIONS: "-Xss512k -XX:MaxMetaspaceSize=110m -XX:ReservedCodeCacheSize=40m"
     healthcheck:
       test: ["CMD", "curl", "-sf", "http://localhost:8080/actuator/health"]
       interval: 30s
