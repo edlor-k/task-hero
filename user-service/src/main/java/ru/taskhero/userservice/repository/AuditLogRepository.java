@@ -26,13 +26,18 @@ public interface AuditLogRepository extends JpaRepository<AuditLog, UUID> {
 
     Page<AuditLog> findByCreatedAtBetween(Instant from, Instant to, Pageable pageable);
 
-    @Query("SELECT a FROM AuditLog a WHERE " +
-            "(:action IS NULL OR a.action = :action) AND " +
-            "(:dateFrom IS NULL OR a.createdAt >= :dateFrom) AND " +
-            "(:dateTo IS NULL OR a.createdAt <= :dateTo) " +
-            "ORDER BY a.createdAt DESC")
+    @Query(value = "SELECT * FROM audit_log a WHERE " +
+            "(CAST(:action AS VARCHAR) IS NULL OR a.action = CAST(:action AS VARCHAR)) AND " +
+            "(CAST(:dateFrom AS TIMESTAMP) IS NULL OR a.created_at >= CAST(:dateFrom AS TIMESTAMP)) AND " +
+            "(CAST(:dateTo AS TIMESTAMP) IS NULL OR a.created_at <= CAST(:dateTo AS TIMESTAMP)) " +
+            "ORDER BY a.created_at DESC",
+            countQuery = "SELECT COUNT(*) FROM audit_log a WHERE " +
+            "(CAST(:action AS VARCHAR) IS NULL OR a.action = CAST(:action AS VARCHAR)) AND " +
+            "(CAST(:dateFrom AS TIMESTAMP) IS NULL OR a.created_at >= CAST(:dateFrom AS TIMESTAMP)) AND " +
+            "(CAST(:dateTo AS TIMESTAMP) IS NULL OR a.created_at <= CAST(:dateTo AS TIMESTAMP))",
+            nativeQuery = true)
     Page<AuditLog> findFiltered(
-            @Param("action") AuditAction action,
+            @Param("action") String action,
             @Param("dateFrom") Instant dateFrom,
             @Param("dateTo") Instant dateTo,
             Pageable pageable

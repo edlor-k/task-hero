@@ -54,7 +54,8 @@ public class AuditServiceImpl implements AuditService {
     @Transactional(readOnly = true)
     public Page<AuditLogDto> getAuditLogs(Pageable pageable, AuditAction action,
                                            Instant dateFrom, Instant dateTo) {
-        return auditLogRepository.findFiltered(action, dateFrom, dateTo, pageable)
+        String actionStr = action != null ? action.name() : null;
+        return auditLogRepository.findFiltered(actionStr, dateFrom, dateTo, pageable)
                 .map(this::toDto);
     }
 
