@@ -371,7 +371,7 @@ public class ChildController {
     ) {
         log.info("Начисление награды ребёнку {}: {} EXP, {} коинов", childId, request.exp(), request.coins());
 
-        ChildResponseDto response = childService.addReward(childId, request.exp(), request.coins());
+        ChildResponseDto response = childService.addReward(childId, request.exp(), request.coins(), request.capExp());
         return ResponseEntity.ok(response);
     }
 

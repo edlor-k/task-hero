@@ -16,6 +16,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -434,5 +435,14 @@ public class TaskAssignmentController {
         TaskAssignmentResponseDto response = assignmentService.extendDeadline(
                 id, parentId, java.time.LocalDate.parse(newDueDate));
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('PARENT')")
+    @Operation(summary = "Удалить назначение", description = "Удалить назначенное задание")
+    public ResponseEntity<Void> deleteAssignment(@PathVariable UUID id) {
+        UUID parentId = SecurityUtils.getCurrentUserId();
+        assignmentService.deleteAssignment(id, parentId);
+        return ResponseEntity.noContent().build();
     }
 }

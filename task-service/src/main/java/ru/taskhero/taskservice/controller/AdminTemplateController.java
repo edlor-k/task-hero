@@ -10,9 +10,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import ru.taskhero.taskservice.dto.TaskAssignmentResponseDto;
 import ru.taskhero.taskservice.dto.TaskTemplateCreateRequest;
 import ru.taskhero.taskservice.dto.TaskTemplateResponseDto;
 import ru.taskhero.taskservice.dto.TaskTemplateUpdateRequest;
+import ru.taskhero.taskservice.service.TaskAssignmentService;
 import ru.taskhero.taskservice.service.TaskTemplateService;
 
 import java.util.List;
@@ -31,6 +33,7 @@ import java.util.UUID;
 public class AdminTemplateController {
 
     private final TaskTemplateService templateService;
+    private final TaskAssignmentService assignmentService;
 
     /**
      * Получить все шаблоны библиотеки.
@@ -78,5 +81,35 @@ public class AdminTemplateController {
         log.info("Админ: удаление шаблона библиотеки: {}", id);
         templateService.deleteLibraryTemplate(id);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Получить все шаблоны заданий конкретного родителя.
+     */
+    @GetMapping("/parent/{parentId}")
+    @Operation(summary = "Получить шаблоны родителя", description = "Все шаблоны заданий, созданные родителем")
+    public ResponseEntity<List<TaskTemplateResponseDto>> getParentTemplates(@PathVariable UUID parentId) {
+        log.info("Админ: запрос шаблонов родителя: {}", parentId);
+        return ResponseEntity.ok(templateService.getAllByParent(parentId));
+    }
+
+    /**
+     * Получить все назначения заданий конкретного родителя.
+     */
+    @GetMapping("/parent/{parentId}/assignments")
+    @Operation(summary = "Получить назначения родителя", description = "Все назначенные задания родителем")
+    public ResponseEntity<List<TaskAssignmentResponseDto>> getParentAssignments(@PathVariable UUID parentId) {
+        log.info("Админ: запрос назначений родителя: {}", parentId);
+        return ResponseEntity.ok(assignmentService.getAllByParent(parentId));
+    }
+
+    /**
+     * Получить все назначения заданий конкретного ребёнка.
+     */
+    @GetMapping("/child/{childId}/assignments")
+    @Operation(summary = "Получить назначения ребёнка", description = "Все задания, назначенные ребёнку")
+    public ResponseEntity<List<TaskAssignmentResponseDto>> getChildAssignments(@PathVariable UUID childId) {
+        log.info("Админ: запрос назначений ребёнка: {}", childId);
+        return ResponseEntity.ok(assignmentService.getAllByChild(childId));
     }
 }

@@ -5,11 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import ru.taskhero.app.client.AdminServiceClient;
 import ru.taskhero.app.client.TaskServiceClient;
 import ru.taskhero.app.client.UserServiceClient;
 import ru.taskhero.app.dto.ChildDto;
@@ -40,6 +42,32 @@ public class ParentController {
 
     private final UserServiceClient userServiceClient;
     private final TaskServiceClient taskServiceClient;
+    private final AdminServiceClient adminServiceClient;
+
+    /**
+     * Добавляет атрибут onboardingComplete для всех страниц родителя.
+     * Используется для скрытия пункта меню «Онбординг» после завершения настройки.
+     */
+    @ModelAttribute("onboardingComplete")
+    public boolean isOnboardingComplete() {
+        try {
+            List<ChildDto> children = userServiceClient.getChildren();
+            if (children.isEmpty()) return false;
+            boolean hasLevelRewards = children.stream().allMatch(child -> {
+                try {
+                    List<LevelRewardDto> rewards = userServiceClient.getLevelRewards(child.id());
+                    return rewards != null && rewards.size() >= 9;
+                } catch (Exception e) {
+                    return false;
+                }
+            });
+            boolean hasShopItems = !userServiceClient.getShopItems().isEmpty();
+            boolean hasTemplates = !taskServiceClient.getActiveTemplates().isEmpty();
+            return hasLevelRewards && hasShopItems && hasTemplates;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
     /**
      * Страница онбординга для новых родителей.
@@ -157,10 +185,11 @@ public class ParentController {
      * Список детей.
      */
     @GetMapping("/children")
-    public String children(Model model) {
+    public String children(@RequestParam(required = false) boolean onboarding, Model model) {
         try {
             List<ChildDto> children = userServiceClient.getChildren();
             model.addAttribute("children", children);
+            model.addAttribute("onboarding", onboarding);
         } catch (Exception e) {
             log.error("Error loading children: {}", e.getMessage());
             model.addAttribute("error", "Ошибка загрузки списка детей");
@@ -219,10 +248,11 @@ public class ParentController {
      * Список шаблонов заданий.
      */
     @GetMapping("/templates")
-    public String templates(Model model) {
+    public String templates(@RequestParam(required = false) boolean onboarding, Model model) {
         try {
             Map<String, Object> response = taskServiceClient.getTemplates(0, 50);
             model.addAttribute("templates", response.get("content"));
+            model.addAttribute("onboarding", onboarding);
         } catch (Exception e) {
             log.error("Error loading templates: {}", e.getMessage());
             model.addAttribute("error", "Ошибка загрузки шаблонов");
@@ -457,6 +487,7 @@ public class ParentController {
             @RequestParam(defaultValue = "NORMAL") String quickDifficulty,
             @RequestParam(required = false) String quickCategory,
             @RequestParam(defaultValue = "false") boolean saveAsTemplate,
+            @RequestParam(defaultValue = "false") boolean important,
             RedirectAttributes redirectAttributes
     ) {
         try {
@@ -491,8 +522,19 @@ public class ParentController {
             if (dueDate != null && !dueDate.isEmpty()) {
                 request.put("dueDate", dueDate);
             }
+            request.put("important", important);
 
             taskServiceClient.assignTask(request);
+
+            try {
+                Map<String, String> audit = new HashMap<>();
+                audit.put("action", "TASK_ASSIGNED");
+                audit.put("targetType", "ASSIGNMENT");
+                audit.put("details", "Назначено задание ребёнку " + childId);
+                adminServiceClient.createAuditEntry(audit);
+            } catch (Exception ex) {
+                log.warn("Audit log failed: {}", ex.getMessage());
+            }
 
             redirectAttributes.addFlashAttribute("success", "Задание назначено!");
 
@@ -536,6 +578,17 @@ public class ParentController {
 
             taskServiceClient.approveTask(id, request);
 
+            try {
+                Map<String, String> audit = new HashMap<>();
+                audit.put("action", "TASK_APPROVED");
+                audit.put("targetType", "ASSIGNMENT");
+                audit.put("targetId", id.toString());
+                audit.put("details", "Одобрено задание " + id);
+                adminServiceClient.createAuditEntry(audit);
+            } catch (Exception ex) {
+                log.warn("Audit log failed: {}", ex.getMessage());
+            }
+
             redirectAttributes.addFlashAttribute("success", "Задание одобрено!");
 
         } catch (Exception e) {
@@ -562,6 +615,17 @@ public class ParentController {
             }
 
             taskServiceClient.rejectTask(id, request);
+
+            try {
+                Map<String, String> audit = new HashMap<>();
+                audit.put("action", "TASK_REJECTED");
+                audit.put("targetType", "ASSIGNMENT");
+                audit.put("targetId", id.toString());
+                audit.put("details", "Отклонено задание " + id);
+                adminServiceClient.createAuditEntry(audit);
+            } catch (Exception ex) {
+                log.warn("Audit log failed: {}", ex.getMessage());
+            }
 
             redirectAttributes.addFlashAttribute("success", "Задание отклонено");
 
@@ -592,13 +656,31 @@ public class ParentController {
         return "redirect:/parent/dashboard";
     }
 
+    /**
+     * Удалить назначение задания.
+     */
+    @PostMapping("/assignments/{id}/delete")
+    public String deleteAssignment(
+            @PathVariable UUID id,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            taskServiceClient.deleteAssignment(id);
+            redirectAttributes.addFlashAttribute("success", "Задание удалено");
+        } catch (Exception e) {
+            log.error("Error deleting assignment: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Ошибка удаления задания");
+        }
+        return "redirect:/parent/dashboard";
+    }
+
     // ==================== Shop ====================
 
     /**
      * Страница магазина родителя.
      */
     @GetMapping("/shop")
-    public String shop(Model model) {
+    public String shop(@RequestParam(required = false) boolean onboarding, Model model) {
         try {
             List<ShopItemDto> items = userServiceClient.getShopItems();
             List<ShopPurchaseDto> pendingPurchases = userServiceClient.getPendingPurchases();
@@ -609,6 +691,7 @@ public class ParentController {
             model.addAttribute("pendingPurchases", pendingPurchases);
             model.addAttribute("allPurchases", allPurchases);
             model.addAttribute("children", children);
+            model.addAttribute("onboarding", onboarding);
         } catch (Exception e) {
             log.error("Error loading shop: {}", e.getMessage());
             model.addAttribute("error", "Ошибка загрузки магазина");

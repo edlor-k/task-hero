@@ -85,6 +85,43 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Assignments -->
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-clipboard-check me-2"></i>Задания</h5>
+                        <div th:if="${assignments == null || #lists.isEmpty(assignments)}" class="text-center py-3">
+                            <p class="text-muted mb-0">Нет назначений</p>
+                        </div>
+                        <div class="table-responsive" th:unless="${assignments == null || #lists.isEmpty(assignments)}">
+                            <table class="table table-sm align-middle mb-0">
+                                <thead>
+                                <tr>
+                                    <th>Задание</th>
+                                    <th>Статус</th>
+                                    <th>Дедлайн</th>
+                                    <th>EXP</th>
+                                    <th>Коины</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="a : ${assignments}">
+                                    <td class="fw-semibold" th:text="${a.template() != null ? a.template().title() : '—'}">Задание</td>
+                                    <td>
+                                        <span class="badge"
+                                              th:classappend="${a.status().name() == 'APPROVED' ? 'bg-success' : (a.status().name() == 'REJECTED' ? 'bg-danger' : (a.status().name() == 'SUBMITTED' ? 'bg-info' : (a.status().name() == 'EXPIRED' ? 'bg-warning text-dark' : 'bg-primary')))}"
+                                              th:text="${a.status()}">Статус</span>
+                                        <span class="badge bg-danger ms-1" th:if="${a.important()}"><i class="bi bi-exclamation-triangle-fill"></i></span>
+                                    </td>
+                                    <td th:text="${a.dueDate() != null ? a.dueDate() : '—'}">Дата</td>
+                                    <td th:text="${a.expEarned() != null ? a.expEarned() : (a.template() != null ? a.template().expReward() : '—')}">0</td>
+                                    <td th:text="${a.coinsEarned() != null ? a.coinsEarned() : (a.template() != null ? a.template().coinsReward() : '—')}">0</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </main>

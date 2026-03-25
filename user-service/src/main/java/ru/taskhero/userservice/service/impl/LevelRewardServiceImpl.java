@@ -8,7 +8,6 @@ import ru.taskhero.common.aop.LogMethod;
 import ru.taskhero.common.exception.ResourceNotFoundException;
 import ru.taskhero.common.exception.UnauthorizedException;
 import ru.taskhero.common.exception.ValidationException;
-import ru.taskhero.common.model.enums.DifficultyTrajectory;
 import ru.taskhero.userservice.dto.LevelInfoDto;
 import ru.taskhero.userservice.dto.LevelRewardCreateRequest;
 import ru.taskhero.userservice.dto.LevelRewardResponseDto;
@@ -39,8 +38,8 @@ public class LevelRewardServiceImpl implements LevelRewardService {
     private final ChildRepository childRepository;
     private final ShopItemRepository shopItemRepository;
 
-    private static final int BASE_EXP = 100;
-    private static final double LEVEL_MULTIPLIER = 1.5;
+    private static final int BASE_EXP_OFFSET = 40;
+    private static final int EXP_SCALE = 5;
 
     @Override
     @Transactional
@@ -205,20 +204,15 @@ public class LevelRewardServiceImpl implements LevelRewardService {
         Child child = childRepository.findById(childId)
                 .orElseThrow(() -> new ResourceNotFoundException("Ребёнок не найден"));
 
-        DifficultyTrajectory trajectory = child.getDifficultyTrajectory() != null
-                ? child.getDifficultyTrajectory() : DifficultyTrajectory.NORMAL;
-
-        double expMult = trajectory.getExpMultiplier();
-
         List<LevelInfoDto> levels = new ArrayList<>();
         for (int level = fromLevel; level <= toLevel; level++) {
             int expRequired = getExpForLevelIncremental(level);
             int totalExpForLevel = getExpForLevel(level);
 
-            // Средние значения EXP за задание с учётом множителя траектории
-            double avgEasyExp = 8 * expMult;
-            double avgNormalExp = 10 * expMult;
-            double avgHardExp = 15 * expMult;
+            // Средние значения EXP за задание
+            double avgEasyExp = 8;
+            double avgNormalExp = 10;
+            double avgHardExp = 15;
 
             int approxEasy = expRequired > 0 ? (int) Math.ceil(expRequired / avgEasyExp) : 0;
             int approxNormal = expRequired > 0 ? (int) Math.ceil(expRequired / avgNormalExp) : 0;
@@ -252,10 +246,11 @@ public class LevelRewardServiceImpl implements LevelRewardService {
 
     /**
      * Incremental EXP для конкретного уровня (сколько нужно от предыдущего до этого).
+     * Ур. 2=50, Ур. 3=70, Ур. 4=100, Ур. 5=140, Ур. 6=190, Ур. 7=250...
      */
     private int getExpForLevelIncremental(int level) {
         if (level <= 1) return 0;
-        return (int) (BASE_EXP * Math.pow(LEVEL_MULTIPLIER, level - 2));
+        return BASE_EXP_OFFSET + EXP_SCALE * level * (level - 1);
     }
 
     /**
@@ -263,11 +258,11 @@ public class LevelRewardServiceImpl implements LevelRewardService {
      */
     private int getExpForLevel(int level) {
         if (level <= 1) return 0;
-        double totalExp = 0;
+        int totalExp = 0;
         for (int i = 2; i <= level; i++) {
-            totalExp += BASE_EXP * Math.pow(LEVEL_MULTIPLIER, i - 2);
+            totalExp += BASE_EXP_OFFSET + EXP_SCALE * i * (i - 1);
         }
-        return (int) Math.round(totalExp);
+        return totalExp;
     }
 
     /**

@@ -69,6 +69,11 @@ public interface ChildService {
     ChildResponseDto addReward(UUID childId, int exp, int coins);
 
     /**
+     * Начислить награду ребёнку с возможным ограничением EXP текущим уровнем.
+     */
+    ChildResponseDto addReward(UUID childId, int exp, int coins, boolean capExp);
+
+    /**
      * Выбрать персонажа для ребёнка (при первом входе).
      *
      * @param childId       ID ребёнка
@@ -76,4 +81,9 @@ public interface ChildService {
      * @return обновленные данные ребёнка
      */
     ChildResponseDto selectCharacter(UUID childId, CharacterType characterType);
+
+    /**
+     * Поиск детей по имени или фамилии.
+     */
+    Page<ChildResponseDto> searchChildren(String query, Pageable pageable);
 }

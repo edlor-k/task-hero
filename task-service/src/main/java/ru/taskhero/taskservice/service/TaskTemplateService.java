@@ -114,4 +114,9 @@ public interface TaskTemplateService {
      * Удалить шаблон библиотеки (админ).
      */
     void deleteLibraryTemplate(UUID id);
+
+    /**
+     * Получить все шаблоны родителя (для админа).
+     */
+    List<TaskTemplateResponseDto> getAllByParent(UUID parentId);
 }

@@ -8,6 +8,7 @@ import org.mapstruct.ReportingPolicy;
 import ru.taskhero.common.model.enums.CharacterType;
 import ru.taskhero.userservice.dto.ChildCreateRequestDto;
 import ru.taskhero.userservice.dto.ChildResponseDto;
+import ru.taskhero.userservice.dto.ParentResponseDto;
 import ru.taskhero.userservice.entity.Child;
 
 /**
@@ -26,17 +27,21 @@ public interface ChildMapper {
      * Преобразует сущность Child в DTO для ответа.
      * Поля expToNextLevel, currentLevelExp, nextLevelExp заполняются из параметров.
      */
+    @Mapping(target = "id", source = "entity.id")
+    @Mapping(target = "firstName", source = "entity.firstName")
+    @Mapping(target = "surname", source = "entity.surname")
     @Mapping(target = "expToNextLevel", source = "expToNextLevel")
     @Mapping(target = "currentLevelExp", source = "currentLevelExp")
     @Mapping(target = "nextLevelExp", source = "nextLevelExp")
     @Mapping(target = "characterImagePath", source = "entity", qualifiedByName = "characterImagePath")
-    ChildResponseDto toDto(Child entity, int expToNextLevel, int currentLevelExp, int nextLevelExp);
+    @Mapping(target = "parent", source = "parent")
+    ChildResponseDto toDto(Child entity, int expToNextLevel, int currentLevelExp, int nextLevelExp, ParentResponseDto parent);
 
     /**
      * Упрощённое преобразование без EXP-прогресса (для списков, где EXP не важен).
      */
     default ChildResponseDto toDto(Child entity) {
-        return toDto(entity, 0, 0, 0);
+        return toDto(entity, 0, 0, 0, null);
     }
 
     /**

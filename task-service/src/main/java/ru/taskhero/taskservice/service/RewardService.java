@@ -17,6 +17,11 @@ public interface RewardService {
     void grantReward(UUID childId, int exp, int coins);
 
     /**
+     * Начислить награду ребёнку с возможным ограничением EXP.
+     */
+    void grantReward(UUID childId, int exp, int coins, boolean capExp);
+
+    /**
      * Рассчитать уровень по количеству EXP.
      *
      * @param exp количество EXP

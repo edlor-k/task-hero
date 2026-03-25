@@ -40,5 +40,7 @@ public record ChildResponseDto(
         @Schema(description = "EXP текущего уровня (начало)")
         int currentLevelExp,
         @Schema(description = "EXP следующего уровня (порог)")
-        int nextLevelExp
+        int nextLevelExp,
+        @Schema(description = "Информация о родителе")
+        ParentResponseDto parent
 ) {}

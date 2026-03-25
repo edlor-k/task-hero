@@ -35,4 +35,13 @@ public interface ParentRepository extends JpaRepository<Parent, UUID> {
      */
     @Query("SELECT p FROM Parent p LEFT JOIN FETCH p.children LEFT JOIN FETCH p.user WHERE p.id = :id")
     Optional<Parent> findByIdWithChildrenAndUser(@Param("id") UUID id);
+
+    /**
+     * Поиск родителей по имени, фамилии или email (для админки).
+     */
+    @Query("SELECT DISTINCT p FROM Parent p LEFT JOIN FETCH p.children LEFT JOIN FETCH p.user "
+            + "WHERE LOWER(p.firstName) LIKE LOWER(CONCAT('%', :q, '%')) "
+            + "OR LOWER(p.surname) LIKE LOWER(CONCAT('%', :q, '%')) "
+            + "OR LOWER(p.user.email) LIKE LOWER(CONCAT('%', :q, '%'))")
+    Page<Parent> searchByNameOrEmail(@Param("q") String query, Pageable pageable);
 }

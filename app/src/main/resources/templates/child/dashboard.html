@@ -18,6 +18,48 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
 
+            <!-- Reassigned task notifications -->
+            <div th:if="${reassignedAssignments != null && !reassignedAssignments.isEmpty()}" th:each="ra : ${reassignedAssignments}"
+                 class="alert alert-info alert-dismissible fade show border-start border-4 border-info">
+                <i class="bi bi-arrow-repeat me-2"></i>
+                <strong>Задание возвращено!</strong> «<span th:text="${ra.template?.title}">Задание</span>»
+                было продлено до <span th:text="${#temporals.format(ra.dueDate, 'dd.MM.yyyy')}">01.01.2026</span>.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Recent results (approved/rejected tasks, purchases) -->
+            <div th:if="${recentResults != null && !recentResults.isEmpty()}" th:each="r : ${recentResults}"
+                 class="alert alert-dismissible fade show border-start border-4"
+                 th:classappend="${r.status == 'APPROVED' ? 'alert-success border-success' : 'alert-danger border-danger'}">
+                <div th:if="${r.status == 'APPROVED'}">
+                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                    Задание «<strong th:text="${r.template?.title}">Задание</strong>» одобрено!
+                    <span th:if="${r.expEarned != null}"> +<span th:text="${r.expEarned}">10</span> EXP</span>
+                    <span th:if="${r.coinsEarned != null}"> +<span th:text="${r.coinsEarned}">5</span> коинов</span>
+                </div>
+                <div th:if="${r.status == 'REJECTED'}">
+                    <i class="bi bi-x-circle-fill text-danger me-2"></i>
+                    Задание «<strong th:text="${r.template?.title}">Задание</strong>» отклонено.
+                    <span th:if="${r.parentComment}" class="d-block mt-1 small text-muted" th:text="${r.parentComment}">Комментарий</span>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Recent purchases -->
+            <div th:if="${recentPurchases != null && !recentPurchases.isEmpty()}" th:each="p : ${recentPurchases}"
+                 class="alert alert-dismissible fade show border-start border-4"
+                 th:classappend="${p.status == 'APPROVED' ? 'alert-success border-success' : p.status == 'REJECTED' ? 'alert-danger border-danger' : 'alert-warning border-warning'}">
+                <div th:if="${p.status == 'APPROVED'}">
+                    <i class="bi bi-bag-check-fill text-success me-2"></i>
+                    Покупка «<strong th:text="${p.shopItem?.title}">Товар</strong>» одобрена!
+                </div>
+                <div th:if="${p.status == 'REJECTED'}">
+                    <i class="bi bi-bag-x-fill text-danger me-2"></i>
+                    Покупка «<strong th:text="${p.shopItem?.title}">Товар</strong>» отклонена.
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
             <!-- Unseen level rewards -->
             <div th:if="${unseenRewards != null && !unseenRewards.isEmpty()}" th:each="reward : ${unseenRewards}"
                  class="alert alert-warning alert-dismissible fade show border-start border-4 border-warning">
@@ -149,7 +191,12 @@
                         <div th:each="a : ${activeAssignments}" class="list-group-item">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div class="me-3">
-                                    <h6 class="fw-semibold mb-1" th:text="${a.template?.title}">Задание</h6>
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <h6 class="fw-semibold mb-0" th:text="${a.template?.title}">Задание</h6>
+                                        <span th:if="${a.important}" class="badge bg-warning text-dark">
+                                            <i class="bi bi-exclamation-triangle-fill me-1"></i>Важное
+                                        </span>
+                                    </div>
                                     <small class="text-muted" th:text="${a.template?.description}" th:if="${a.template?.description}">Описание</small>
                                     <div class="d-flex gap-2 mt-1">
                                         <span class="badge bg-success-subtle text-success" th:if="${a.template?.expReward}">
@@ -158,6 +205,15 @@
                                         <span class="badge bg-warning-subtle text-warning" th:if="${a.template?.coinsReward}">
                                             <i class="bi bi-coin me-1"></i><span th:text="${a.template.coinsReward}">5</span>
                                         </span>
+                                    </div>
+                                    <!-- Deadline -->
+                                    <div th:if="${a.dueDate}" class="mt-1">
+                                        <small th:classappend="${a.dueDate.isBefore(T(java.time.LocalDate).now().plusDays(1)) ? 'text-danger fw-semibold' : 'text-muted'}">
+                                            <i class="bi bi-clock me-1"></i>Дедлайн: <span th:text="${#temporals.format(a.dueDate, 'dd.MM.yyyy')}">01.01.2026</span>
+                                            <span th:with="daysLeft=${T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(), a.dueDate)}"
+                                                  th:if="${daysLeft >= 0}"
+                                                  th:text="' (' + ${daysLeft == 0 ? 'сегодня' : daysLeft == 1 ? 'завтра' : daysLeft + ' дн.'} + ')'"></span>
+                                        </small>
                                     </div>
                                     <!-- Sub-items -->
                                     <div th:if="${a.template?.subItems != null and !a.template.subItems.isEmpty()}" class="mt-2">

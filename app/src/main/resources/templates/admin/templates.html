@@ -25,6 +25,37 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
 
+            <!-- Search -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-5">
+                            <label class="form-label fw-semibold">Поиск</label>
+                            <input type="text" id="templateSearch" class="form-control" placeholder="Название шаблона...">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Категория</label>
+                            <select id="templateCategory" class="form-select">
+                                <option value="">Все категории</option>
+                                <option value="STUDY">Учёба</option>
+                                <option value="HOUSEHOLD">По дому</option>
+                                <option value="SPORTS">Спорт</option>
+                                <option value="CREATIVITY">Творчество</option>
+                                <option value="HYGIENE">Гигиена</option>
+                                <option value="SOCIAL">Общение</option>
+                                <option value="READING">Чтение</option>
+                                <option value="OTHER">Другое</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="button" class="btn btn-secondary w-100" onclick="document.getElementById('templateSearch').value='';document.getElementById('templateCategory').value='';filterTemplates();">
+                                <i class="bi bi-x-lg me-1"></i>Сбросить
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Templates table -->
             <div class="card">
                 <div class="card-body">
@@ -32,7 +63,7 @@
                         <p class="text-muted mb-0">Нет шаблонов в библиотеке</p>
                     </div>
                     <div class="table-responsive" th:unless="${templates == null || #lists.isEmpty(templates)}">
-                        <table class="table align-middle mb-0">
+                        <table id="templatesTable" class="table align-middle mb-0">
                             <thead>
                             <tr>
                                 <th>Название</th>
@@ -212,5 +243,28 @@
     </div>
 </div>
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+<script>
+function filterTemplates() {
+    var query = document.getElementById('templateSearch').value.toLowerCase();
+    var category = document.getElementById('templateCategory').value;
+    var rows = document.querySelectorAll('#templatesTable tbody tr');
+    rows.forEach(function(row) {
+        var title = row.querySelector('td:nth-child(1)');
+        var catBadge = row.querySelector('td:nth-child(3) .badge');
+        var titleText = title ? title.textContent.toLowerCase() : '';
+        var catText = catBadge ? catBadge.textContent.trim() : '';
+        var catMap = {'STUDY':'Учёба','HOUSEHOLD':'По дому','SPORTS':'Спорт','CREATIVITY':'Творчество','HYGIENE':'Гигиена','SOCIAL':'Общение','READING':'Чтение','OTHER':'Другое'};
+        var matchQuery = !query || titleText.indexOf(query) !== -1;
+        var matchCat = !category || catText === (catMap[category] || category);
+        row.style.display = matchQuery && matchCat ? '' : 'none';
+    });
+}
+document.addEventListener('DOMContentLoaded', function() {
+    var search = document.getElementById('templateSearch');
+    var cat = document.getElementById('templateCategory');
+    if (search) search.addEventListener('input', filterTemplates);
+    if (cat) cat.addEventListener('change', filterTemplates);
+});
+</script>
 </body>
 </html>

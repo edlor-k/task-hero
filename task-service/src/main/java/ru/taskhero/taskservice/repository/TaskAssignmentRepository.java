@@ -156,4 +156,9 @@ public interface TaskAssignmentRepository extends JpaRepository<TaskAssignment, 
      * @return true если существует
      */
     boolean existsByChildIdAndTemplateIdAndStatusIn(UUID childId, UUID templateId, List<TaskStatus> statuses);
+
+    /**
+     * Проверить, есть ли у ребёнка невыполненные важные задания.
+     */
+    boolean existsByChildIdAndImportantTrueAndStatusIn(UUID childId, List<TaskStatus> statuses);
 }

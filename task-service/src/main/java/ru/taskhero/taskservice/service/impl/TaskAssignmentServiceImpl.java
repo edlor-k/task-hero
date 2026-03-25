@@ -82,6 +82,7 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
                 .childId(request.childId())
                 .status(TaskStatus.CREATED)
                 .dueDate(request.dueDate())
+                .important(request.important() != null && request.important())
                 .build();
 
         assignment = assignmentRepository.save(assignment);
@@ -215,8 +216,14 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
 
         assignment = assignmentRepository.save(assignment);
 
-        // Начисляем награду
-        rewardService.grantReward(assignment.getChildId(), expToGrant, coinsToGrant);
+        // Проверяем, есть ли ещё незавершённые важные задания у ребёнка
+        List<TaskStatus> incompleteStatuses = List.of(TaskStatus.CREATED, TaskStatus.SUBMITTED, TaskStatus.EXPIRED);
+        boolean hasIncompleteImportant = assignmentRepository.existsByChildIdAndImportantTrueAndStatusIn(
+                assignment.getChildId(), incompleteStatuses
+        );
+
+        // Начисляем награду (с ограничением EXP, если есть незавершённые важные задания)
+        rewardService.grantReward(assignment.getChildId(), expToGrant, coinsToGrant, hasIncompleteImportant);
 
         log.info("Задание {} одобрено, начислено {} EXP и {} коинов",
                 assignmentId, expToGrant, coinsToGrant);
@@ -313,5 +320,33 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
         }
 
         return assignment;
+    }
+
+    @Override
+    @Transactional
+    @LogMethod("assignment-delete")
+    public void deleteAssignment(UUID assignmentId, UUID parentId) {
+        log.info("Удаление назначения {} родителем {}", assignmentId, parentId);
+        TaskAssignment assignment = findAssignmentAndVerifyParent(assignmentId, parentId);
+        assignmentRepository.delete(assignment);
+        log.info("Назначение {} удалено", assignmentId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TaskAssignmentResponseDto> getAllByParent(UUID parentId) {
+        log.info("Получение всех назначений родителя: {}", parentId);
+        return assignmentRepository.findAllByParentIdWithTemplate(parentId, Pageable.unpaged())
+                .map(assignmentMapper::toDto)
+                .getContent();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TaskAssignmentResponseDto> getAllByChild(UUID childId) {
+        log.info("Получение всех назначений ребёнка: {}", childId);
+        return assignmentRepository.findAllByChildId(childId).stream()
+                .map(assignmentMapper::toDto)
+                .toList();
     }
 }

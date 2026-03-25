@@ -17,10 +17,12 @@ import ru.taskhero.userservice.dto.ChildResponseDto;
 import ru.taskhero.userservice.dto.UpdateChildRequest;
 import ru.taskhero.userservice.entity.Child;
 import ru.taskhero.userservice.entity.Parent;
+import ru.taskhero.userservice.entity.AuditAction;
 import ru.taskhero.userservice.mapper.ChildMapper;
 import ru.taskhero.userservice.mapper.ParentMapper;
 import ru.taskhero.userservice.repository.ChildRepository;
 import ru.taskhero.userservice.repository.ParentRepository;
+import ru.taskhero.userservice.service.AuditService;
 import ru.taskhero.userservice.service.ChildService;
 import ru.taskhero.userservice.service.LevelRewardService;
 import ru.taskhero.userservice.util.TokenGenerator;
@@ -41,6 +43,7 @@ public class ChildServiceImpl implements ChildService {
     private final ChildMapper childMapper;
     private final ParentMapper parentMapper;
     private final LevelRewardService levelRewardService;
+    private final AuditService auditService;
 
     /**
      * Добавить нового ребёнка к родителю.
@@ -80,6 +83,10 @@ public class ChildServiceImpl implements ChildService {
 
         child = childRepository.save(child);
         log.info("Создан ребёнок: {} {} с loginToken: {}", child.getFirstName(), child.getSurname(), loginToken);
+
+        // Аудит
+        auditService.log(parent.getUser().getId(), null, AuditAction.CHILD_CREATED,
+                "CHILD", child.getId(), "Создан ребёнок " + child.getFirstName() + " " + child.getSurname());
 
         return toChildResponseDto(child);
     }
@@ -135,7 +142,7 @@ public class ChildServiceImpl implements ChildService {
     public Page<ChildResponseDto> getAllChildren(Pageable pageable) {
         log.info("Получение списка всех детей, page={}", pageable.getPageNumber());
 
-        return childRepository.findAll(pageable)
+        return childRepository.findAllWithParent(pageable)
                 .map(this::toChildResponseDto);
     }
 
@@ -271,7 +278,14 @@ public class ChildServiceImpl implements ChildService {
     @Transactional
     @LogMethod("child-add-reward")
     public ChildResponseDto addReward(UUID childId, int exp, int coins) {
-        log.info("Начисление награды ребёнку {}: {} EXP, {} коинов", childId, exp, coins);
+        return addReward(childId, exp, coins, false);
+    }
+
+    @Override
+    @Transactional
+    @LogMethod("child-add-reward")
+    public ChildResponseDto addReward(UUID childId, int exp, int coins, boolean capExp) {
+        log.info("Начисление награды ребёнку {}: {} EXP, {} коинов, capExp={}", childId, exp, coins, capExp);
 
         Child child = childRepository.findById(childId)
                 .orElseThrow(() -> {
@@ -285,7 +299,18 @@ public class ChildServiceImpl implements ChildService {
         int adjustedExp = (int) Math.round(exp * trajectory.getExpMultiplier());
 
         // Начисляем награды
-        child.setExp(child.getExp() + adjustedExp);
+        int newExp = child.getExp() + adjustedExp;
+
+        // Если есть незавершённые важные задания — ограничиваем EXP максимумом текущего уровня
+        if (capExp) {
+            int nextLevelThreshold = getExpForLevel(child.getLevel() + 1);
+            if (newExp >= nextLevelThreshold) {
+                newExp = nextLevelThreshold - 1;
+                log.info("EXP ограничен до {} из-за незавершённых важных заданий", newExp);
+            }
+        }
+
+        child.setExp(newExp);
         child.setCoins(child.getCoins() + coins);
 
         // Пересчитываем уровень
@@ -342,10 +367,7 @@ public class ChildServiceImpl implements ChildService {
      * @return уровень
      */
     private int calculateLevel(int exp) {
-        int baseExp = 100;
-        double multiplier = 1.5;
-
-        if (exp < baseExp) {
+        if (exp < 50) {
             return 1;
         }
 
@@ -354,7 +376,7 @@ public class ChildServiceImpl implements ChildService {
 
         while (expRequired <= exp) {
             level++;
-            expRequired += (int) (baseExp * Math.pow(multiplier, level - 2));
+            expRequired += 40 + 5 * level * (level - 1);
         }
 
         return level - 1;
@@ -371,15 +393,12 @@ public class ChildServiceImpl implements ChildService {
             return 0;
         }
 
-        int baseExp = 100;
-        double multiplier = 1.5;
-
-        double totalExp = 0;
+        int totalExp = 0;
         for (int i = 2; i <= level; i++) {
-            totalExp += baseExp * Math.pow(multiplier, i - 2);
+            totalExp += 40 + 5 * i * (i - 1);
         }
 
-        return (int) Math.round(totalExp);
+        return totalExp;
     }
 
     /**
@@ -397,7 +416,8 @@ public class ChildServiceImpl implements ChildService {
         int progressInLevel = Math.max(0, child.getExp() - currentLevelThreshold);
         int expToNextLevel = Math.max(0, nextLevelThreshold - child.getExp());
 
-        return childMapper.toDto(child, expToNextLevel, progressInLevel, levelRange);
+        var parent = child.getParent() != null ? parentMapper.toParentResponseDto(child.getParent()) : null;
+        return childMapper.toDto(child, expToNextLevel, progressInLevel, levelRange, parent);
     }
 
     /**
@@ -422,5 +442,13 @@ public class ChildServiceImpl implements ChildService {
 
         log.debug("Сгенерирован уникальный loginToken за {} попыток", attempts);
         return token;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ChildResponseDto> searchChildren(String query, Pageable pageable) {
+        log.info("Поиск детей по запросу: {}", query);
+        return childRepository.searchByName(query, pageable)
+                .map(this::toChildResponseDto);
     }
 }

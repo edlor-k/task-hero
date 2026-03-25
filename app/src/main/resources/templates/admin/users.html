@@ -83,8 +83,8 @@
                                 </td>
                                 <td>
                                     <span class="badge"
-                                          th:classappend="${user['active'] == true ? 'bg-success' : 'bg-secondary'}"
-                                          th:text="${user['active'] == true ? 'Активен' : 'Заблокирован'}">Status</span>
+                                          th:classappend="${user['isActive'] == true ? 'bg-success' : 'bg-secondary'}"
+                                          th:text="${user['isActive'] == true ? 'Активен' : 'Заблокирован'}">Status</span>
                                 </td>
                                 <td class="text-end">
                                     <div class="btn-group btn-group-sm">
@@ -93,9 +93,9 @@
                                               th:action="@{/admin/users/{id}/toggle-active(id=${user['id']})}"
                                               class="d-inline">
                                             <button type="submit" class="btn btn-sm"
-                                                    th:classappend="${user['active'] == true ? 'btn-outline-warning' : 'btn-outline-success'}"
-                                                    th:title="${user['active'] == true ? 'Заблокировать' : 'Разблокировать'}">
-                                                <i class="bi" th:classappend="${user['active'] == true ? 'bi-lock' : 'bi-unlock'}"></i>
+                                                    th:classappend="${user['isActive'] == true ? 'btn-outline-warning' : 'btn-outline-success'}"
+                                                    th:title="${user['isActive'] == true ? 'Заблокировать' : 'Разблокировать'}">
+                                                <i class="bi" th:classappend="${user['isActive'] == true ? 'bi-lock' : 'bi-unlock'}"></i>
                                             </button>
                                         </form>
                                         <!-- Reset password -->

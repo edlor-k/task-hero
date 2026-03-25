@@ -123,4 +123,22 @@ public interface TaskAssignmentService {
      * @return обновленное назначение
      */
     TaskAssignmentResponseDto extendDeadline(UUID assignmentId, UUID parentId, LocalDate newDueDate);
+
+    /**
+     * Удалить назначение задания.
+     *
+     * @param assignmentId ID назначения
+     * @param parentId     ID родителя
+     */
+    void deleteAssignment(UUID assignmentId, UUID parentId);
+
+    /**
+     * Получить все назначения родителя (для админа, без пагинации).
+     */
+    List<TaskAssignmentResponseDto> getAllByParent(UUID parentId);
+
+    /**
+     * Получить все назначения ребёнка (для админа).
+     */
+    List<TaskAssignmentResponseDto> getAllByChild(UUID childId);
 }

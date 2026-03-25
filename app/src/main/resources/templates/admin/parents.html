@@ -22,6 +22,24 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
 
+            <!-- Filters -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" th:action="@{/admin/parents}" class="row g-3 align-items-end">
+                        <div class="col-md-8">
+                            <label class="form-label fw-semibold">Поиск</label>
+                            <input type="text" name="q" class="form-control" placeholder="Имя, фамилия или email..."
+                                   th:value="${searchQuery}">
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-search me-1"></i>Найти
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             <!-- Parents table -->
             <div class="card">
                 <div class="card-body">
@@ -67,14 +85,14 @@
                     <nav th:if="${totalPages != null && totalPages > 1}" class="mt-3">
                         <ul class="pagination pagination-sm justify-content-center mb-0">
                             <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
-                                <a class="page-link" th:href="@{/admin/parents(page=${currentPage - 1})}">«</a>
+                                <a class="page-link" th:href="@{/admin/parents(page=${currentPage - 1}, q=${searchQuery})}">«</a>
                             </li>
                             <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}" class="page-item"
                                 th:classappend="${i == currentPage ? 'active' : ''}">
-                                <a class="page-link" th:href="@{/admin/parents(page=${i})}" th:text="${i + 1}">1</a>
+                                <a class="page-link" th:href="@{/admin/parents(page=${i}, q=${searchQuery})}" th:text="${i + 1}">1</a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
-                                <a class="page-link" th:href="@{/admin/parents(page=${currentPage + 1})}">»</a>
+                                <a class="page-link" th:href="@{/admin/parents(page=${currentPage + 1}, q=${searchQuery})}">»</a>
                             </li>
                         </ul>
                     </nav>

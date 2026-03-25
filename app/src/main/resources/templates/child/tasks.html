@@ -49,15 +49,20 @@
                         <div class="card-body">
                             <!-- Status indicator -->
                             <div class="d-flex justify-content-between align-items-start mb-2">
-                                <span class="badge"
-                                      th:classappend="${a.status == 'CREATED' ? 'bg-primary' :
-                                                        a.status == 'SUBMITTED' ? 'bg-warning text-dark' :
-                                                        a.status == 'APPROVED' ? 'bg-success' :
-                                                        a.status == 'REJECTED' ? 'bg-danger' : 'bg-secondary'}"
-                                      th:text="${a.status == 'CREATED' ? 'Новое' :
-                                                 a.status == 'SUBMITTED' ? 'На проверке' :
-                                                 a.status == 'APPROVED' ? 'Одобрено' :
-                                                 a.status == 'REJECTED' ? 'Отклонено' : a.status}">Статус</span>
+                                <div class="d-flex gap-2 align-items-center">
+                                    <span class="badge"
+                                          th:classappend="${a.status == 'CREATED' ? 'bg-primary' :
+                                                            a.status == 'SUBMITTED' ? 'bg-warning text-dark' :
+                                                            a.status == 'APPROVED' ? 'bg-success' :
+                                                            a.status == 'REJECTED' ? 'bg-danger' : 'bg-secondary'}"
+                                          th:text="${a.status == 'CREATED' ? 'Новое' :
+                                                     a.status == 'SUBMITTED' ? 'На проверке' :
+                                                     a.status == 'APPROVED' ? 'Одобрено' :
+                                                     a.status == 'REJECTED' ? 'Отклонено' : a.status}">Статус</span>
+                                    <span th:if="${a.important}" class="badge bg-warning text-dark">
+                                        <i class="bi bi-exclamation-triangle-fill me-1"></i>Важное
+                                    </span>
+                                </div>
                                 <span class="badge"
                                       th:if="${a.template?.difficulty}"
                                       th:classappend="${a.template.difficulty == 'EASY' ? 'bg-success-subtle text-success' :
@@ -68,6 +73,16 @@
 
                             <h5 class="fw-bold" th:text="${a.template?.title}">Задание</h5>
                             <p class="text-muted small" th:text="${a.template?.description}" th:if="${a.template?.description}">Описание</p>
+
+                            <!-- Deadline -->
+                            <div th:if="${a.dueDate}" class="mb-2">
+                                <small th:classappend="${a.dueDate.isBefore(T(java.time.LocalDate).now().plusDays(1)) ? 'text-danger fw-semibold' : 'text-muted'}">
+                                    <i class="bi bi-clock me-1"></i>Дедлайн: <span th:text="${#temporals.format(a.dueDate, 'dd.MM.yyyy')}">01.01.2026</span>
+                                    <span th:with="daysLeft=${T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(), a.dueDate)}"
+                                          th:if="${daysLeft >= 0}"
+                                          th:text="' (' + ${daysLeft == 0 ? 'сегодня' : daysLeft == 1 ? 'завтра' : daysLeft + ' дн.'} + ')'"></span>
+                                </small>
+                            </div>
 
                             <div class="d-flex gap-2 mb-3">
                                 <span class="text-success small" th:if="${a.template?.expReward}">

@@ -47,4 +47,12 @@ public interface ChildRepository extends JpaRepository<Child, UUID> {
      */
     @Query("SELECT COUNT(c) > 0 FROM Child c WHERE c.id = :childId AND c.parent.id = :parentId")
     boolean existsByIdAndParentId(@Param("childId") UUID childId, @Param("parentId") UUID parentId);
+
+    /**
+     * Поиск детей по имени или фамилии (для админки).
+     */
+    @Query("SELECT c FROM Child c LEFT JOIN FETCH c.parent "
+            + "WHERE LOWER(c.firstName) LIKE LOWER(CONCAT('%', :q, '%')) "
+            + "OR LOWER(c.surname) LIKE LOWER(CONCAT('%', :q, '%'))")
+    Page<Child> searchByName(@Param("q") String query, Pageable pageable);
 }

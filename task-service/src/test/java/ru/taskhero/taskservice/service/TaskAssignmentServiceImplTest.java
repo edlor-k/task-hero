@@ -89,13 +89,13 @@ class TaskAssignmentServiceImplTest {
         TaskTemplateResponseDto templateDto = new TaskTemplateResponseDto(
                 templateId, parentId, "Убраться в комнате", null,
                 25, 10, false, null, null, null, null,
-                null, null, null, true, false, null, Instant.now(), null
+                null, null, null, true, false, null, null, Instant.now(), null
         );
 
         responseDto = new TaskAssignmentResponseDto(
                 assignmentId, childId, TaskStatus.CREATED, LocalDate.now().plusDays(7),
                 null, null, null, null, null, null,
-                templateDto, Instant.now(), null
+                null, templateDto, Instant.now(), null
         );
     }
 
@@ -104,7 +104,7 @@ class TaskAssignmentServiceImplTest {
     void shouldAssignTaskToChild() {
         // Given
         TaskAssignRequest request = new TaskAssignRequest(
-                templateId, childId, LocalDate.now().plusDays(7)
+                templateId, childId, LocalDate.now().plusDays(7), null
         );
 
         when(templateRepository.findById(templateId)).thenReturn(Optional.of(template));
@@ -128,7 +128,7 @@ class TaskAssignmentServiceImplTest {
     void shouldThrowExceptionWhenAssigningOthersTemplate() {
         // Given
         UUID otherParentId = UUID.randomUUID();
-        TaskAssignRequest request = new TaskAssignRequest(templateId, childId, null);
+        TaskAssignRequest request = new TaskAssignRequest(templateId, childId, null, null);
 
         when(templateRepository.findById(templateId)).thenReturn(Optional.of(template));
 
@@ -141,7 +141,7 @@ class TaskAssignmentServiceImplTest {
     @DisplayName("Должен выбросить исключение при повторном назначении не-повторяемого задания")
     void shouldThrowExceptionWhenAssigningDuplicateNonRepeatable() {
         // Given
-        TaskAssignRequest request = new TaskAssignRequest(templateId, childId, null);
+        TaskAssignRequest request = new TaskAssignRequest(templateId, childId, null, null);
 
         when(templateRepository.findById(templateId)).thenReturn(Optional.of(template));
         when(assignmentRepository.existsByChildIdAndTemplateIdAndStatusIn(eq(childId), eq(templateId), any()))
@@ -165,7 +165,7 @@ class TaskAssignmentServiceImplTest {
                 new TaskAssignmentResponseDto(
                         assignmentId, childId, TaskStatus.SUBMITTED, null,
                         "Я все сделал!", null, Instant.now(), null, null, null,
-                        null, Instant.now(), null
+                        null, null, Instant.now(), null
                 )
         );
 
@@ -205,7 +205,7 @@ class TaskAssignmentServiceImplTest {
                 new TaskAssignmentResponseDto(
                         assignmentId, childId, TaskStatus.APPROVED, null,
                         null, "Молодец!", null, Instant.now(), 25, 10,
-                        null, Instant.now(), Instant.now()
+                        null, null, Instant.now(), Instant.now()
                 )
         );
 
@@ -231,7 +231,7 @@ class TaskAssignmentServiceImplTest {
                 new TaskAssignmentResponseDto(
                         assignmentId, childId, TaskStatus.REJECTED, null,
                         null, "Нужно переделать", null, Instant.now(), null, null,
-                        null, Instant.now(), Instant.now()
+                        null, null, Instant.now(), Instant.now()
                 )
         );
 

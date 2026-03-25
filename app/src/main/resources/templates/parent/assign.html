@@ -118,6 +118,16 @@
 
                                 <input type="hidden" id="recurrenceRule" name="recurrenceRule">
 
+                                <div class="col-12">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="important" value="true" id="templateImportant">
+                                        <label class="form-check-label fw-semibold" for="templateImportant">
+                                            <i class="bi bi-exclamation-triangle text-warning me-1"></i>Важное задание
+                                        </label>
+                                        <div class="form-text">Без выполнения этого задания ребёнок не сможет перейти на новый уровень</div>
+                                    </div>
+                                </div>
+
                                 <div class="mt-4">
                                     <button type="submit" class="btn btn-primary btn-lg">
                                         <i class="bi bi-send me-1"></i>Назначить
@@ -171,6 +181,15 @@
                                     <div class="col-md-6">
                                         <label class="form-label fw-semibold">Дедлайн (необязательно)</label>
                                         <input type="datetime-local" class="form-control" name="dueDate">
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="important" value="true" id="quickImportant">
+                                            <label class="form-check-label fw-semibold" for="quickImportant">
+                                                <i class="bi bi-exclamation-triangle text-warning me-1"></i>Важное задание
+                                            </label>
+                                            <div class="form-text">Без выполнения этого задания ребёнок не сможет перейти на новый уровень</div>
+                                        </div>
                                     </div>
                                 </div>
 

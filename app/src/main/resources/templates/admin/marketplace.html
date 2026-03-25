@@ -25,6 +25,23 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
 
+            <!-- Search -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-8">
+                            <label class="form-label fw-semibold">Поиск</label>
+                            <input type="text" id="marketplaceSearch" class="form-control" placeholder="Название товара...">
+                        </div>
+                        <div class="col-md-4">
+                            <button type="button" class="btn btn-secondary w-100" onclick="document.getElementById('marketplaceSearch').value='';filterMarketplace();">
+                                <i class="bi bi-x-lg me-1"></i>Сбросить
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Items table -->
             <div class="card">
                 <div class="card-body">
@@ -32,7 +49,7 @@
                         <p class="text-muted mb-0">Нет товаров в маркетплейсе</p>
                     </div>
                     <div class="table-responsive" th:unless="${items == null || #lists.isEmpty(items)}">
-                        <table class="table align-middle mb-0">
+                        <table id="marketplaceTable" class="table align-middle mb-0">
                             <thead>
                             <tr>
                                 <th></th>
@@ -158,5 +175,21 @@
     </div>
 </div>
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+<script>
+function filterMarketplace() {
+    var query = document.getElementById('marketplaceSearch').value.toLowerCase();
+    var rows = document.querySelectorAll('#marketplaceTable tbody tr');
+    rows.forEach(function(row) {
+        var title = row.querySelector('td:nth-child(2)');
+        var desc = row.querySelector('td:nth-child(3)');
+        var text = ((title ? title.textContent : '') + ' ' + (desc ? desc.textContent : '')).toLowerCase();
+        row.style.display = text.indexOf(query) !== -1 ? '' : 'none';
+    });
+}
+document.addEventListener('DOMContentLoaded', function() {
+    var input = document.getElementById('marketplaceSearch');
+    if (input) input.addEventListener('input', filterMarketplace);
+});
+</script>
 </body>
 </html>

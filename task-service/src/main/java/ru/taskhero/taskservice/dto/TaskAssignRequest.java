@@ -23,6 +23,9 @@ public record TaskAssignRequest(
 
         @Schema(description = "Срок выполнения", example = "2025-02-01")
         @Future(message = "Срок выполнения должен быть в будущем")
-        LocalDate dueDate
+        LocalDate dueDate,
+
+        @Schema(description = "Важное задание")
+        Boolean important
 ) {
 }

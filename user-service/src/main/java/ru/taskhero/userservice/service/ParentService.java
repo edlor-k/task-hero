@@ -40,4 +40,9 @@ public interface ParentService {
      * Обновить профиль текущего родителя.
      */
     ParentResponseDto updateCurrentParent(UUID userId, UpdateParentRequest request);
+
+    /**
+     * Поиск родителей по имени, фамилии или email.
+     */
+    Page<ParentWithChildrenDto> searchParents(String query, Pageable pageable);
 }

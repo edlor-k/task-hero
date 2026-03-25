@@ -126,14 +126,16 @@ public class AdminWebController {
     public String parents(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String q,
             Model model
     ) {
         try {
-            var result = adminServiceClient.getAllParents(page, size);
+            var result = adminServiceClient.getAllParents(page, size, q);
             model.addAttribute("parents", result.get("content"));
             model.addAttribute("currentPage", result.get("number"));
             model.addAttribute("totalPages", result.get("totalPages"));
             model.addAttribute("totalElements", result.get("totalElements"));
+            model.addAttribute("searchQuery", q);
         } catch (Exception e) {
             log.error("Error loading parents: {}", e.getMessage());
             model.addAttribute("error", "Ошибка загрузки родителей");
@@ -147,6 +149,34 @@ public class AdminWebController {
         try {
             var parent = adminServiceClient.getParentDetail(id);
             model.addAttribute("parent", parent);
+
+            try {
+                var shopItems = adminServiceClient.getParentShopItems(id);
+                model.addAttribute("shopItems", shopItems);
+            } catch (Exception e) {
+                log.warn("Не удалось загрузить товары родителя: {}", e.getMessage());
+            }
+
+            try {
+                var templates = taskServiceClient.getParentTemplates(id);
+                model.addAttribute("templates", templates);
+            } catch (Exception e) {
+                log.warn("Не удалось загрузить шаблоны родителя: {}", e.getMessage());
+            }
+
+            try {
+                var assignments = taskServiceClient.getParentAssignments(id);
+                model.addAttribute("assignments", assignments);
+            } catch (Exception e) {
+                log.warn("Не удалось загрузить назначения родителя: {}", e.getMessage());
+            }
+
+            try {
+                var purchases = adminServiceClient.getParentPurchases(id);
+                model.addAttribute("purchases", purchases);
+            } catch (Exception e) {
+                log.warn("Не удалось загрузить покупки родителя: {}", e.getMessage());
+            }
         } catch (Exception e) {
             log.error("Error loading parent detail: {}", e.getMessage());
             model.addAttribute("error", "Ошибка загрузки данных родителя");
@@ -179,14 +209,16 @@ public class AdminWebController {
     public String children(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String q,
             Model model
     ) {
         try {
-            var result = adminServiceClient.getAllChildren(page, size);
+            var result = adminServiceClient.getAllChildren(page, size, q);
             model.addAttribute("children", result.get("content"));
             model.addAttribute("currentPage", result.get("number"));
             model.addAttribute("totalPages", result.get("totalPages"));
             model.addAttribute("totalElements", result.get("totalElements"));
+            model.addAttribute("searchQuery", q);
         } catch (Exception e) {
             log.error("Error loading children: {}", e.getMessage());
             model.addAttribute("error", "Ошибка загрузки детей");
@@ -200,6 +232,13 @@ public class AdminWebController {
         try {
             var child = adminServiceClient.getChildDetail(id);
             model.addAttribute("child", child);
+
+            try {
+                var assignments = taskServiceClient.getChildAssignments(id);
+                model.addAttribute("assignments", assignments);
+            } catch (Exception e) {
+                log.warn("Не удалось загрузить назначения ребёнка: {}", e.getMessage());
+            }
         } catch (Exception e) {
             log.error("Error loading child detail: {}", e.getMessage());
             model.addAttribute("error", "Ошибка загрузки данных ребёнка");

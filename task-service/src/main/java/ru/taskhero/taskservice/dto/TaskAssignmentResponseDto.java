@@ -43,6 +43,9 @@ public record TaskAssignmentResponseDto(
         @Schema(description = "Начисленные коины")
         Integer coinsEarned,
 
+        @Schema(description = "Важное задание")
+        Boolean important,
+
         @Schema(description = "Информация о шаблоне задания")
         TaskTemplateResponseDto template,
 

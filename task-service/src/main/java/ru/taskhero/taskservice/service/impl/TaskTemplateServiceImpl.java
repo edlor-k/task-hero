@@ -336,4 +336,13 @@ public class TaskTemplateServiceImpl implements TaskTemplateService {
 
         return template;
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TaskTemplateResponseDto> getAllByParent(UUID parentId) {
+        log.info("Получение всех шаблонов родителя: {}", parentId);
+        return templateRepository.findAllByParentId(parentId).stream()
+                .map(templateMapper::toDto)
+                .toList();
+    }
 }

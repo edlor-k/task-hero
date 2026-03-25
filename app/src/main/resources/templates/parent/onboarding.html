@@ -35,7 +35,7 @@
                                 <i class="bi bi-check-circle-fill me-1"></i>Выполнено!
                             </div>
 
-                            <a th:href="@{/parent/children}" class="btn btn-lg w-100"
+                            <a th:href="@{/parent/children(onboarding=true)}" class="btn btn-lg w-100"
                                th:classappend="${hasChildren} ? 'btn-outline-success' : 'btn-primary'">
                                 <i class="bi bi-person-plus me-1"></i>
                                 <span th:text="${hasChildren} ? 'Управление детьми' : 'Добавить ребёнка'">Добавить ребёнка</span>
@@ -93,11 +93,11 @@
                                 <a th:href="@{/parent/shop/marketplace(onboarding=true)}" class="btn btn-warning">
                                     <i class="bi bi-shop-window me-1"></i>Маркетплейс
                                 </a>
-                                <a th:href="@{/parent/shop}" class="btn btn-outline-warning">
+                                <a th:href="@{/parent/shop(onboarding=true)}" class="btn btn-outline-warning">
                                     <i class="bi bi-plus-lg me-1"></i>Создать вручную
                                 </a>
                             </div>
-                            <a th:if="${hasShopItems}" th:href="@{/parent/shop}" class="btn btn-outline-success w-100">
+                            <a th:if="${hasShopItems}" th:href="@{/parent/shop(onboarding=true)}" class="btn btn-outline-success w-100">
                                 <i class="bi bi-cart me-1"></i>Открыть магазин
                             </a>
                         </div>
@@ -126,11 +126,11 @@
                                 <a th:href="@{/parent/library(onboarding=true)}" class="btn btn-secondary">
                                     <i class="bi bi-book me-1"></i>Библиотека
                                 </a>
-                                <a th:href="@{/parent/templates}" class="btn btn-outline-secondary">
+                                <a th:href="@{/parent/templates(onboarding=true)}" class="btn btn-outline-secondary">
                                     <i class="bi bi-plus-lg me-1"></i>Создать шаблон
                                 </a>
                             </div>
-                            <a th:if="${hasTemplates}" th:href="@{/parent/templates}" class="btn btn-outline-success w-100">
+                            <a th:if="${hasTemplates}" th:href="@{/parent/templates(onboarding=true)}" class="btn btn-outline-success w-100">
                                 <i class="bi bi-list-check me-1"></i>Мои шаблоны
                             </a>
                         </div>

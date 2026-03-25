@@ -16,9 +16,11 @@ import ru.taskhero.userservice.dto.ShopPurchaseResponseDto;
 import ru.taskhero.userservice.entity.Child;
 import ru.taskhero.userservice.entity.ShopItem;
 import ru.taskhero.userservice.entity.ShopPurchase;
+import ru.taskhero.userservice.entity.AuditAction;
 import ru.taskhero.userservice.repository.ChildRepository;
 import ru.taskhero.userservice.repository.ShopItemRepository;
 import ru.taskhero.userservice.repository.ShopPurchaseRepository;
+import ru.taskhero.userservice.service.AuditService;
 import ru.taskhero.userservice.service.ShopService;
 
 import java.time.Instant;
@@ -40,6 +42,7 @@ public class ShopServiceImpl implements ShopService {
     private final ShopItemRepository shopItemRepository;
     private final ShopPurchaseRepository shopPurchaseRepository;
     private final ChildRepository childRepository;
+    private final AuditService auditService;
 
     @Override
     @Transactional
@@ -180,6 +183,9 @@ public class ShopServiceImpl implements ShopService {
         purchase = shopPurchaseRepository.save(purchase);
         log.info("Запрос на покупку создан: {}", purchase.getId());
 
+        auditService.log(childId, null, AuditAction.SHOP_PURCHASE_REQUESTED,
+                "PURCHASE", purchase.getId(), "Запрос на покупку \"" + item.getTitle() + "\"");
+
         return toPurchaseDto(purchase, child.getFirstName());
     }
 
@@ -221,6 +227,9 @@ public class ShopServiceImpl implements ShopService {
         log.info("Покупка {} одобрена, списано {} коинов у ребёнка {}",
                 purchaseId, price, purchase.getChildId());
 
+        auditService.log(parentId, null, AuditAction.SHOP_PURCHASE_APPROVED,
+                "PURCHASE", purchaseId, "Одобрена покупка \"" + purchase.getShopItem().getTitle() + "\"");
+
         return toPurchaseDto(purchase, child.getFirstName());
     }
 
@@ -247,6 +256,9 @@ public class ShopServiceImpl implements ShopService {
         purchase = shopPurchaseRepository.save(purchase);
 
         log.info("Покупка {} отклонена", purchaseId);
+
+        auditService.log(parentId, null, AuditAction.SHOP_PURCHASE_REJECTED,
+                "PURCHASE", purchaseId, "Отклонена покупка \"" + purchase.getShopItem().getTitle() + "\"");
 
         String childName = childRepository.findById(purchase.getChildId())
                 .map(Child::getFirstName).orElse("Неизвестно");

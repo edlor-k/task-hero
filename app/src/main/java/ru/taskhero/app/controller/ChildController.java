@@ -72,6 +72,34 @@ public class ChildController {
             model.addAttribute("totalExp", totalExp);
             model.addAttribute("totalCoins", totalCoins);
 
+            // Reassigned tasks: active assignments updated after creation (deadline extended)
+            List<TaskAssignmentDto> reassigned = activeAssignments.stream()
+                    .filter(a -> a.updatedAt() != null && a.createdAt() != null
+                            && a.updatedAt().isAfter(a.createdAt().plusSeconds(60)))
+                    .toList();
+            model.addAttribute("reassignedAssignments", reassigned);
+
+            // Recent results: recently reviewed tasks (approved/rejected)
+            List<TaskAssignmentDto> recentResults = allAssignments.stream()
+                    .filter(a -> "APPROVED".equals(a.status()) || "REJECTED".equals(a.status()))
+                    .filter(a -> a.reviewedAt() != null
+                            && a.reviewedAt().isAfter(java.time.Instant.now().minus(java.time.Duration.ofDays(3))))
+                    .toList();
+            model.addAttribute("recentResults", recentResults);
+
+            // Recent purchases
+            try {
+                List<ShopPurchaseDto> myPurchases = userServiceClient.getMyPurchases();
+                List<ShopPurchaseDto> recentPurchases = myPurchases.stream()
+                        .filter(p -> "APPROVED".equals(p.status()) || "REJECTED".equals(p.status()))
+                        .filter(p -> p.reviewedAt() != null
+                                && p.reviewedAt().isAfter(java.time.Instant.now().minus(java.time.Duration.ofDays(3))))
+                        .toList();
+                model.addAttribute("recentPurchases", recentPurchases);
+            } catch (Exception ex) {
+                log.warn("Error loading purchases: {}", ex.getMessage());
+            }
+
             // Load unseen level rewards
             try {
                 List<LevelRewardDto> unseenRewards = userServiceClient.getUnseenRewards(childProfile.id());

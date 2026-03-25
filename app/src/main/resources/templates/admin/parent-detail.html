@@ -95,6 +95,146 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Shop Items (Rewards) -->
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-gift me-2"></i>Награды (магазин)</h5>
+                        <div th:if="${shopItems == null || #lists.isEmpty(shopItems)}" class="text-center py-3">
+                            <p class="text-muted mb-0">Нет товаров</p>
+                        </div>
+                        <div class="table-responsive" th:unless="${shopItems == null || #lists.isEmpty(shopItems)}">
+                            <table class="table table-sm align-middle mb-0">
+                                <thead>
+                                <tr>
+                                    <th>Название</th>
+                                    <th>Описание</th>
+                                    <th>Цена</th>
+                                    <th>Статус</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="item : ${shopItems}">
+                                    <td class="fw-semibold">
+                                        <i class="bi" th:classappend="${item['iconName']}" th:if="${item['iconName'] != null}"></i>
+                                        <span th:text="${item['title']}">Товар</span>
+                                    </td>
+                                    <td th:text="${item['description'] != null ? item['description'] : '—'}">Описание</td>
+                                    <td><span class="badge bg-warning text-dark" th:text="${item['priceCoins'] + ' \uD83E\uDE99'}">0</span></td>
+                                    <td>
+                                        <span class="badge" th:classappend="${item['active'] == true ? 'bg-success' : 'bg-secondary'}"
+                                              th:text="${item['active'] == true ? 'Активен' : 'Неактивен'}">Статус</span>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Task Templates -->
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-list-task me-2"></i>Шаблоны заданий</h5>
+                        <div th:if="${templates == null || #lists.isEmpty(templates)}" class="text-center py-3">
+                            <p class="text-muted mb-0">Нет шаблонов</p>
+                        </div>
+                        <div class="table-responsive" th:unless="${templates == null || #lists.isEmpty(templates)}">
+                            <table class="table table-sm align-middle mb-0">
+                                <thead>
+                                <tr>
+                                    <th>Название</th>
+                                    <th>Категория</th>
+                                    <th>EXP</th>
+                                    <th>Коины</th>
+                                    <th>Статус</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="tpl : ${templates}">
+                                    <td class="fw-semibold" th:text="${tpl.title()}">Задание</td>
+                                    <td><span class="badge bg-info bg-opacity-10 text-info" th:text="${tpl.category()}" th:if="${tpl.category() != null}">Категория</span></td>
+                                    <td th:text="${tpl.expReward()}">0</td>
+                                    <td th:text="${tpl.coinsReward()}">0</td>
+                                    <td>
+                                        <span class="badge" th:classappend="${tpl.active() ? 'bg-success' : 'bg-secondary'}"
+                                              th:text="${tpl.active() ? 'Активен' : 'Неактивен'}">Статус</span>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Task Assignments -->
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-clipboard-check me-2"></i>Назначенные задания</h5>
+                        <div th:if="${assignments == null || #lists.isEmpty(assignments)}" class="text-center py-3">
+                            <p class="text-muted mb-0">Нет назначений</p>
+                        </div>
+                        <div class="table-responsive" th:unless="${assignments == null || #lists.isEmpty(assignments)}">
+                            <table class="table table-sm align-middle mb-0">
+                                <thead>
+                                <tr>
+                                    <th>Задание</th>
+                                    <th>Статус</th>
+                                    <th>Дедлайн</th>
+                                    <th>EXP</th>
+                                    <th>Коины</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="a : ${assignments}">
+                                    <td class="fw-semibold" th:text="${a.template() != null ? a.template().title() : '—'}">Задание</td>
+                                    <td>
+                                        <span class="badge"
+                                              th:classappend="${a.status().name() == 'APPROVED' ? 'bg-success' : (a.status().name() == 'REJECTED' ? 'bg-danger' : (a.status().name() == 'SUBMITTED' ? 'bg-info' : (a.status().name() == 'EXPIRED' ? 'bg-warning text-dark' : 'bg-primary')))}"
+                                              th:text="${a.status()}">Статус</span>
+                                        <span class="badge bg-danger ms-1" th:if="${a.important()}"><i class="bi bi-exclamation-triangle-fill"></i></span>
+                                    </td>
+                                    <td th:text="${a.dueDate() != null ? a.dueDate() : '—'}">Дата</td>
+                                    <td th:text="${a.expEarned() != null ? a.expEarned() : (a.template() != null ? a.template().expReward() : '—')}">0</td>
+                                    <td th:text="${a.coinsEarned() != null ? a.coinsEarned() : (a.template() != null ? a.template().coinsReward() : '—')}">0</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Purchases -->
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-bag-check me-2"></i>Покупки</h5>
+                        <div th:if="${purchases == null || #lists.isEmpty(purchases)}" class="text-center py-3">
+                            <p class="text-muted mb-0">Нет покупок</p>
+                        </div>
+                        <div class="table-responsive" th:unless="${purchases == null || #lists.isEmpty(purchases)}">
+                            <table class="table table-sm align-middle mb-0">
+                                <thead>
+                                <tr>
+                                    <th>Товар</th>
+                                    <th>Цена</th>
+                                    <th>Статус</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="p : ${purchases}">
+                                    <td class="fw-semibold" th:text="${p['shopItem'] != null ? p['shopItem']['title'] : '—'}">Товар</td>
+                                    <td><span class="badge bg-warning text-dark" th:text="${p['shopItem'] != null ? p['shopItem']['priceCoins'] + ' \uD83E\uDE99' : '—'}">0</span></td>
+                                    <td>
+                                        <span class="badge"
+                                              th:classappend="${p['status'] == 'APPROVED' ? 'bg-success' : (p['status'] == 'REJECTED' ? 'bg-danger' : 'bg-info')}"
+                                              th:text="${p['status']}">Статус</span>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </main>

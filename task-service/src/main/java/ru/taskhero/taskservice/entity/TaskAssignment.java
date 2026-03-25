@@ -96,4 +96,11 @@ public class TaskAssignment extends BaseEntity {
      */
     @Column(name = "coins_earned")
     private Integer coinsEarned;
+
+    /**
+     * Важное задание — без его выполнения ребёнок не перейдёт на новый уровень.
+     */
+    @Builder.Default
+    @Column(name = "important", nullable = false)
+    private boolean important = false;
 }

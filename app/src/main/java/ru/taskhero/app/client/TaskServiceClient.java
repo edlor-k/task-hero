@@ -172,6 +172,12 @@ public interface TaskServiceClient {
             @RequestParam("newDueDate") String newDueDate
     );
 
+    /**
+     * Удалить назначение.
+     */
+    @DeleteMapping("/assignments/{id}")
+    void deleteAssignment(@PathVariable("id") UUID id);
+
     // ==================== Admin Library Templates ====================
 
     /** Получить все шаблоны библиотеки (админ). */
@@ -189,4 +195,16 @@ public interface TaskServiceClient {
     /** Удалить шаблон библиотеки (админ). */
     @DeleteMapping("/admin/templates/library/{id}")
     void deleteLibraryTemplate(@PathVariable("id") UUID id);
+
+    /** Получить шаблоны родителя (админ). */
+    @GetMapping("/admin/templates/parent/{parentId}")
+    List<TaskTemplateDto> getParentTemplates(@PathVariable("parentId") UUID parentId);
+
+    /** Получить назначения родителя (админ). */
+    @GetMapping("/admin/templates/parent/{parentId}/assignments")
+    List<TaskAssignmentDto> getParentAssignments(@PathVariable("parentId") UUID parentId);
+
+    /** Получить назначения ребёнка (админ). */
+    @GetMapping("/admin/templates/child/{childId}/assignments")
+    List<TaskAssignmentDto> getChildAssignments(@PathVariable("childId") UUID childId);
 }

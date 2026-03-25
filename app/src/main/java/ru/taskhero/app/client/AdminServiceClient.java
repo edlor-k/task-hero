@@ -58,7 +58,8 @@ public interface AdminServiceClient {
     @GetMapping("/admin/parents")
     Map<String, Object> getAllParents(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String q
     );
 
     /** Получить детали родителя. */
@@ -75,7 +76,8 @@ public interface AdminServiceClient {
     @GetMapping("/admin/children")
     Map<String, Object> getAllChildren(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String q
     );
 
     /** Получить детали ребёнка. */
@@ -97,6 +99,10 @@ public interface AdminServiceClient {
     AdminStatisticsDto getStatistics();
 
     // ==================== Audit ====================
+
+    /** Создать запись аудита. */
+    @PostMapping("/admin/audit")
+    void createAuditEntry(@RequestBody Map<String, String> request);
 
     /** Получить журнал аудита с фильтрами. */
     @GetMapping("/admin/audit")
@@ -125,4 +131,12 @@ public interface AdminServiceClient {
     /** Удалить товар маркетплейса. */
     @DeleteMapping("/admin/marketplace/{id}")
     void deleteMarketplaceItem(@PathVariable("id") UUID id);
+
+    /** Получить товары магазина родителя. */
+    @GetMapping("/admin/parents/{id}/shop-items")
+    List<Map<String, Object>> getParentShopItems(@PathVariable("id") UUID id);
+
+    /** Получить покупки у родителя. */
+    @GetMapping("/admin/parents/{id}/purchases")
+    List<Map<String, Object>> getParentPurchases(@PathVariable("id") UUID id);
 }

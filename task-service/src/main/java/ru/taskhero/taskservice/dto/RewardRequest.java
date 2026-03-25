@@ -16,6 +16,9 @@ public record RewardRequest(
 
         @Schema(description = "Коины для начисления", example = "10")
         @Min(value = 0, message = "Коины не могут быть отрицательными")
-        int coins
+        int coins,
+
+        @Schema(description = "Ограничить EXP максимумом текущего уровня")
+        boolean capExp
 ) {
 }

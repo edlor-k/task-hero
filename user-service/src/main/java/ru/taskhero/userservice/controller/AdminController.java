@@ -212,10 +212,16 @@ public class AdminController {
             description = "Возвращает пагинированный список родителей с информацией о их детях"
     )
     public ResponseEntity<Page<ParentWithChildrenDto>> getAllParents(
-            @ParameterObject @PageableDefault(size = 20) Pageable pageable
+            @ParameterObject @PageableDefault(size = 20) Pageable pageable,
+            @Parameter(description = "Поиск по имени/email") @RequestParam(required = false) String q
     ) {
-        log.info("Админ: запрос списка родителей, page={}", pageable.getPageNumber());
-        Page<ParentWithChildrenDto> parents = parentService.getAllParents(pageable);
+        log.info("Админ: запрос списка родителей, page={}, q={}", pageable.getPageNumber(), q);
+        Page<ParentWithChildrenDto> parents;
+        if (q != null && !q.isBlank()) {
+            parents = parentService.searchParents(q, pageable);
+        } else {
+            parents = parentService.getAllParents(pageable);
+        }
         return ResponseEntity.ok(parents);
     }
 
@@ -274,10 +280,16 @@ public class AdminController {
             description = "Возвращает пагинированный список всех детей в системе"
     )
     public ResponseEntity<Page<ChildResponseDto>> getAllChildren(
-            @ParameterObject @PageableDefault(size = 20) Pageable pageable
+            @ParameterObject @PageableDefault(size = 20) Pageable pageable,
+            @Parameter(description = "Поиск по имени") @RequestParam(required = false) String q
     ) {
-        log.info("Админ: запрос списка всех детей, page={}", pageable.getPageNumber());
-        Page<ChildResponseDto> children = childService.getAllChildren(pageable);
+        log.info("Админ: запрос списка всех детей, page={}, q={}", pageable.getPageNumber(), q);
+        Page<ChildResponseDto> children;
+        if (q != null && !q.isBlank()) {
+            children = childService.searchChildren(q, pageable);
+        } else {
+            children = childService.getAllChildren(pageable);
+        }
         return ResponseEntity.ok(children);
     }
 
@@ -371,6 +383,23 @@ public class AdminController {
     }
 
     // ==================== Audit Log ====================
+
+    /**
+     * Создать запись аудита (для внешних сервисов).
+     */
+    @PostMapping("/audit")
+    public ResponseEntity<Void> createAuditEntry(
+            @RequestBody Map<String, String> request
+    ) {
+        UUID actorId = request.get("actorId") != null ? UUID.fromString(request.get("actorId")) : null;
+        String actorEmail = request.get("actorEmail");
+        AuditAction action = AuditAction.valueOf(request.get("action"));
+        String targetType = request.get("targetType");
+        UUID targetId = request.get("targetId") != null ? UUID.fromString(request.get("targetId")) : null;
+        String details = request.get("details");
+        auditService.log(actorId, actorEmail, action, targetType, targetId, details);
+        return ResponseEntity.ok().build();
+    }
 
     /**
      * Получить журнал аудита.
@@ -477,5 +506,25 @@ public class AdminController {
         auditService.log(currentAdminId, admin.email(), AuditAction.MARKETPLACE_ITEM_DELETED,
                 "MARKETPLACE", id, null);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Получить товары магазина конкретного родителя.
+     */
+    @GetMapping("/parents/{id}/shop-items")
+    @Operation(summary = "Получить товары родителя", description = "Список наград/товаров, созданных родителем")
+    public ResponseEntity<java.util.List<ShopItemResponseDto>> getParentShopItems(@PathVariable UUID id) {
+        log.info("Админ: запрос товаров родителя: {}", id);
+        return ResponseEntity.ok(shopService.getItemsByParent(id));
+    }
+
+    /**
+     * Получить покупки детей конкретного родителя.
+     */
+    @GetMapping("/parents/{id}/purchases")
+    @Operation(summary = "Получить покупки у родителя", description = "Все покупки детей данного родителя")
+    public ResponseEntity<java.util.List<ShopPurchaseResponseDto>> getParentPurchases(@PathVariable UUID id) {
+        log.info("Админ: запрос покупок родителя: {}", id);
+        return ResponseEntity.ok(shopService.getAllPurchasesByParent(id));
     }
 }

@@ -15,9 +15,11 @@ import ru.taskhero.userservice.dto.ParentResponseDto;
 import ru.taskhero.userservice.dto.RegisterResponseDto;
 import ru.taskhero.userservice.dto.UserRegisterRequest;
 import ru.taskhero.userservice.dto.UserResponseDto;
+import ru.taskhero.userservice.entity.AuditAction;
 import ru.taskhero.userservice.entity.User;
 import ru.taskhero.userservice.mapper.UserMapper;
 import ru.taskhero.userservice.repository.UserRepository;
+import ru.taskhero.userservice.service.AuditService;
 import ru.taskhero.userservice.service.ParentService;
 import ru.taskhero.userservice.service.UserService;
 
@@ -35,6 +37,7 @@ public class UserServiceImpl implements UserService {
     private final ParentService parentService;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final AuditService auditService;
 
     /**
      * Регистрация нового пользователя (родителя).
@@ -70,6 +73,10 @@ public class UserServiceImpl implements UserService {
         // Создание Parent профиля
         ParentResponseDto parentDto = parentService.createForUser(user.getId(), request.firstName(), request.surname());
         log.info("Создан профиль родителя для пользователя: {}", user.getId());
+
+        // Аудит
+        auditService.log(user.getId(), user.getEmail(), AuditAction.USER_REGISTERED,
+                "USER", user.getId(), "Регистрация пользователя " + user.getEmail());
 
         // Формируем комбинированный ответ
         return new RegisterResponseDto(

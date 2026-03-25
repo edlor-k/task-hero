@@ -203,4 +203,21 @@ public class ParentServiceImpl implements ParentService {
 
         return parentMapper.toParentResponseDto(parent);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ParentWithChildrenDto> searchParents(String query, Pageable pageable) {
+        log.info("Поиск родителей по запросу: {}", query);
+        return parentRepository.searchByNameOrEmail(query, pageable)
+                .map(parent -> new ParentWithChildrenDto(
+                        parent.getId(),
+                        parent.getFirstName(),
+                        parent.getSurname(),
+                        userMapper.toDto(parent.getUser()),
+                        parent.getChildren().stream()
+                                .map(childMapper::toDto)
+                                .toList(),
+                        parent.getChildren() != null ? parent.getChildren().size() : 0
+                ));
+    }
 }
