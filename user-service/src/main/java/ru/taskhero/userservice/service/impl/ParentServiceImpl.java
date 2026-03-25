@@ -102,7 +102,7 @@ public class ParentServiceImpl implements ParentService {
     public Page<ParentWithChildrenDto> getAllParents(Pageable pageable) {
         log.info("Получение списка всех родителей, page={}", pageable.getPageNumber());
 
-        return parentRepository.findAll(pageable)
+        return parentRepository.findAllWithChildren(pageable)
                 .map(parent -> new ParentWithChildrenDto(
                         parent.getId(),
                         parent.getFirstName(),
@@ -127,7 +127,7 @@ public class ParentServiceImpl implements ParentService {
     public ParentDetailDto getDetailById(UUID parentId) {
         log.info("Получение детальной информации о родителе: {}", parentId);
 
-        Parent parent = parentRepository.findById(parentId)
+        Parent parent = parentRepository.findByIdWithChildrenAndUser(parentId)
                 .orElseThrow(() -> {
                     log.error("Родитель с ID: {} не найден.", parentId);
                     return new ResourceNotFoundException("Родитель с ID " + parentId + " не найден");

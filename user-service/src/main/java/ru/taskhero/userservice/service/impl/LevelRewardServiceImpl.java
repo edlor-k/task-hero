@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Реализация сервиса наград за достижение уровней.
@@ -48,7 +49,7 @@ public class LevelRewardServiceImpl implements LevelRewardService {
                                                        List<LevelRewardCreateRequest> rewards) {
         log.info("Создание {} наград за уровни для ребёнка {} родителем {}", rewards.size(), childId, parentId);
 
-        Child child = childRepository.findById(childId)
+        Child child = childRepository.findByIdWithParent(childId)
                 .orElseThrow(() -> new ResourceNotFoundException("Ребёнок с ID " + childId + " не найден"));
 
         if (!child.getParent().getId().equals(parentId)) {
@@ -81,15 +82,18 @@ public class LevelRewardServiceImpl implements LevelRewardService {
         }
 
         log.info("Создано {} наград за уровни для ребёнка {}", created.size(), childId);
-        return created.stream().map(this::toDto).toList();
+        Map<UUID, String> shopItemTitles = resolveShopItemTitles(created);
+        return created.stream().map(r -> toDto(r, shopItemTitles)).toList();
     }
 
     @Override
     @Transactional(readOnly = true)
     @LogMethod("level-reward-get-by-child")
     public List<LevelRewardResponseDto> getRewardsByChild(UUID childId) {
-        return levelRewardRepository.findAllByChildIdOrderByLevel(childId).stream()
-                .map(this::toDto)
+        List<LevelReward> rewards = levelRewardRepository.findAllByChildIdOrderByLevel(childId);
+        Map<UUID, String> shopItemTitles = resolveShopItemTitles(rewards);
+        return rewards.stream()
+                .map(r -> toDto(r, shopItemTitles))
                 .toList();
     }
 
@@ -97,8 +101,10 @@ public class LevelRewardServiceImpl implements LevelRewardService {
     @Transactional(readOnly = true)
     @LogMethod("level-reward-get-history")
     public List<LevelRewardResponseDto> getRewardHistory(UUID childId) {
-        return levelRewardRepository.findAllByChildIdAndClaimedTrueOrderByLevel(childId).stream()
-                .map(this::toDto)
+        List<LevelReward> rewards = levelRewardRepository.findAllByChildIdAndClaimedTrueOrderByLevel(childId);
+        Map<UUID, String> shopItemTitles = resolveShopItemTitles(rewards);
+        return rewards.stream()
+                .map(r -> toDto(r, shopItemTitles))
                 .toList();
     }
 
@@ -106,8 +112,10 @@ public class LevelRewardServiceImpl implements LevelRewardService {
     @Transactional(readOnly = true)
     @LogMethod("level-reward-get-unseen")
     public List<LevelRewardResponseDto> getUnseenRewards(UUID childId) {
-        return levelRewardRepository.findAllByChildIdAndClaimedTrueAndSeenFalse(childId).stream()
-                .map(this::toDto)
+        List<LevelReward> rewards = levelRewardRepository.findAllByChildIdAndClaimedTrueAndSeenFalse(childId);
+        Map<UUID, String> shopItemTitles = resolveShopItemTitles(rewards);
+        return rewards.stream()
+                .map(r -> toDto(r, shopItemTitles))
                 .toList();
     }
 
@@ -115,7 +123,7 @@ public class LevelRewardServiceImpl implements LevelRewardService {
     @Transactional
     @LogMethod("level-reward-mark-seen")
     public LevelRewardResponseDto markRewardSeen(UUID rewardId, UUID childId) {
-        LevelReward reward = levelRewardRepository.findById(rewardId)
+        LevelReward reward = levelRewardRepository.findByIdWithChild(rewardId)
                 .orElseThrow(() -> new ResourceNotFoundException("Награда не найдена"));
 
         if (!reward.getChild().getId().equals(childId)) {
@@ -132,7 +140,7 @@ public class LevelRewardServiceImpl implements LevelRewardService {
     @Transactional
     @LogMethod("level-reward-mark-issued")
     public LevelRewardResponseDto markRewardIssued(UUID rewardId, UUID parentId) {
-        LevelReward reward = levelRewardRepository.findById(rewardId)
+        LevelReward reward = levelRewardRepository.findByIdWithChildAndParent(rewardId)
                 .orElseThrow(() -> new ResourceNotFoundException("Награда не найдена"));
 
         if (!reward.getChild().getParent().getId().equals(parentId)) {
@@ -227,7 +235,7 @@ public class LevelRewardServiceImpl implements LevelRewardService {
     @Transactional
     @LogMethod("level-reward-delete")
     public void deleteReward(UUID rewardId, UUID parentId) {
-        LevelReward reward = levelRewardRepository.findById(rewardId)
+        LevelReward reward = levelRewardRepository.findByIdWithChildAndParent(rewardId)
                 .orElseThrow(() -> new ResourceNotFoundException("Награда не найдена"));
 
         if (!reward.getChild().getParent().getId().equals(parentId)) {
@@ -263,7 +271,30 @@ public class LevelRewardServiceImpl implements LevelRewardService {
     }
 
     /**
-     * Конвертировать LevelReward в DTO.
+     * Конвертировать LevelReward в DTO (с предзагруженными названиями товаров).
+     */
+    private LevelRewardResponseDto toDto(LevelReward reward, Map<UUID, String> shopItemTitles) {
+        String shopItemTitle = reward.getShopItemId() != null
+                ? shopItemTitles.get(reward.getShopItemId()) : null;
+
+        return new LevelRewardResponseDto(
+                reward.getId(),
+                reward.getChild().getId(),
+                reward.getLevel(),
+                reward.getTitle(),
+                reward.getDescription(),
+                reward.getShopItemId(),
+                shopItemTitle,
+                reward.isClaimed(),
+                reward.getClaimedAt(),
+                reward.isIssued(),
+                reward.getIssuedAt(),
+                reward.isSeen()
+        );
+    }
+
+    /**
+     * Конвертировать LevelReward в DTO (для единичных вызовов).
      */
     private LevelRewardResponseDto toDto(LevelReward reward) {
         String shopItemTitle = null;
@@ -287,5 +318,21 @@ public class LevelRewardServiceImpl implements LevelRewardService {
                 reward.getIssuedAt(),
                 reward.isSeen()
         );
+    }
+
+    /**
+     * Пакетная загрузка названий товаров для списка наград.
+     */
+    private Map<UUID, String> resolveShopItemTitles(List<LevelReward> rewards) {
+        List<UUID> shopItemIds = rewards.stream()
+                .map(LevelReward::getShopItemId)
+                .filter(id -> id != null)
+                .distinct()
+                .toList();
+        if (shopItemIds.isEmpty()) {
+            return Map.of();
+        }
+        return shopItemRepository.findAllById(shopItemIds).stream()
+                .collect(Collectors.toMap(ShopItem::getId, ShopItem::getTitle));
     }
 }

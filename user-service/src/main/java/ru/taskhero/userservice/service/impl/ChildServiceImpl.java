@@ -151,7 +151,7 @@ public class ChildServiceImpl implements ChildService {
     public ChildDetailDto getDetailById(UUID childId) {
         log.info("Получение детальной информации о ребенке: {}", childId);
 
-        Child child = childRepository.findById(childId)
+        Child child = childRepository.findByIdWithParent(childId)
                 .orElseThrow(() -> {
                     log.error("Ребенок с ID: {} не найден.", childId);
                     return new ResourceNotFoundException("Ребенок с ID " + childId + " не найден");
@@ -253,10 +253,10 @@ public class ChildServiceImpl implements ChildService {
     @Transactional(readOnly = true)
     @LogMethod("child-check-ownership")
     public boolean isChildBelongsToParent(UUID childId, UUID parentId) {
-        Child child = childRepository.findById(childId)
-                .orElseThrow(() -> new ResourceNotFoundException("Ребенок с ID " + childId + " не найден"));
-
-        return child.getParent() != null && child.getParent().getId().equals(parentId);
+        if (!childRepository.existsById(childId)) {
+            throw new ResourceNotFoundException("Ребенок с ID " + childId + " не найден");
+        }
+        return childRepository.existsByIdAndParentId(childId, parentId);
     }
 
     /**

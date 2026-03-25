@@ -35,4 +35,22 @@ public interface ShopItemRepository extends JpaRepository<ShopItem, UUID> {
      * Найти все элементы маркетплейса.
      */
     List<ShopItem> findAllByMarketplaceItemTrue();
+
+    /**
+     * Найти все товары родителя с загруженными детьми.
+     */
+    @Query("SELECT DISTINCT si FROM ShopItem si LEFT JOIN FETCH si.children WHERE si.parentId = :parentId")
+    List<ShopItem> findAllByParentIdWithChildren(@Param("parentId") UUID parentId);
+
+    /**
+     * Найти активные товары для ребёнка с загруженными детьми.
+     */
+    @Query("SELECT DISTINCT si FROM ShopItem si LEFT JOIN FETCH si.children WHERE si.active = true AND EXISTS (SELECT 1 FROM si.children c WHERE c.id = :childId)")
+    List<ShopItem> findActiveByChildIdWithChildren(@Param("childId") UUID childId);
+
+    /**
+     * Найти все элементы маркетплейса с загруженными детьми.
+     */
+    @Query("SELECT DISTINCT si FROM ShopItem si LEFT JOIN FETCH si.children WHERE si.marketplaceItem = true")
+    List<ShopItem> findAllMarketplaceWithChildren();
 }

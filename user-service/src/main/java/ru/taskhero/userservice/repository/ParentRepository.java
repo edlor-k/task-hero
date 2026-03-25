@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import ru.taskhero.userservice.entity.Parent;
 
 import java.util.Optional;
@@ -28,4 +29,10 @@ public interface ParentRepository extends JpaRepository<Parent, UUID> {
      */
     @Query("SELECT DISTINCT p FROM Parent p LEFT JOIN FETCH p.children LEFT JOIN FETCH p.user")
     Page<Parent> findAllWithChildren(Pageable pageable);
+
+    /**
+     * Получить родителя по ID с загруженными детьми и пользователем.
+     */
+    @Query("SELECT p FROM Parent p LEFT JOIN FETCH p.children LEFT JOIN FETCH p.user WHERE p.id = :id")
+    Optional<Parent> findByIdWithChildrenAndUser(@Param("id") UUID id);
 }

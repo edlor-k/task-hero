@@ -27,4 +27,16 @@ public interface LevelRewardRepository extends JpaRepository<LevelReward, UUID> 
     int findMaxLevelByChildId(@Param("childId") UUID childId);
 
     List<LevelReward> findAllByChildIdAndClaimedTrueAndSeenFalse(UUID childId);
+
+    /**
+     * Найти награду по ID с загруженным ребёнком.
+     */
+    @Query("SELECT lr FROM LevelReward lr JOIN FETCH lr.child WHERE lr.id = :id")
+    Optional<LevelReward> findByIdWithChild(@Param("id") UUID id);
+
+    /**
+     * Найти награду по ID с загруженным ребёнком и его родителем.
+     */
+    @Query("SELECT lr FROM LevelReward lr JOIN FETCH lr.child c LEFT JOIN FETCH c.parent WHERE lr.id = :id")
+    Optional<LevelReward> findByIdWithChildAndParent(@Param("id") UUID id);
 }

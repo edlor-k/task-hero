@@ -26,6 +26,15 @@ public interface TaskAssignmentRepository extends JpaRepository<TaskAssignment, 
      * @param childId ID ребёнка
      * @return список назначений
      */
+    @Query("SELECT a FROM TaskAssignment a JOIN FETCH a.template WHERE a.childId = :childId")
+    List<TaskAssignment> findAllByChildIdWithTemplate(@Param("childId") UUID childId);
+
+    /**
+     * Найти все назначения ребёнка.
+     *
+     * @param childId ID ребёнка
+     * @return список назначений
+     */
     List<TaskAssignment> findAllByChildId(UUID childId);
 
     /**
@@ -44,6 +53,9 @@ public interface TaskAssignmentRepository extends JpaRepository<TaskAssignment, 
      * @param status  статус задания
      * @return список назначений
      */
+    @Query("SELECT a FROM TaskAssignment a JOIN FETCH a.template WHERE a.childId = :childId AND a.status = :status")
+    List<TaskAssignment> findAllByChildIdAndStatusWithTemplate(@Param("childId") UUID childId, @Param("status") TaskStatus status);
+
     List<TaskAssignment> findAllByChildIdAndStatus(UUID childId, TaskStatus status);
 
     /**
@@ -53,6 +65,9 @@ public interface TaskAssignmentRepository extends JpaRepository<TaskAssignment, 
      * @param statuses список статусов
      * @return список назначений
      */
+    @Query("SELECT a FROM TaskAssignment a JOIN FETCH a.template WHERE a.childId = :childId AND a.status IN :statuses")
+    List<TaskAssignment> findAllByChildIdAndStatusInWithTemplate(@Param("childId") UUID childId, @Param("statuses") List<TaskStatus> statuses);
+
     List<TaskAssignment> findAllByChildIdAndStatusIn(UUID childId, List<TaskStatus> statuses);
 
     /**
@@ -70,6 +85,10 @@ public interface TaskAssignmentRepository extends JpaRepository<TaskAssignment, 
      * @param pageable параметры пагинации
      * @return страница назначений
      */
+    @Query(value = "SELECT a FROM TaskAssignment a JOIN FETCH a.template WHERE a.template.parentId = :parentId",
+            countQuery = "SELECT COUNT(a) FROM TaskAssignment a WHERE a.template.parentId = :parentId")
+    Page<TaskAssignment> findAllByParentIdWithTemplate(@Param("parentId") UUID parentId, Pageable pageable);
+
     @Query("SELECT a FROM TaskAssignment a WHERE a.template.parentId = :parentId")
     Page<TaskAssignment> findAllByParentId(@Param("parentId") UUID parentId, Pageable pageable);
 
@@ -80,6 +99,12 @@ public interface TaskAssignmentRepository extends JpaRepository<TaskAssignment, 
      * @param status   статус задания
      * @return список назначений
      */
+    @Query("SELECT a FROM TaskAssignment a JOIN FETCH a.template WHERE a.template.parentId = :parentId AND a.status = :status")
+    List<TaskAssignment> findAllByParentIdAndStatusWithTemplate(
+            @Param("parentId") UUID parentId,
+            @Param("status") TaskStatus status
+    );
+
     @Query("SELECT a FROM TaskAssignment a WHERE a.template.parentId = :parentId AND a.status = :status")
     List<TaskAssignment> findAllByParentIdAndStatus(
             @Param("parentId") UUID parentId,

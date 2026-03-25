@@ -111,7 +111,7 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
     public List<TaskAssignmentResponseDto> getByChild(UUID childId) {
         log.debug("Получение всех заданий ребёнка: {}", childId);
 
-        return assignmentRepository.findAllByChildId(childId)
+        return assignmentRepository.findAllByChildIdWithTemplate(childId)
                 .stream()
                 .map(assignmentMapper::toDto)
                 .toList();
@@ -123,7 +123,7 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
     public List<TaskAssignmentResponseDto> getByChildAndStatus(UUID childId, TaskStatus status) {
         log.debug("Получение заданий ребёнка {} со статусом {}", childId, status);
 
-        return assignmentRepository.findAllByChildIdAndStatus(childId, status)
+        return assignmentRepository.findAllByChildIdAndStatusWithTemplate(childId, status)
                 .stream()
                 .map(assignmentMapper::toDto)
                 .toList();
@@ -137,7 +137,7 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
 
         List<TaskStatus> activeStatuses = List.of(TaskStatus.CREATED, TaskStatus.SUBMITTED);
 
-        return assignmentRepository.findAllByChildIdAndStatusIn(childId, activeStatuses)
+        return assignmentRepository.findAllByChildIdAndStatusInWithTemplate(childId, activeStatuses)
                 .stream()
                 .map(assignmentMapper::toDto)
                 .toList();
@@ -149,7 +149,7 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
     public Page<TaskAssignmentResponseDto> getByParent(UUID parentId, Pageable pageable) {
         log.debug("Получение заданий родителя: {}", parentId);
 
-        return assignmentRepository.findAllByParentId(parentId, pageable)
+        return assignmentRepository.findAllByParentIdWithTemplate(parentId, pageable)
                 .map(assignmentMapper::toDto);
     }
 
@@ -159,7 +159,7 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
     public List<TaskAssignmentResponseDto> getPendingReviewByParent(UUID parentId) {
         log.debug("Получение заданий на проверку для родителя: {}", parentId);
 
-        return assignmentRepository.findAllByParentIdAndStatus(parentId, TaskStatus.SUBMITTED)
+        return assignmentRepository.findAllByParentIdAndStatusWithTemplate(parentId, TaskStatus.SUBMITTED)
                 .stream()
                 .map(assignmentMapper::toDto)
                 .toList();
@@ -253,7 +253,7 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
     public List<TaskAssignmentResponseDto> getExpiredByParent(UUID parentId) {
         log.debug("Получение просроченных заданий для родителя: {}", parentId);
 
-        return assignmentRepository.findAllByParentIdAndStatus(parentId, TaskStatus.EXPIRED)
+        return assignmentRepository.findAllByParentIdAndStatusWithTemplate(parentId, TaskStatus.EXPIRED)
                 .stream()
                 .map(assignmentMapper::toDto)
                 .toList();

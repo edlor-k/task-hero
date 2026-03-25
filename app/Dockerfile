@@ -37,4 +37,11 @@ USER appuser
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", \
+  "-XX:MaxRAMPercentage=75.0", \
+  "-XX:InitialRAMPercentage=50.0", \
+  "-XX:+UseG1GC", \
+  "-XX:+UseStringDeduplication", \
+  "-XX:MinHeapFreeRatio=20", \
+  "-XX:MaxHeapFreeRatio=40", \
+  "-jar", "app.jar"]

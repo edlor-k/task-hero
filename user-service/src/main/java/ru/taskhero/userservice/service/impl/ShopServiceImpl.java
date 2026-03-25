@@ -24,8 +24,10 @@ import ru.taskhero.userservice.service.ShopService;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Реализация сервиса магазина.
@@ -70,7 +72,7 @@ public class ShopServiceImpl implements ShopService {
     @Transactional(readOnly = true)
     @LogMethod("shop-get-items-by-parent")
     public List<ShopItemResponseDto> getItemsByParent(UUID parentId) {
-        return shopItemRepository.findAllByParentId(parentId).stream()
+        return shopItemRepository.findAllByParentIdWithChildren(parentId).stream()
                 .map(this::toItemDto)
                 .toList();
     }
@@ -79,7 +81,7 @@ public class ShopServiceImpl implements ShopService {
     @Transactional(readOnly = true)
     @LogMethod("shop-get-items-for-child")
     public List<ShopItemResponseDto> getItemsForChild(UUID childId) {
-        return shopItemRepository.findActiveByChildId(childId).stream()
+        return shopItemRepository.findActiveByChildIdWithChildren(childId).stream()
                 .map(this::toItemDto)
                 .toList();
     }
@@ -255,13 +257,10 @@ public class ShopServiceImpl implements ShopService {
     @Transactional(readOnly = true)
     @LogMethod("shop-get-pending-purchases")
     public List<ShopPurchaseResponseDto> getPendingPurchases(UUID parentId) {
-        return shopPurchaseRepository.findAllByParentIdAndStatus(parentId, PurchaseStatus.PENDING)
-                .stream()
-                .map(p -> {
-                    String childName = childRepository.findById(p.getChildId())
-                            .map(Child::getFirstName).orElse("Неизвестно");
-                    return toPurchaseDto(p, childName);
-                })
+        List<ShopPurchase> purchases = shopPurchaseRepository.findAllByParentIdAndStatus(parentId, PurchaseStatus.PENDING);
+        Map<UUID, String> childNames = resolveChildNames(purchases);
+        return purchases.stream()
+                .map(p -> toPurchaseDto(p, childNames.getOrDefault(p.getChildId(), "Неизвестно")))
                 .toList();
     }
 
@@ -269,12 +268,10 @@ public class ShopServiceImpl implements ShopService {
     @Transactional(readOnly = true)
     @LogMethod("shop-get-purchases-by-child")
     public List<ShopPurchaseResponseDto> getPurchasesByChild(UUID childId) {
+        String childName = childRepository.findById(childId)
+                .map(Child::getFirstName).orElse("Неизвестно");
         return shopPurchaseRepository.findAllByChildId(childId).stream()
-                .map(p -> {
-                    String childName = childRepository.findById(p.getChildId())
-                            .map(Child::getFirstName).orElse("Неизвестно");
-                    return toPurchaseDto(p, childName);
-                })
+                .map(p -> toPurchaseDto(p, childName))
                 .toList();
     }
 
@@ -282,12 +279,10 @@ public class ShopServiceImpl implements ShopService {
     @Transactional(readOnly = true)
     @LogMethod("shop-get-all-purchases-by-parent")
     public List<ShopPurchaseResponseDto> getAllPurchasesByParent(UUID parentId) {
-        return shopPurchaseRepository.findAllByParentId(parentId).stream()
-                .map(p -> {
-                    String childName = childRepository.findById(p.getChildId())
-                            .map(Child::getFirstName).orElse("Неизвестно");
-                    return toPurchaseDto(p, childName);
-                })
+        List<ShopPurchase> purchases = shopPurchaseRepository.findAllByParentId(parentId);
+        Map<UUID, String> childNames = resolveChildNames(purchases);
+        return purchases.stream()
+                .map(p -> toPurchaseDto(p, childNames.getOrDefault(p.getChildId(), "Неизвестно")))
                 .toList();
     }
 
@@ -295,7 +290,7 @@ public class ShopServiceImpl implements ShopService {
     @Transactional(readOnly = true)
     @LogMethod("shop-get-marketplace-items")
     public List<ShopItemResponseDto> getMarketplaceItems() {
-        return shopItemRepository.findAllByMarketplaceItemTrue().stream()
+        return shopItemRepository.findAllMarketplaceWithChildren().stream()
                 .map(this::toItemDto)
                 .toList();
     }
@@ -352,6 +347,18 @@ public class ShopServiceImpl implements ShopService {
                 item.getCreatedAt(),
                 item.isMarketplaceItem()
         );
+    }
+
+    /**
+     * Пакетная загрузка имён детей для списка покупок.
+     */
+    private Map<UUID, String> resolveChildNames(List<ShopPurchase> purchases) {
+        List<UUID> childIds = purchases.stream()
+                .map(ShopPurchase::getChildId)
+                .distinct()
+                .toList();
+        return childRepository.findAllById(childIds).stream()
+                .collect(Collectors.toMap(Child::getId, Child::getFirstName));
     }
 
     /**
