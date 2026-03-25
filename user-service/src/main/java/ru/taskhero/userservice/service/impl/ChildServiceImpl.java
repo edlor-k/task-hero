@@ -85,7 +85,7 @@ public class ChildServiceImpl implements ChildService {
         log.info("Создан ребёнок: {} {} с loginToken: {}", child.getFirstName(), child.getSurname(), loginToken);
 
         // Аудит
-        auditService.log(parent.getUser().getId(), null, AuditAction.CHILD_CREATED,
+        auditService.log(parent.getUser().getId(), parent.getUser().getEmail(), AuditAction.CHILD_CREATED,
                 "CHILD", child.getId(), "Создан ребёнок " + child.getFirstName() + " " + child.getSurname());
 
         return toChildResponseDto(child);

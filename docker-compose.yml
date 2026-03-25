@@ -1,5 +1,5 @@
 # ============================================================
-# Docker Compose для TaskHero
+# Docker Compose для TaskHero (локальная разработка)
 # ============================================================
 # Использование:
 #   Только БД и Adminer (для разработки):
@@ -33,21 +33,23 @@ services:
     command:
       - "postgres"
       - "-c"
-      - "max_connections=30"
+      - "max_connections=20"
       - "-c"
-      - "shared_buffers=128MB"
+      - "shared_buffers=80MB"
       - "-c"
-      - "effective_cache_size=256MB"
+      - "effective_cache_size=160MB"
       - "-c"
-      - "work_mem=4MB"
+      - "work_mem=2MB"
       - "-c"
-      - "maintenance_work_mem=64MB"
+      - "maintenance_work_mem=48MB"
       - "-c"
       - "checkpoint_completion_target=0.9"
       - "-c"
       - "wal_buffers=4MB"
       - "-c"
       - "random_page_cost=1.1"
+      - "-c"
+      - "huge_pages=off"
     networks:
       - taskhero-network
     healthcheck:
@@ -55,14 +57,19 @@ services:
       interval: 30s
       timeout: 5s
       retries: 5
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     deploy:
       resources:
         limits:
-          cpus: "0.50"
-          memory: 384M
+          cpus: "0.60"
+          memory: 320M
         reservations:
-          cpus: "0.15"
-          memory: 128M
+          cpus: "0.20"
+          memory: 160M
 
   # ==================== Adminer (DB UI) ====================
   adminer:
@@ -104,18 +111,32 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/taskhero
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: 5
+      SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: 2
       JWT_SECRET: mySecretKeyForJWTTokenGenerationThatIsLongEnough256bits
       JWT_EXPIRATION_MS: 86400000
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
       LOGGING_LEVEL_ROOT: INFO
+      JAVA_TOOL_OPTIONS: "-Xss512k -XX:MaxMetaspaceSize=96m -XX:ReservedCodeCacheSize=48m"
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8081/users/actuator/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 60s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     deploy:
       resources:
         limits:
-          cpus: "0.50"
-          memory: 256M
+          cpus: "0.75"
+          memory: 384M
         reservations:
-          cpus: "0.10"
-          memory: 128M
+          cpus: "0.15"
+          memory: 192M
     networks:
       - taskhero-network
 
@@ -135,17 +156,31 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/taskhero
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: 5
+      SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: 2
       USER_SERVICE_URL: http://user-service:8081/users
       JWT_SECRET: mySecretKeyForJWTTokenGenerationThatIsLongEnough256bits
       LOGGING_LEVEL_ROOT: INFO
+      JAVA_TOOL_OPTIONS: "-Xss512k -XX:MaxMetaspaceSize=96m -XX:ReservedCodeCacheSize=48m"
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8082/tasks/actuator/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 60s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     deploy:
       resources:
         limits:
-          cpus: "0.50"
-          memory: 256M
+          cpus: "0.75"
+          memory: 384M
         reservations:
-          cpus: "0.10"
-          memory: 128M
+          cpus: "0.15"
+          memory: 192M
     networks:
       - taskhero-network
 
@@ -165,14 +200,26 @@ services:
       USER_SERVICE_URL: http://user-service:8081/users
       TASK_SERVICE_URL: http://task-service:8082/tasks
       LOGGING_LEVEL_ROOT: INFO
+      JAVA_TOOL_OPTIONS: "-Xss512k -XX:MaxMetaspaceSize=80m -XX:ReservedCodeCacheSize=40m"
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 60s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     deploy:
       resources:
         limits:
-          cpus: "0.30"
-          memory: 256M
+          cpus: "0.50"
+          memory: 320M
         reservations:
           cpus: "0.10"
-          memory: 128M
+          memory: 160M
     networks:
       - taskhero-network
 
