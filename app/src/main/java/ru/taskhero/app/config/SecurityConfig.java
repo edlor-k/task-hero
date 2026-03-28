@@ -28,6 +28,7 @@ public class SecurityConfig {
                         .requestMatchers("/", "/home", "/about").permitAll()
                         .requestMatchers("/login", "/register", "/login/child").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/error").permitAll()
 
                         // Страницы для родителей

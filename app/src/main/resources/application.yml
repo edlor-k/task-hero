@@ -30,6 +30,15 @@ services:
   task-service:
     url: ${TASK_SERVICE_URL:http://localhost:8082/tasks}
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: never
+
 logging:
   level:
     root: ${LOGGING_LEVEL_ROOT:INFO}
