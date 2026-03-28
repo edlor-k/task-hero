@@ -81,6 +81,10 @@
                                     <span th:with="daysLeft=${T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(), a.dueDate)}"
                                           th:if="${daysLeft >= 0}"
                                           th:text="' (' + ${daysLeft == 0 ? 'сегодня' : daysLeft == 1 ? 'завтра' : daysLeft + ' дн.'} + ')'"></span>
+                                    <span th:with="daysLeft=${T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(), a.dueDate)}"
+                                          th:if="${daysLeft < 0}"
+                                          class="text-danger fw-semibold"
+                                          th:text="' (просрочено на ' + ${-daysLeft} + ' дн.)'"></span>
                                 </small>
                             </div>
 

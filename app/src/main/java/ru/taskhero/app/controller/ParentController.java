@@ -204,6 +204,7 @@ public class ParentController {
     public String addChild(
             @RequestParam String firstName,
             @RequestParam String surname,
+            @RequestParam(defaultValue = "false") boolean onboarding,
             RedirectAttributes redirectAttributes
     ) {
         try {
@@ -219,6 +220,9 @@ public class ParentController {
             redirectAttributes.addFlashAttribute("error", msg);
         }
 
+        if (onboarding) {
+            return "redirect:/parent/onboarding";
+        }
         return "redirect:/parent/children";
     }
 
@@ -644,10 +648,31 @@ public class ParentController {
     public String extendDeadline(
             @PathVariable UUID id,
             @RequestParam String newDueDate,
+            @RequestParam(required = false) Integer newExpReward,
+            @RequestParam(required = false) Integer newCoinsReward,
             RedirectAttributes redirectAttributes
     ) {
         try {
             taskServiceClient.extendDeadline(id, newDueDate);
+
+            // Update template rewards if provided
+            if (newExpReward != null || newCoinsReward != null) {
+                try {
+                    TaskAssignmentDto assignment = taskServiceClient.getAssignment(id);
+                    if (assignment.template() != null) {
+                        Map<String, Object> updateRequest = new HashMap<>();
+                        updateRequest.put("title", assignment.template().title());
+                        updateRequest.put("description", assignment.template().description());
+                        updateRequest.put("expReward", newExpReward != null ? newExpReward : assignment.template().expReward());
+                        updateRequest.put("coinsReward", newCoinsReward != null ? newCoinsReward : assignment.template().coinsReward());
+                        updateRequest.put("difficulty", assignment.template().difficulty());
+                        taskServiceClient.updateTemplate(assignment.template().id(), updateRequest);
+                    }
+                } catch (Exception ex) {
+                    log.warn("Error updating template rewards: {}", ex.getMessage());
+                }
+            }
+
             redirectAttributes.addFlashAttribute("success", "Дедлайн продлён");
         } catch (Exception e) {
             log.error("Error extending deadline: {}", e.getMessage());

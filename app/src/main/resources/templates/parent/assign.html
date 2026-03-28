@@ -277,6 +277,33 @@
             hint.style.display = 'none';
         }
     }
+
+    // Difficulty hint for quick task rewards
+    (function() {
+        const multipliers = { EASY: 0.8, NORMAL: 1.0, HARD: 1.5 };
+        const quickDifficulty = document.querySelector('#quickTask select[name="quickDifficulty"]');
+        const quickExp = document.querySelector('#quickTask input[name="quickExpReward"]');
+        const quickCoins = document.querySelector('#quickTask input[name="quickCoinsReward"]');
+        if (!quickDifficulty || !quickExp || !quickCoins) return;
+
+        let baseExp = parseInt(quickExp.value || '10');
+        let baseCoins = parseInt(quickCoins.value || '5');
+
+        quickDifficulty.addEventListener('change', function() {
+            const mult = multipliers[this.value] || 1.0;
+            quickExp.value = Math.round(baseExp * mult);
+            quickCoins.value = Math.round(baseCoins * mult);
+        });
+
+        quickExp.addEventListener('input', function() {
+            const mult = multipliers[quickDifficulty.value] || 1.0;
+            baseExp = Math.round(parseInt(this.value || '0') / mult);
+        });
+        quickCoins.addEventListener('input', function() {
+            const mult = multipliers[quickDifficulty.value] || 1.0;
+            baseCoins = Math.round(parseInt(this.value || '0') / mult);
+        });
+    })();
 </script>
 </body>
 </html>

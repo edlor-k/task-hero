@@ -164,6 +164,12 @@ public interface TaskServiceClient {
     List<TaskAssignmentDto> getExpiredAssignments();
 
     /**
+     * Получить назначение по ID.
+     */
+    @GetMapping("/assignments/{id}")
+    TaskAssignmentDto getAssignment(@PathVariable("id") UUID id);
+
+    /**
      * Продлить дедлайн просроченного задания.
      */
     @PostMapping("/assignments/{id}/extend-deadline")

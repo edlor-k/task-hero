@@ -1,7 +1,7 @@
 package ru.taskhero.taskservice.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
@@ -22,7 +22,7 @@ public record TaskAssignRequest(
         UUID childId,
 
         @Schema(description = "Срок выполнения", example = "2025-02-01")
-        @Future(message = "Срок выполнения должен быть в будущем")
+        @FutureOrPresent(message = "Срок выполнения должен быть сегодня или в будущем")
         LocalDate dueDate,
 
         @Schema(description = "Важное задание")

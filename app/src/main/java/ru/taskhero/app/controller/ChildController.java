@@ -72,8 +72,10 @@ public class ChildController {
             model.addAttribute("totalExp", totalExp);
             model.addAttribute("totalCoins", totalCoins);
 
-            // Reassigned tasks: active assignments updated after creation (deadline extended)
+            // Reassigned tasks: expired tasks that were re-assigned with a new deadline
             List<TaskAssignmentDto> reassigned = activeAssignments.stream()
+                    .filter(a -> "CREATED".equals(a.status()))
+                    .filter(a -> a.dueDate() != null)
                     .filter(a -> a.updatedAt() != null && a.createdAt() != null
                             && a.updatedAt().isAfter(a.createdAt().plusSeconds(60)))
                     .toList();
@@ -261,19 +263,14 @@ public class ChildController {
     @GetMapping("/shop")
     public String shop(Model model) {
         try {
+            ChildDto profile = userServiceClient.getMyChildProfile();
+            model.addAttribute("childProfile", profile);
+
             List<ShopItemDto> availableItems = userServiceClient.getAvailableShopItems();
             List<ShopPurchaseDto> myPurchases = userServiceClient.getMyPurchases();
 
             model.addAttribute("items", availableItems);
             model.addAttribute("purchases", myPurchases);
-
-            // Подгрузка баланса
-            try {
-                ChildDto profile = userServiceClient.getMyChildProfile();
-                model.addAttribute("childProfile", profile);
-            } catch (Exception ex) {
-                log.warn("Could not load child profile for shop: {}", ex.getMessage());
-            }
         } catch (Exception e) {
             log.error("Error loading child shop: {}", e.getMessage());
             model.addAttribute("error", "Ошибка загрузки магазина");

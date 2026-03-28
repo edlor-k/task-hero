@@ -68,9 +68,11 @@
                                         <span class="badge bg-warning-subtle text-warning" th:text="${expired.template.coinsReward} + ' коинов'">5 коинов</span>
                                     </td>
                                     <td>
-                                        <div class="d-flex gap-1 flex-wrap">
-                                            <form th:action="@{/parent/assignments/{id}/extend-deadline(id=${expired.id})}" method="post" class="d-flex gap-1">
-                                                <input type="date" name="newDueDate" required class="form-control form-control-sm" style="width: 150px;">
+                                        <div class="d-flex gap-1 flex-wrap align-items-center">
+                                            <form th:action="@{/parent/assignments/{id}/extend-deadline(id=${expired.id})}" method="post" class="d-flex gap-1 align-items-center flex-wrap">
+                                                <input type="date" name="newDueDate" required class="form-control form-control-sm" style="width: 140px;">
+                                                <input type="number" name="newExpReward" th:value="${expired.template.expReward}" min="0" class="form-control form-control-sm" style="width: 70px;" title="EXP">
+                                                <input type="number" name="newCoinsReward" th:value="${expired.template.coinsReward}" min="0" class="form-control form-control-sm" style="width: 70px;" title="Коины">
                                                 <button type="submit" class="btn btn-sm btn-outline-warning" title="Продлить дедлайн">
                                                     <i class="bi bi-calendar-plus"></i>
                                                 </button>
