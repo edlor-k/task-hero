@@ -281,6 +281,7 @@ public class ParentController {
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String recurrenceRule,
             @RequestParam(required = false) List<String> subItems,
+            @RequestParam(defaultValue = "false") boolean onboarding,
             RedirectAttributes redirectAttributes
     ) {
         try {
@@ -298,7 +299,7 @@ public class ParentController {
             redirectAttributes.addFlashAttribute("error", msg);
         }
 
-        return "redirect:/parent/templates";
+        return "redirect:/parent/templates" + (onboarding ? "?onboarding=true" : "");
     }
 
     /**
@@ -734,6 +735,7 @@ public class ParentController {
             @RequestParam int priceCoins,
             @RequestParam(defaultValue = "bi-gift") String iconName,
             @RequestParam List<UUID> childIds,
+            @RequestParam(defaultValue = "false") boolean onboarding,
             RedirectAttributes redirectAttributes
     ) {
         try {
@@ -750,7 +752,7 @@ public class ParentController {
             log.error("Error adding shop item: {}", e.getMessage());
             redirectAttributes.addFlashAttribute("error", "Ошибка добавления товара");
         }
-        return "redirect:/parent/shop";
+        return "redirect:/parent/shop" + (onboarding ? "?onboarding=true" : "");
     }
 
     /**
@@ -907,6 +909,7 @@ public class ParentController {
             @RequestParam List<String> titles,
             @RequestParam List<String> descriptions,
             @RequestParam List<String> shopItemIds,
+            @RequestParam(defaultValue = "false") boolean onboarding,
             RedirectAttributes redirectAttributes
     ) {
         try {
@@ -931,7 +934,7 @@ public class ParentController {
 
             if (rewardsList.isEmpty()) {
                 redirectAttributes.addFlashAttribute("error", "Заполните хотя бы одну награду");
-                return "redirect:/parent/level-rewards?childId=" + childId;
+                return "redirect:/parent/level-rewards?childId=" + childId + (onboarding ? "&onboarding=true" : "");
             }
 
             Map<String, Object> request = new HashMap<>();
@@ -943,7 +946,7 @@ public class ParentController {
             log.error("Error adding level rewards: {}", e.getMessage());
             redirectAttributes.addFlashAttribute("error", "Ошибка сохранения наград");
         }
-        return "redirect:/parent/level-rewards?childId=" + childId;
+        return "redirect:/parent/level-rewards?childId=" + childId + (onboarding ? "&onboarding=true" : "");
     }
 
     /**
@@ -953,6 +956,7 @@ public class ParentController {
     public String markRewardIssued(
             @PathVariable UUID id,
             @RequestParam UUID childId,
+            @RequestParam(defaultValue = "false") boolean onboarding,
             RedirectAttributes redirectAttributes
     ) {
         try {
@@ -962,7 +966,7 @@ public class ParentController {
             log.error("Error marking reward issued: {}", e.getMessage());
             redirectAttributes.addFlashAttribute("error", "Ошибка обновления награды");
         }
-        return "redirect:/parent/level-rewards?childId=" + childId;
+        return "redirect:/parent/level-rewards?childId=" + childId + (onboarding ? "&onboarding=true" : "");
     }
 
     /**
@@ -972,6 +976,7 @@ public class ParentController {
     public String deleteLevelReward(
             @PathVariable UUID id,
             @RequestParam UUID childId,
+            @RequestParam(defaultValue = "false") boolean onboarding,
             RedirectAttributes redirectAttributes
     ) {
         try {
@@ -981,7 +986,7 @@ public class ParentController {
             log.error("Error deleting level reward: {}", e.getMessage());
             redirectAttributes.addFlashAttribute("error", "Ошибка удаления награды");
         }
-        return "redirect:/parent/level-rewards?childId=" + childId;
+        return "redirect:/parent/level-rewards?childId=" + childId + (onboarding ? "&onboarding=true" : "");
     }
 
     // ==================== Marketplace ====================

@@ -127,6 +127,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <form th:action="@{/parent/templates/add}" method="post">
+                <input type="hidden" name="onboarding" th:value="${onboarding}"/>
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold"><i class="bi bi-journal-plus me-2"></i>Новый шаблон</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>

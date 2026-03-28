@@ -8,7 +8,7 @@ import ru.taskhero.taskservice.dto.TaskAssignmentResponseDto;
 import ru.taskhero.taskservice.dto.TaskReviewRequest;
 import ru.taskhero.taskservice.dto.TaskSubmitRequest;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -122,7 +122,7 @@ public interface TaskAssignmentService {
      * @param newDueDate   новый дедлайн
      * @return обновленное назначение
      */
-    TaskAssignmentResponseDto extendDeadline(UUID assignmentId, UUID parentId, LocalDate newDueDate);
+    TaskAssignmentResponseDto extendDeadline(UUID assignmentId, UUID parentId, LocalDateTime newDueDate);
 
     /**
      * Удалить назначение задания.

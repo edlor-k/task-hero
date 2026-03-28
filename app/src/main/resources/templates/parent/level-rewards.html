@@ -96,6 +96,7 @@
                                                   th:action="@{/parent/level-rewards/{id}/issued(id=${reward.id()})}"
                                                   method="post" class="d-inline">
                                                 <input type="hidden" name="childId" th:value="${selectedChild.id}"/>
+                                                <input type="hidden" name="onboarding" th:value="${onboarding}"/>
                                                 <button type="submit" class="btn btn-sm btn-success" title="Отметить как выданную">
                                                     <i class="bi bi-check-lg"></i>
                                                 </button>
@@ -105,6 +106,7 @@
                                                   th:action="@{/parent/level-rewards/{id}/delete(id=${reward.id()})}"
                                                   method="post" class="d-inline">
                                                 <input type="hidden" name="childId" th:value="${selectedChild.id}"/>
+                                                <input type="hidden" name="onboarding" th:value="${onboarding}"/>
                                                 <button type="submit" class="btn btn-sm btn-outline-danger" title="Удалить">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
@@ -152,6 +154,7 @@
                         </div>
 
                         <form th:action="@{/parent/level-rewards/{childId}/add(childId=${selectedChild.id})}" method="post">
+                            <input type="hidden" name="onboarding" th:value="${onboarding}"/>
                             <div id="rewardsContainer">
                                 <div class="reward-row row g-2 mb-3 align-items-end" th:each="info : ${levelInfoList}" th:if="${!rewardedLevels.contains(info.level())}">
                                     <div class="col-md-1">

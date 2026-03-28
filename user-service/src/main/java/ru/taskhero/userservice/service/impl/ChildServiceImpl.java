@@ -293,13 +293,8 @@ public class ChildServiceImpl implements ChildService {
                     return new ResourceNotFoundException("Ребёнок с ID " + childId + " не найден");
                 });
 
-        // Применяем множитель траектории к EXP
-        DifficultyTrajectory trajectory = child.getDifficultyTrajectory() != null
-                ? child.getDifficultyTrajectory() : DifficultyTrajectory.NORMAL;
-        int adjustedExp = (int) Math.round(exp * trajectory.getExpMultiplier());
-
-        // Начисляем награды
-        int newExp = child.getExp() + adjustedExp;
+        // Начисляем награды без множителей — ровно столько, сколько назначил родитель
+        int newExp = child.getExp() + exp;
 
         // Если есть незавершённые важные задания — ограничиваем EXP максимумом текущего уровня
         if (capExp) {

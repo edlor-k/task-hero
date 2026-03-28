@@ -23,7 +23,7 @@
                  class="alert alert-info alert-dismissible fade show border-start border-4 border-info">
                 <i class="bi bi-arrow-repeat me-2"></i>
                 <strong>Задание возвращено!</strong> «<span th:text="${ra.template?.title}">Задание</span>»
-                <span th:if="${ra.dueDate}">было продлено до <span th:text="${#temporals.format(ra.dueDate, 'dd.MM.yyyy')}">01.01.2026</span>.</span>
+                <span th:if="${ra.dueDate}">было продлено до <span th:text="${#temporals.format(ra.dueDate, 'dd.MM.yyyy ''в'' HH:mm')}">01.01.2026 в 21:15</span>.</span>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
 
@@ -208,15 +208,15 @@
                                     </div>
                                     <!-- Deadline -->
                                     <div th:if="${a.dueDate}" class="mt-1">
-                                        <small th:classappend="${a.dueDate.isBefore(T(java.time.LocalDate).now().plusDays(1)) ? 'text-danger fw-semibold' : 'text-muted'}">
-                                            <i class="bi bi-clock me-1"></i>Дедлайн: <span th:text="${#temporals.format(a.dueDate, 'dd.MM.yyyy')}">01.01.2026</span>
-                                            <span th:with="daysLeft=${T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(), a.dueDate)}"
-                                                  th:if="${daysLeft >= 0}"
-                                                  th:text="' (' + ${daysLeft == 0 ? 'сегодня' : daysLeft == 1 ? 'завтра' : daysLeft + ' дн.'} + ')'"></span>
-                                            <span th:with="daysLeft=${T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(), a.dueDate)}"
-                                                  th:if="${daysLeft < 0}"
+                                        <small th:classappend="${a.dueDate.isBefore(T(java.time.LocalDateTime).now()) ? 'text-danger fw-semibold' : 'text-muted'}">
+                                            <i class="bi bi-clock me-1"></i>Дедлайн: <span th:text="${#temporals.format(a.dueDate, 'dd.MM.yyyy ''в'' HH:mm')}">01.01.2026 в 21:15</span>
+                                            <span th:with="hoursLeft=${T(java.time.Duration).between(T(java.time.LocalDateTime).now(), a.dueDate).toHours()}"
+                                                  th:if="${hoursLeft >= 0}"
+                                                  th:text="' (' + ${hoursLeft < 1 ? 'менее часа' : hoursLeft < 24 ? hoursLeft + ' ч.' : (hoursLeft / 24) + ' дн.'} + ')'"></span>
+                                            <span th:with="hoursLeft=${T(java.time.Duration).between(T(java.time.LocalDateTime).now(), a.dueDate).toHours()}"
+                                                  th:if="${hoursLeft < 0}"
                                                   class="text-danger fw-semibold"
-                                                  th:text="' (просрочено на ' + ${-daysLeft} + ' дн.)'"></span>
+                                                  th:text="' (просрочено на ' + ${(-hoursLeft) < 24 ? (-hoursLeft) + ' ч.' : ((-hoursLeft) / 24) + ' дн.'} + ')'"></span>
                                         </small>
                                     </div>
                                     <!-- Sub-items -->

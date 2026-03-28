@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import ru.taskhero.common.model.enums.TaskStatus;
 import ru.taskhero.taskservice.entity.TaskAssignment;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -136,7 +136,7 @@ public interface TaskAssignmentRepository extends JpaRepository<TaskAssignment, 
      * @param status статус задания
      * @return список просроченных назначений
      */
-    List<TaskAssignment> findAllByDueDateBeforeAndStatus(LocalDate date, TaskStatus status);
+    List<TaskAssignment> findAllByDueDateBeforeAndStatus(LocalDateTime date, TaskStatus status);
 
     /**
      * Подсчитать количество назначений ребёнка с определённым статусом.

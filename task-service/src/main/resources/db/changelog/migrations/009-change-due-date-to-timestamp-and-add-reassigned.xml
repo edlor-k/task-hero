@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.8.xsd">
+
+    <changeSet id="009-1" author="task-hero">
+        <comment>Change due_date column from date to timestamp to support time component</comment>
+        <modifyDataType tableName="task_assignments" columnName="due_date" newDataType="timestamp"/>
+    </changeSet>
+
+    <changeSet id="009-2" author="task-hero">
+        <comment>Add reassigned flag for tracking extended-deadline tasks</comment>
+        <addColumn tableName="task_assignments">
+            <column name="reassigned" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

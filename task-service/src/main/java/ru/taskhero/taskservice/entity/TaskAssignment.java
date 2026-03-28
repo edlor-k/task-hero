@@ -18,7 +18,7 @@ import ru.taskhero.common.model.entity.BaseEntity;
 import ru.taskhero.common.model.enums.TaskStatus;
 
 import java.time.Instant;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
@@ -59,7 +59,7 @@ public class TaskAssignment extends BaseEntity {
      * Срок выполнения задания.
      */
     @Column(name = "due_date")
-    private LocalDate dueDate;
+    private LocalDateTime dueDate;
 
     /**
      * Комментарий ребёнка при сдаче задания.
@@ -103,4 +103,11 @@ public class TaskAssignment extends BaseEntity {
     @Builder.Default
     @Column(name = "important", nullable = false)
     private boolean important = false;
+
+    /**
+     * Флаг переназначения — true, если задание было продлено после просрочки.
+     */
+    @Builder.Default
+    @Column(name = "reassigned", nullable = false)
+    private boolean reassigned = false;
 }

@@ -433,7 +433,7 @@ public class TaskAssignmentController {
     ) {
         UUID parentId = SecurityUtils.getCurrentUserId();
         TaskAssignmentResponseDto response = assignmentService.extendDeadline(
-                id, parentId, java.time.LocalDate.parse(newDueDate));
+                id, parentId, java.time.LocalDateTime.parse(newDueDate));
         return ResponseEntity.ok(response);
     }
 

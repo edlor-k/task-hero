@@ -1,7 +1,7 @@
 package ru.taskhero.app.dto;
 
 import java.time.Instant;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
@@ -11,7 +11,7 @@ public record TaskAssignmentDto(
         UUID id,
         UUID childId,
         String status,
-        LocalDate dueDate,
+        LocalDateTime dueDate,
         String childComment,
         String parentComment,
         Instant submittedAt,
@@ -19,6 +19,7 @@ public record TaskAssignmentDto(
         Integer expEarned,
         Integer coinsEarned,
         Boolean important,
+        Boolean reassigned,
         TaskTemplateDto template,
         Instant createdAt,
         Instant updatedAt

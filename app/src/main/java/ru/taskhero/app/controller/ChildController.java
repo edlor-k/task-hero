@@ -72,12 +72,10 @@ public class ChildController {
             model.addAttribute("totalExp", totalExp);
             model.addAttribute("totalCoins", totalCoins);
 
-            // Reassigned tasks: expired tasks that were re-assigned with a new deadline
+            // Reassigned tasks: tasks that were extended after expiration
             List<TaskAssignmentDto> reassigned = activeAssignments.stream()
                     .filter(a -> "CREATED".equals(a.status()))
-                    .filter(a -> a.dueDate() != null)
-                    .filter(a -> a.updatedAt() != null && a.createdAt() != null
-                            && a.updatedAt().isAfter(a.createdAt().plusSeconds(60)))
+                    .filter(a -> Boolean.TRUE.equals(a.reassigned()))
                     .toList();
             model.addAttribute("reassignedAssignments", reassigned);
 
@@ -290,8 +288,11 @@ public class ChildController {
             userServiceClient.requestPurchase(itemId);
             redirectAttributes.addFlashAttribute("success", "Запрос на покупку отправлен!");
         } catch (Exception e) {
-            log.error("Error requesting purchase: {}", e.getMessage());
-            redirectAttributes.addFlashAttribute("error", "Ошибка запроса покупки. Возможно, недостаточно монет.");
+            log.error("Error requesting purchase for item {}: {}", itemId, e.getMessage());
+            String errorMsg = e.getMessage() != null && !e.getMessage().isBlank()
+                    ? e.getMessage()
+                    : "Ошибка запроса покупки";
+            redirectAttributes.addFlashAttribute("error", errorMsg);
         }
         return "redirect:/child/shop";
     }

@@ -173,6 +173,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <form th:action="@{/parent/shop/add}" method="post">
+                <input type="hidden" name="onboarding" th:value="${onboarding}"/>
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold"><i class="bi bi-bag-plus me-2"></i>Добавить товар</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>

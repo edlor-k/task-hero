@@ -24,7 +24,7 @@ import ru.taskhero.taskservice.service.RewardService;
 import ru.taskhero.taskservice.service.TaskAssignmentService;
 
 import java.time.Instant;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -269,7 +269,7 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
     @Override
     @Transactional
     @LogMethod("assignment-extend-deadline")
-    public TaskAssignmentResponseDto extendDeadline(UUID assignmentId, UUID parentId, LocalDate newDueDate) {
+    public TaskAssignmentResponseDto extendDeadline(UUID assignmentId, UUID parentId, LocalDateTime newDueDate) {
         log.info("Продление дедлайна задания {} родителем {}", assignmentId, parentId);
 
         TaskAssignment assignment = findAssignmentAndVerifyParent(assignmentId, parentId);
@@ -280,6 +280,7 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
 
         assignment.setDueDate(newDueDate);
         assignment.setStatus(TaskStatus.CREATED);
+        assignment.setReassigned(true);
         assignment = assignmentRepository.save(assignment);
 
         log.info("Дедлайн задания {} продлён до {}", assignmentId, newDueDate);
