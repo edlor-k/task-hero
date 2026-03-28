@@ -45,7 +45,9 @@ public interface ShopItemRepository extends JpaRepository<ShopItem, UUID> {
     /**
      * Найти активные товары для ребёнка с загруженными детьми.
      */
-    @Query("SELECT DISTINCT si FROM ShopItem si LEFT JOIN FETCH si.children WHERE si.active = true AND EXISTS (SELECT 1 FROM si.children c WHERE c.id = :childId)")
+    @Query("SELECT DISTINCT si FROM ShopItem si LEFT JOIN FETCH si.children "
+            + "WHERE si.id IN (SELECT si2.id FROM ShopItem si2 JOIN si2.children c "
+            + "WHERE c.id = :childId AND si2.active = true)")
     List<ShopItem> findActiveByChildIdWithChildren(@Param("childId") UUID childId);
 
     /**
