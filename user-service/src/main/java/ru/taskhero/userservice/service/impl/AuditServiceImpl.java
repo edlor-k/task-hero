@@ -31,16 +31,27 @@ public class AuditServiceImpl implements AuditService {
     @Transactional
     public void log(UUID adminId, String adminEmail, AuditAction action,
                     String targetType, UUID targetId, String details) {
+        String resolvedAdminEmail = resolveAdminEmail(adminId, adminEmail);
         AuditLog entry = AuditLog.builder()
                 .adminId(adminId)
-                .adminEmail(adminEmail)
+                .adminEmail(resolvedAdminEmail)
                 .action(action)
                 .targetType(targetType)
                 .targetId(targetId)
                 .details(details)
                 .build();
         auditLogRepository.save(entry);
-        log.info("Аудит: {} выполнил {} над {} {}: {}", adminEmail, action, targetType, targetId, details);
+        log.info("Аудит: {} выполнил {} над {} {}: {}", resolvedAdminEmail, action, targetType, targetId, details);
+    }
+
+    private String resolveAdminEmail(UUID adminId, String adminEmail) {
+        if (adminEmail != null && !adminEmail.isBlank()) {
+            return adminEmail;
+        }
+        if (adminId != null) {
+            return "actor+" + adminId + "@taskhero.local";
+        }
+        return "system@taskhero.local";
     }
 
     @Override
