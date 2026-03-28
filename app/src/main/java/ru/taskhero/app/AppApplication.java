@@ -4,6 +4,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
+import java.util.TimeZone;
+
 /**
  * Главный класс приложения TaskHero.
  * Точка входа с Thymeleaf UI, объединяющая все модули.
@@ -16,6 +18,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 public class AppApplication {
 
     public static void main(String[] args) {
+        TimeZone.setDefault(TimeZone.getTimeZone("Europe/Moscow"));
         SpringApplication.run(AppApplication.class, args);
     }
 }

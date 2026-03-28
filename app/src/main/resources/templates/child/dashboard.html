@@ -229,12 +229,14 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <form th:if="${a.status == 'CREATED'}"
+                                    <form th:if="${a.status == 'CREATED' and (a.dueDate == null or !a.dueDate.isBefore(T(java.time.LocalDateTime).now()))}"
                                           th:action="@{/child/tasks/{id}/submit(id=${a.id})}" method="post">
                                         <button type="submit" class="btn btn-sm btn-success">
                                             <i class="bi bi-check-lg me-1"></i>Сдать
                                         </button>
                                     </form>
+                                    <span th:if="${a.status == 'CREATED' and a.dueDate != null and a.dueDate.isBefore(T(java.time.LocalDateTime).now())}"
+                                          class="badge bg-danger">Просрочено</span>
                                     <span th:if="${a.status == 'SUBMITTED'}" class="badge bg-warning text-dark">На проверке</span>
                                 </div>
                             </div>

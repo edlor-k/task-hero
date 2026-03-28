@@ -161,4 +161,12 @@ public interface TaskAssignmentRepository extends JpaRepository<TaskAssignment, 
      * Проверить, есть ли у ребёнка невыполненные важные задания.
      */
     boolean existsByChildIdAndImportantTrueAndStatusIn(UUID childId, List<TaskStatus> statuses);
+
+    /**
+     * Найти просроченные задания для родителя: EXPIRED или CREATED с истёкшим дедлайном.
+     */
+    @Query("SELECT a FROM TaskAssignment a JOIN FETCH a.template WHERE a.template.parentId = :parentId "
+            + "AND (a.status = ru.taskhero.common.model.enums.TaskStatus.EXPIRED "
+            + "OR (a.status = ru.taskhero.common.model.enums.TaskStatus.CREATED AND a.dueDate IS NOT NULL AND a.dueDate < :now))")
+    List<TaskAssignment> findOverdueByParent(@Param("parentId") UUID parentId, @Param("now") LocalDateTime now);
 }

@@ -83,6 +83,7 @@ class TaskTemplateServiceImplTest {
                 true,
                 false,
                 null,
+                null,
                 Instant.now(),
                 null
         );

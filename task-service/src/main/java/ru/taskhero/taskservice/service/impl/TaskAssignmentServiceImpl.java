@@ -179,6 +179,11 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
             throw new ValidationException("Задание уже было сдано или проверено");
         }
 
+        if (assignment.getDueDate() != null && assignment.getDueDate().isBefore(LocalDateTime.now())) {
+            log.warn("Попытка сдать просроченное задание {}", assignmentId);
+            throw new ValidationException("Дедлайн задания истёк");
+        }
+
         assignment.setStatus(TaskStatus.SUBMITTED);
         assignment.setChildComment(request.comment());
         assignment.setSubmittedAt(Instant.now());
@@ -260,7 +265,7 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
     public List<TaskAssignmentResponseDto> getExpiredByParent(UUID parentId) {
         log.debug("Получение просроченных заданий для родителя: {}", parentId);
 
-        return assignmentRepository.findAllByParentIdAndStatusWithTemplate(parentId, TaskStatus.EXPIRED)
+        return assignmentRepository.findOverdueByParent(parentId, LocalDateTime.now())
                 .stream()
                 .map(assignmentMapper::toDto)
                 .toList();
@@ -274,7 +279,10 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
 
         TaskAssignment assignment = findAssignmentAndVerifyParent(assignmentId, parentId);
 
-        if (assignment.getStatus() != TaskStatus.EXPIRED) {
+        if (assignment.getStatus() != TaskStatus.EXPIRED
+                && !(assignment.getStatus() == TaskStatus.CREATED
+                     && assignment.getDueDate() != null
+                     && assignment.getDueDate().isBefore(LocalDateTime.now()))) {
             throw new ValidationException("Продлить дедлайн можно только для просроченных заданий");
         }
 

@@ -21,6 +21,7 @@ import ru.taskhero.app.dto.TaskAssignmentDto;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -267,8 +268,15 @@ public class ChildController {
             List<ShopItemDto> availableItems = userServiceClient.getAvailableShopItems();
             List<ShopPurchaseDto> myPurchases = userServiceClient.getMyPurchases();
 
+            // Collect item IDs with pending purchases
+            Set<UUID> pendingItemIds = myPurchases.stream()
+                    .filter(p -> "PENDING".equals(p.status()) && p.shopItem() != null)
+                    .map(p -> p.shopItem().id())
+                    .collect(java.util.stream.Collectors.toSet());
+
             model.addAttribute("items", availableItems);
             model.addAttribute("purchases", myPurchases);
+            model.addAttribute("pendingItemIds", pendingItemIds);
         } catch (Exception e) {
             log.error("Error loading child shop: {}", e.getMessage());
             model.addAttribute("error", "Ошибка загрузки магазина");

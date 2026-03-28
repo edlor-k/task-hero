@@ -24,7 +24,7 @@ import ru.taskhero.taskservice.repository.TaskTemplateRepository;
 import ru.taskhero.taskservice.service.impl.TaskAssignmentServiceImpl;
 
 import java.time.Instant;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -83,7 +83,7 @@ class TaskAssignmentServiceImplTest {
                 .template(template)
                 .childId(childId)
                 .status(TaskStatus.CREATED)
-                .dueDate(LocalDate.now().plusDays(7))
+                .dueDate(LocalDateTime.now().plusDays(7))
                 .build();
 
         TaskTemplateResponseDto templateDto = new TaskTemplateResponseDto(
@@ -93,9 +93,9 @@ class TaskAssignmentServiceImplTest {
         );
 
         responseDto = new TaskAssignmentResponseDto(
-                assignmentId, childId, TaskStatus.CREATED, LocalDate.now().plusDays(7),
+                assignmentId, childId, TaskStatus.CREATED, LocalDateTime.now().plusDays(7),
                 null, null, null, null, null, null,
-                null, templateDto, Instant.now(), null
+                null, null, templateDto, Instant.now(), null
         );
     }
 
@@ -104,7 +104,7 @@ class TaskAssignmentServiceImplTest {
     void shouldAssignTaskToChild() {
         // Given
         TaskAssignRequest request = new TaskAssignRequest(
-                templateId, childId, LocalDate.now().plusDays(7), null
+                templateId, childId, LocalDateTime.now().plusDays(7), null
         );
 
         when(templateRepository.findById(templateId)).thenReturn(Optional.of(template));
@@ -165,7 +165,7 @@ class TaskAssignmentServiceImplTest {
                 new TaskAssignmentResponseDto(
                         assignmentId, childId, TaskStatus.SUBMITTED, null,
                         "Я все сделал!", null, Instant.now(), null, null, null,
-                        null, null, Instant.now(), null
+                        null, null, null, Instant.now(), null
                 )
         );
 
@@ -205,9 +205,11 @@ class TaskAssignmentServiceImplTest {
                 new TaskAssignmentResponseDto(
                         assignmentId, childId, TaskStatus.APPROVED, null,
                         null, "Молодец!", null, Instant.now(), 25, 10,
-                        null, null, Instant.now(), Instant.now()
+                        null, null, null, Instant.now(), Instant.now()
                 )
         );
+        when(assignmentRepository.existsByChildIdAndImportantTrueAndStatusIn(any(), any()))
+                .thenReturn(false);
 
         // When
         TaskAssignmentResponseDto result = assignmentService.approve(assignmentId, parentId, request);
@@ -215,7 +217,7 @@ class TaskAssignmentServiceImplTest {
         // Then
         assertThat(result).isNotNull();
         assertThat(result.status()).isEqualTo(TaskStatus.APPROVED);
-        verify(rewardService).grantReward(childId, 25, 10);
+        verify(rewardService).grantReward(childId, 25, 10, false);
     }
 
     @Test
@@ -231,7 +233,7 @@ class TaskAssignmentServiceImplTest {
                 new TaskAssignmentResponseDto(
                         assignmentId, childId, TaskStatus.REJECTED, null,
                         null, "Нужно переделать", null, Instant.now(), null, null,
-                        null, null, Instant.now(), Instant.now()
+                        null, null, null, Instant.now(), Instant.now()
                 )
         );
 
@@ -262,7 +264,7 @@ class TaskAssignmentServiceImplTest {
     @DisplayName("Должен получить назначения ребёнка")
     void shouldGetAssignmentsByChild() {
         // Given
-        when(assignmentRepository.findAllByChildId(childId)).thenReturn(List.of(assignment));
+        when(assignmentRepository.findAllByChildIdWithTemplate(childId)).thenReturn(List.of(assignment));
         when(assignmentMapper.toDto(assignment)).thenReturn(responseDto);
 
         // When
@@ -278,7 +280,7 @@ class TaskAssignmentServiceImplTest {
     void shouldGetActiveAssignmentsByChild() {
         // Given
         List<TaskStatus> activeStatuses = List.of(TaskStatus.CREATED, TaskStatus.SUBMITTED);
-        when(assignmentRepository.findAllByChildIdAndStatusIn(childId, activeStatuses))
+        when(assignmentRepository.findAllByChildIdAndStatusInWithTemplate(childId, activeStatuses))
                 .thenReturn(List.of(assignment));
         when(assignmentMapper.toDto(assignment)).thenReturn(responseDto);
 
@@ -294,7 +296,7 @@ class TaskAssignmentServiceImplTest {
     void shouldGetPendingReviewByParent() {
         // Given
         assignment.setStatus(TaskStatus.SUBMITTED);
-        when(assignmentRepository.findAllByParentIdAndStatus(parentId, TaskStatus.SUBMITTED))
+        when(assignmentRepository.findAllByParentIdAndStatusWithTemplate(parentId, TaskStatus.SUBMITTED))
                 .thenReturn(List.of(assignment));
         when(assignmentMapper.toDto(assignment)).thenReturn(responseDto);
 
