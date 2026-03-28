@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('О проекте')}"></head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark" style="background: #1e293b;">
+<nav class="navbar navbar-expand-lg navbar-dark" style="background: var(--sidebar-bg, #1e293b);">
     <div class="container">
         <a class="navbar-brand fw-bold" th:href="@{/}">
             <i class="bi bi-trophy me-2"></i>TaskGamer

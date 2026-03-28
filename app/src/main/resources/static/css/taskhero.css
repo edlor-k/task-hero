@@ -1,123 +1,56 @@
 /* ========================================================
-   TaskHero — Modern Bootstrap 5 Theme
-   Pure Bootstrap 5.3 + Bootstrap Icons + custom sidebar
+   TaskGamer — ModernAdmin integration overrides
    ======================================================== */
 
-:root {
-    --th-sidebar-width: 260px;
-    --th-sidebar-bg: #1e293b;
-    --th-sidebar-color: #94a3b8;
-    --th-sidebar-active: #ffffff;
-    --th-sidebar-hover-bg: rgba(255,255,255,0.08);
-    --th-sidebar-active-bg: rgba(99,102,241,0.2);
-    --th-topbar-height: 60px;
-    --th-primary: #6366f1;
-    --th-primary-light: rgba(99,102,241,0.1);
+/* ---- Sidebar nav-link active state (auto-detected by JS) ---- */
+.sidebar .nav-menu .nav-link.active {
+    color: var(--accent-color) !important;
+    background-color: color-mix(in srgb, var(--accent-color) 10%, transparent);
 }
 
-/* --- Sidebar --- */
-.th-sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: var(--th-sidebar-width);
-    background: var(--th-sidebar-bg);
-    z-index: 1040;
-    transition: transform 0.3s ease;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-
-.sidebar-section-label {
-    display: block;
-    padding: 1rem 1rem 0.35rem 1rem;
-    font-size: 0.65rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #64748b;
-    list-style: none;
-}
-
-.sidebar-link {
-    display: flex !important;
+/* ---- Sidebar footer icon helper ---- */
+.sidebar-footer-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.55rem 1rem !important;
-    margin-bottom: 2px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--th-sidebar-color) !important;
-    border-radius: 0.5rem;
-    transition: all 0.15s ease;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1rem;
 }
-.sidebar-link i {
-    font-size: 1.1rem;
-    width: 24px;
-    text-align: center;
+
+/* ---- Stat icon helper (used on dashboard cards) ---- */
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
     flex-shrink: 0;
 }
-.sidebar-link:hover {
-    color: var(--th-sidebar-active) !important;
-    background: var(--th-sidebar-hover-bg);
-}
-.sidebar-link.active {
-    color: var(--th-sidebar-active) !important;
-    background: var(--th-sidebar-active-bg);
-    font-weight: 600;
-}
 
-/* --- Topbar --- */
-.th-topbar {
-    height: var(--th-topbar-height);
-}
-
-/* --- Main layout --- */
-.th-layout {
-    display: flex;
+/* ---- Auth pages ---- */
+.auth-wrapper {
     min-height: 100vh;
-}
-.th-content {
-    margin-left: var(--th-sidebar-width);
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    background: #f8fafc;
-}
-.th-main {
-    flex: 1;
-    padding: 1.5rem;
+    background: var(--background-color, #f0f4f9);
 }
 
-/* --- Sidebar backdrop (mobile) --- */
-.sidebar-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 1035;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-}
-.sidebar-backdrop.show {
-    opacity: 1;
-    pointer-events: auto;
+/* ---- Child hero card gradient ---- */
+.child-hero-card {
+    background: linear-gradient(135deg, var(--accent-color, #1a66c4) 0%, #6f42c1 100%);
+    border: none;
 }
 
-/* --- Mobile: hide sidebar by default --- */
-@media (max-width: 991.98px) {
-    .th-sidebar {
-        transform: translateX(-100%);
-    }
-    .th-sidebar.show {
-        transform: translateX(0);
-    }
-    .th-content {
-        margin-left: 0;
+/* ---- Mobile responsive: main adjustments ---- */
+@media (max-width: 1199.98px) {
+    .main {
+        margin-left: 0 !important;
     }
 }
+
 
 /* --- Cards --- */
 .card {
@@ -133,16 +66,7 @@
     border-radius: 0.75rem 0.75rem 0 0 !important;
 }
 
-/* --- Stat icon helper --- */
-.stat-icon {
-    width: 48px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 0.75rem;
-    font-size: 1.25rem;
-}
+
 
 /* --- Character card (select-character page) --- */
 .character-card {
@@ -160,11 +84,7 @@
     line-height: 1;
 }
 
-/* --- Auth pages --- */
-.auth-wrapper {
-    min-height: 100vh;
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
-}
+
 
 /* --- Progress bar --- */
 .progress {
@@ -202,11 +122,11 @@
     box-shadow: 0 6px 20px rgba(0,0,0,0.08) !important;
 }
 
-/* --- Scrollbar for sidebar --- */
-.th-sidebar::-webkit-scrollbar {
+/* ModernAdmin sidebar scrollbar */
+.sidebar::-webkit-scrollbar {
     width: 4px;
 }
-.th-sidebar::-webkit-scrollbar-thumb {
+.sidebar::-webkit-scrollbar-thumb {
     background: rgba(255,255,255,0.15);
     border-radius: 4px;
 }

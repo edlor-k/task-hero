@@ -1,0 +1,171 @@
+/*--------------------------------------------------------------
+# DataTables Overrides (simple-datatables)
+--------------------------------------------------------------*/
+
+.datatable-wrapper {
+  overflow-x: auto;
+}
+
+.datatable-wrapper .datatable-top,
+.datatable-wrapper .datatable-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) 0;
+}
+
+.datatable-wrapper .datatable-search {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.datatable-wrapper .datatable-search input {
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 0.875rem;
+  font-family: inherit;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background-color: var(--input-bg);
+  color: var(--default-color);
+  transition: border-color var(--transition-fast);
+}
+
+.datatable-wrapper .datatable-search input:focus {
+  outline: 0;
+  border-color: var(--input-focus-border);
+}
+
+.datatable-wrapper .datatable-dropdown {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 0.875rem;
+  color: var(--muted-color);
+}
+
+.datatable-wrapper .datatable-dropdown select {
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 0.875rem;
+  font-family: inherit;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background-color: var(--input-bg);
+  color: var(--default-color);
+  cursor: pointer;
+}
+
+.datatable-wrapper .datatable-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.datatable-wrapper .datatable-table thead th {
+  padding: var(--spacing-md);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted-color);
+  background-color: var(--table-header-bg);
+  border-bottom: 1px solid var(--border-color);
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+
+.datatable-wrapper .datatable-table thead th:hover {
+  background-color: var(--table-hover-bg);
+}
+
+.datatable-wrapper .datatable-table thead th.datatable-ascending::after,
+.datatable-wrapper .datatable-table thead th.datatable-descending::after {
+  content: "";
+  display: inline-block;
+  margin-left: var(--spacing-xs);
+  border: 4px solid transparent;
+}
+
+.datatable-wrapper .datatable-table thead th.datatable-ascending::after {
+  border-bottom-color: var(--accent-color);
+  transform: translateY(-2px);
+}
+
+.datatable-wrapper .datatable-table thead th.datatable-descending::after {
+  border-top-color: var(--accent-color);
+  transform: translateY(2px);
+}
+
+.datatable-wrapper .datatable-table tbody td {
+  padding: var(--spacing-md);
+  font-size: 0.875rem;
+  color: var(--default-color);
+  border-bottom: 1px solid var(--border-color-light);
+  vertical-align: middle;
+}
+
+.datatable-wrapper .datatable-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.datatable-wrapper .datatable-table tbody tr:hover td {
+  background-color: var(--table-hover-bg);
+}
+
+.datatable-wrapper .datatable-info {
+  font-size: 0.8125rem;
+  color: var(--muted-color);
+}
+
+.datatable-wrapper .datatable-pagination {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.datatable-wrapper .datatable-pagination button,
+.datatable-wrapper .datatable-pagination a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 var(--spacing-sm);
+  font-size: 0.8125rem;
+  font-family: inherit;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface-color);
+  color: var(--default-color);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.datatable-wrapper .datatable-pagination button:hover:not(:disabled),
+.datatable-wrapper .datatable-pagination a:hover {
+  background-color: var(--background-color);
+  border-color: var(--border-color-dark);
+}
+
+.datatable-wrapper .datatable-pagination .active button,
+.datatable-wrapper .datatable-pagination .active a {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+  color: white;
+}
+
+.datatable-wrapper .datatable-pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Empty state */
+.datatable-wrapper .datatable-empty {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  color: var(--muted-color);
+}

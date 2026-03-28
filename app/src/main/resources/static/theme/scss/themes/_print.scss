@@ -1,0 +1,210 @@
+/*--------------------------------------------------------------
+# Print Styles
+--------------------------------------------------------------*/
+
+@media print {
+  *,
+  *::before,
+  *::after {
+    background: transparent !important;
+    color: #000 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* Hide non-essential elements */
+  .header,
+  .sidebar,
+  .footer,
+  .back-to-top,
+  .btn,
+  .dropdown-menu,
+  .modal,
+  .toast-container,
+  .no-print {
+    display: none !important;
+  }
+
+  /* Reset main content area */
+  .main {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .main-content {
+    padding: 0 !important;
+  }
+
+  /* Page setup */
+  @page {
+    margin: 2cm;
+    size: A4;
+  }
+
+  /* Headings */
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Images */
+  img {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+  }
+
+  /* Tables */
+  table {
+    border-collapse: collapse !important;
+  }
+
+  table, th, td {
+    border: 1px solid #ddd !important;
+  }
+
+  th {
+    background-color: #f5f5f5 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  tr {
+    page-break-inside: avoid;
+  }
+
+  /* Links */
+  a {
+    text-decoration: underline;
+  }
+
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #666;
+  }
+
+  a[href^="#"]::after,
+  a[href^="javascript:"]::after {
+    content: "";
+  }
+
+  /* Cards - show borders */
+  .card {
+    border: 1px solid #ddd !important;
+    page-break-inside: avoid;
+  }
+
+  .card-header {
+    border-bottom: 1px solid #ddd !important;
+    background-color: #f5f5f5 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Badges - show borders */
+  .badge {
+    border: 1px solid currentColor !important;
+    padding: 2px 6px !important;
+  }
+
+  /* Progress bars */
+  .progress {
+    border: 1px solid #ddd !important;
+  }
+
+  .progress-bar {
+    background-color: #333 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Alerts */
+  .alert {
+    border: 1px solid currentColor !important;
+  }
+
+  /* Forms - hide interactive elements */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  textarea,
+  select {
+    border: 1px solid #ddd !important;
+    background: transparent !important;
+  }
+
+  /* Charts - typically not printable */
+  .chart-container,
+  canvas {
+    page-break-inside: avoid;
+  }
+
+  /* Invoice specific */
+  .invoice {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .invoice-header {
+    margin-bottom: 2cm !important;
+  }
+
+  .invoice-logo img {
+    max-height: 60px !important;
+  }
+
+  .invoice-table {
+    width: 100% !important;
+    margin: 1cm 0 !important;
+  }
+
+  .invoice-total {
+    margin-top: 1cm !important;
+  }
+
+  /* Orphan/Widow control */
+  p, li {
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* Prevent breaks after headings */
+  h1, h2, h3, h4, h5, h6 {
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* Blockquotes */
+  blockquote {
+    border-left: 4px solid #333 !important;
+    page-break-inside: avoid;
+  }
+
+  /* Code blocks */
+  pre, code {
+    border: 1px solid #ddd !important;
+    page-break-inside: avoid;
+  }
+
+  /* Show print-only elements */
+  .print-only {
+    display: block !important;
+  }
+}
+
+/* Print-only class (hidden on screen) */
+.print-only {
+  display: none;
+}
+
+/* No-print class (visible on screen, hidden in print) */
+@media screen {
+  .no-print {
+    display: block;
+  }
+}

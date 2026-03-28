@@ -1,12 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Журнал аудита')}"></head>
 <body>
-<div class="th-layout">
-    <nav th:replace="~{fragments/layout :: sidebar-admin}"></nav>
-    <div class="th-content">
-        <header th:replace="~{fragments/layout :: header}"></header>
-        <main class="th-main">
+<th:block th:replace="~{fragments/layout :: header}"></th:block>
+<div class="sidebar-overlay"></div>
+<th:block th:replace="~{fragments/layout :: sidebar-admin}"></th:block>
+<main class="main">
+    <div class="main-content">
 
             <div class="d-flex align-items-center justify-content-between mb-4">
                 <h4 class="fw-bold mb-0"><i class="bi bi-journal-text me-2"></i>Журнал аудита</h4>
@@ -128,11 +128,9 @@
                     </nav>
                 </div>
             </div>
-
-        </main>
-        <footer th:replace="~{fragments/layout :: footer}"></footer>
     </div>
-</div>
+</main>
+<a href="#" class="back-to-top"><i class="bi bi-arrow-up-short"></i></a>
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 </body>
 </html>

@@ -1,0 +1,200 @@
+/*--------------------------------------------------------------
+# Alerts
+--------------------------------------------------------------*/
+
+.alert {
+  position: relative;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+}
+
+.alert-heading {
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+  color: inherit;
+}
+
+.alert p:last-child {
+  margin-bottom: 0;
+}
+
+/* Alert Colors */
+.alert-primary {
+  background-color: color-mix(in srgb, var(--accent-color), transparent 90%);
+  border-color: var(--accent-color);
+  color: color-mix(in srgb, var(--accent-color), black 15%);
+}
+
+.alert-secondary {
+  background-color: var(--border-color-light);
+  border-color: var(--border-color-dark);
+  color: var(--default-color);
+}
+
+.alert-success {
+  background-color: var(--success-color-light);
+  border-color: var(--success-color);
+  color: #166534;
+}
+
+.alert-warning {
+  background-color: var(--warning-color-light);
+  border-color: var(--warning-color);
+  color: #92400e;
+}
+
+.alert-danger {
+  background-color: var(--danger-color-light);
+  border-color: var(--danger-color);
+  color: #991b1b;
+}
+
+.alert-info {
+  background-color: var(--info-color-light);
+  border-color: var(--info-color);
+  color: #0e7490;
+}
+
+/* Dark mode adjustments */
+[data-theme="dark"] .alert-success {
+  color: var(--success-color);
+}
+
+[data-theme="dark"] .alert-warning {
+  color: var(--warning-color);
+}
+
+[data-theme="dark"] .alert-danger {
+  color: var(--danger-color);
+}
+
+[data-theme="dark"] .alert-info {
+  color: var(--info-color);
+}
+
+[data-theme="dark"] .alert-primary {
+  color: var(--accent-color);
+}
+
+/* Alert with Icon */
+.alert-icon {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.alert-icon > i {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.alert-icon-content {
+  flex: 1;
+}
+
+/* Dismissible Alert */
+.alert-dismissible {
+  padding-right: calc(var(--spacing-lg) + 32px);
+}
+
+.alert-dismissible .btn-close {
+  position: absolute;
+  top: 50%;
+  right: var(--spacing-md);
+  transform: translateY(-50%);
+  padding: var(--spacing-sm);
+  background: transparent;
+  border: none;
+  opacity: 0.5;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+.alert-dismissible .btn-close:hover {
+  opacity: 1;
+}
+
+.alert-dismissible .btn-close i {
+  font-size: 1rem;
+}
+
+/* Alert Outline Variants */
+.alert-outline-primary {
+  background-color: transparent;
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+.alert-outline-success {
+  background-color: transparent;
+  border-color: var(--success-color);
+  color: var(--success-color);
+}
+
+.alert-outline-warning {
+  background-color: transparent;
+  border-color: var(--warning-color);
+  color: var(--warning-color);
+}
+
+.alert-outline-danger {
+  background-color: transparent;
+  border-color: var(--danger-color);
+  color: var(--danger-color);
+}
+
+.alert-outline-info {
+  background-color: transparent;
+  border-color: var(--info-color);
+  color: var(--info-color);
+}
+
+/* Solid Background Variants */
+.alert-solid-primary {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+  color: white;
+}
+
+.alert-solid-success {
+  background-color: var(--success-color);
+  border-color: var(--success-color);
+  color: white;
+}
+
+.alert-solid-warning {
+  background-color: var(--warning-color);
+  border-color: var(--warning-color);
+  color: #1e293b;
+}
+
+.alert-solid-danger {
+  background-color: var(--danger-color);
+  border-color: var(--danger-color);
+  color: white;
+}
+
+.alert-solid-info {
+  background-color: var(--info-color);
+  border-color: var(--info-color);
+  color: white;
+}
+
+/* Alert Link */
+.alert-link {
+  font-weight: 600;
+  color: inherit;
+  text-decoration: underline;
+}
+
+/* Alert List */
+.alert ul {
+  margin-bottom: 0;
+  padding-left: var(--spacing-lg);
+}
+
+.alert ul li {
+  margin-top: var(--spacing-xs);
+}

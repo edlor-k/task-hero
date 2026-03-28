@@ -1,0 +1,174 @@
+/*--------------------------------------------------------------
+# Badges
+--------------------------------------------------------------*/
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25em 0.5em;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: var(--radius-sm);
+}
+
+/* Badge Colors - Bootstrap's .bg-* handle backgrounds, these set text color */
+.badge.bg-primary { color: white; }
+.badge.bg-secondary { color: white; }
+.badge.bg-success { color: white; }
+.badge.bg-warning { color: #1e293b; }
+.badge.bg-danger { color: white; }
+.badge.bg-info { color: white; }
+.badge.bg-light { color: var(--default-color); }
+.badge.bg-dark { color: white; }
+
+/* Soft/Light Badge Variants */
+.badge-soft-primary {
+  background-color: color-mix(in srgb, var(--accent-color), transparent 90%);
+  color: var(--accent-color);
+}
+
+.badge-soft-success {
+  background-color: var(--success-color-light);
+  color: var(--success-color);
+}
+
+.badge-soft-warning {
+  background-color: var(--warning-color-light);
+  color: var(--warning-color);
+}
+
+.badge-soft-danger {
+  background-color: var(--danger-color-light);
+  color: var(--danger-color);
+}
+
+.badge-soft-info {
+  background-color: var(--info-color-light);
+  color: var(--info-color);
+}
+
+.badge-soft-secondary {
+  background-color: var(--border-color-light);
+  color: var(--muted-color);
+}
+
+/* Outline Badges */
+.badge-outline-primary {
+  background-color: transparent;
+  border: 1px solid var(--accent-color);
+  color: var(--accent-color);
+}
+
+.badge-outline-secondary {
+  background-color: transparent;
+  border: 1px solid var(--muted-color);
+  color: var(--muted-color);
+}
+
+.badge-outline-success {
+  background-color: transparent;
+  border: 1px solid var(--success-color);
+  color: var(--success-color);
+}
+
+.badge-outline-warning {
+  background-color: transparent;
+  border: 1px solid var(--warning-color);
+  color: var(--warning-color);
+}
+
+.badge-outline-danger {
+  background-color: transparent;
+  border: 1px solid var(--danger-color);
+  color: var(--danger-color);
+}
+
+.badge-outline-info {
+  background-color: transparent;
+  border: 1px solid var(--info-color);
+  color: var(--info-color);
+}
+
+/* Pill Badge - Bootstrap has .rounded-pill, this adds badge-specific padding */
+.badge.rounded-pill {
+  padding-left: 0.75em;
+  padding-right: 0.75em;
+}
+
+/* Badge with Icon */
+.badge-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25em;
+}
+
+.badge-icon i {
+  font-size: 0.875em;
+}
+
+/* Badge Dot */
+.badge-dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border-radius: var(--radius-full);
+}
+
+.badge-dot-lg {
+  width: 10px;
+  height: 10px;
+}
+
+/* Status Badge */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: var(--radius-full);
+}
+
+.status-badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background-color: currentColor;
+}
+
+.status-badge-active {
+  background-color: var(--success-color-light);
+  color: var(--success-color);
+}
+
+.status-badge-inactive {
+  background-color: var(--border-color-light);
+  color: var(--muted-color);
+}
+
+.status-badge-pending {
+  background-color: var(--warning-color-light);
+  color: var(--warning-color);
+}
+
+.status-badge-error {
+  background-color: var(--danger-color-light);
+  color: var(--danger-color);
+}
+
+/* Badge Sizes */
+.badge-sm {
+  padding: 0.2em 0.4em;
+  font-size: 0.625rem;
+}
+
+.badge-lg {
+  padding: 0.35em 0.65em;
+  font-size: 0.875rem;
+}

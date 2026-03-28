@@ -1,0 +1,257 @@
+/*--------------------------------------------------------------
+# Navigation Components (Tabs, Pills, etc.)
+--------------------------------------------------------------*/
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  padding-left: 0;
+  margin-bottom: 0;
+  list-style: none;
+}
+
+.nav-link {
+  display: block;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--muted-color);
+  text-decoration: none;
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.nav-link:hover,
+.nav-link:focus {
+  color: var(--accent-color);
+}
+
+.nav-link.disabled {
+  color: var(--light-color);
+  pointer-events: none;
+  cursor: default;
+}
+
+.nav-link.active {
+  color: var(--accent-color);
+}
+
+/* Tabs */
+.nav-tabs {
+  border-bottom: 1px solid var(--border-color);
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+  }
+}
+
+.nav-tabs .nav-item {
+  flex-shrink: 0;
+}
+
+.nav-tabs .nav-link {
+  margin-bottom: -1px;
+  background: none;
+  border: 1px solid transparent;
+  border-top-left-radius: var(--radius-md);
+  border-top-right-radius: var(--radius-md);
+  white-space: nowrap;
+}
+
+.nav-tabs .nav-link:hover,
+.nav-tabs .nav-link:focus {
+  border-color: var(--border-color-light) var(--border-color-light) var(--border-color);
+  isolation: isolate;
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--heading-color);
+  background-color: var(--surface-color);
+  border-color: var(--border-color) var(--border-color) var(--surface-color);
+}
+
+/* Bordered Tabs (used in profile, settings pages) */
+.nav-tabs-bordered {
+  border-bottom: 2px solid var(--border-color);
+}
+
+.nav-tabs-bordered .nav-link {
+  margin-bottom: -2px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+
+.nav-tabs-bordered .nav-link:hover,
+.nav-tabs-bordered .nav-link:focus {
+  border-color: transparent;
+  border-bottom-color: var(--accent-color);
+  isolation: auto;
+}
+
+.nav-tabs-bordered .nav-link.active {
+  background-color: transparent;
+  border-color: transparent;
+  border-bottom-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+/* Pills */
+.nav-pills .nav-link {
+  background: none;
+  border: 0;
+  border-radius: var(--radius-md);
+}
+
+.nav-pills .nav-link:hover {
+  background-color: var(--background-color);
+}
+
+.nav-pills .nav-link.active {
+  color: white;
+  background-color: var(--accent-color);
+}
+
+/* Underline Tabs */
+.nav-underline {
+  gap: var(--spacing-lg);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.nav-underline .nav-link {
+  padding: var(--spacing-md) 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  margin-bottom: -1px;
+}
+
+.nav-underline .nav-link:hover {
+  border-bottom-color: var(--border-color-dark);
+}
+
+.nav-underline .nav-link.active {
+  color: var(--accent-color);
+  border-bottom-color: var(--accent-color);
+}
+
+/* Justified Tabs/Pills */
+.nav-fill .nav-item {
+  flex: 1 1 auto;
+  text-align: center;
+}
+
+.nav-justified .nav-item {
+  flex-basis: 0;
+  flex-grow: 1;
+  text-align: center;
+}
+
+/* Vertical Nav */
+.nav-vertical {
+  flex-direction: column;
+}
+
+.nav-vertical .nav-link {
+  border-radius: var(--radius-md);
+}
+
+.nav-vertical .nav-link.active {
+  background-color: color-mix(in srgb, var(--accent-color), transparent 90%);
+  color: var(--accent-color);
+}
+
+/* Tab Content */
+.tab-content > .tab-pane {
+  display: none;
+}
+
+.tab-content > .active {
+  display: block;
+}
+
+/* Nav with Icon */
+.nav-link-icon {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.nav-link-icon i {
+  font-size: 1.125rem;
+}
+
+/* Segment Control (Toggle Group) */
+.nav-segment {
+  background-color: var(--background-color);
+  border-radius: var(--radius-md);
+  padding: 4px;
+  gap: 0;
+}
+
+.nav-segment .nav-link {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-sm);
+}
+
+.nav-segment .nav-link.active {
+  background-color: var(--surface-color);
+  color: var(--heading-color);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Card Nav (inside card header) */
+.card-header-tabs {
+  margin-right: calc(var(--spacing-lg) * -0.5);
+  margin-bottom: calc(var(--spacing-md) * -1);
+  margin-left: calc(var(--spacing-lg) * -0.5);
+  border-bottom: 0;
+}
+
+.card-header-pills {
+  margin-right: calc(var(--spacing-lg) * -0.5);
+  margin-left: calc(var(--spacing-lg) * -0.5);
+}
+
+/* Steps Navigation */
+.nav-steps {
+  counter-reset: step;
+}
+
+.nav-steps .nav-link {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+}
+
+.nav-steps .nav-link::before {
+  counter-increment: step;
+  content: counter(step);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  background-color: var(--background-color);
+  color: var(--muted-color);
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.nav-steps .nav-link.active::before {
+  background-color: var(--accent-color);
+  color: white;
+}
+
+.nav-steps .nav-link.completed::before {
+  content: "\2713";
+  background-color: var(--success-color);
+  color: white;
+}

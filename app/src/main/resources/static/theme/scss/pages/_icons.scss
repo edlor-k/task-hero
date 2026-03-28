@@ -1,0 +1,98 @@
+// Icons Page Styles
+
+.icons-filter {
+  position: sticky;
+  top: 70px;
+  z-index: 10;
+  background: var(--surface-color);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-color);
+}
+
+.icons-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1rem;
+}
+
+.glyph-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 0.5rem;
+  border-radius: 0.5rem;
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  min-height: 100px;
+
+  &:hover {
+    border-color: var(--accent-color);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--accent-color), transparent 85%);
+    transform: translateY(-2px);
+  }
+
+  i {
+    font-size: 1.75rem;
+    color: var(--default-color);
+    margin-bottom: 0.5rem;
+  }
+
+  .glyph-name {
+    font-size: 0.7rem;
+    color: var(--muted-color);
+    word-break: break-all;
+    line-height: 1.2;
+  }
+
+  &.copied {
+    border-color: var(--success-color);
+    background: var(--success-color-light);
+
+    i {
+      color: var(--success-color);
+    }
+  }
+}
+
+.icons-count {
+  font-size: 0.875rem;
+  color: var(--muted-color);
+}
+
+.glyph-category {
+  margin-bottom: 2rem;
+
+  h5 {
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+}
+
+// Copy notification toast
+.copy-toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--heading-color);
+  color: var(--contrast-color);
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 9999;
+  pointer-events: none;
+
+  &.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}

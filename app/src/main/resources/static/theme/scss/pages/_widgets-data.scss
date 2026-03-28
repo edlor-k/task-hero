@@ -1,0 +1,928 @@
+/*--------------------------------------------------------------
+# Widget Data Page Styles
+--------------------------------------------------------------*/
+
+// ============================================================
+// Stat Cards with Progress Bar
+// ============================================================
+.widget-stat-progress {
+  .card-body {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+    position: relative;
+    overflow: hidden;
+  }
+}
+
+.widget-stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+
+  &.primary {
+    background-color: color-mix(in srgb, var(--accent-color), transparent 85%);
+    color: var(--accent-color);
+  }
+
+  &.success {
+    background-color: color-mix(in srgb, var(--success-color), transparent 85%);
+    color: var(--success-color);
+  }
+
+  &.warning {
+    background-color: color-mix(in srgb, var(--warning-color), transparent 85%);
+    color: var(--warning-color);
+  }
+
+  &.danger {
+    background-color: color-mix(in srgb, var(--danger-color), transparent 85%);
+    color: var(--danger-color);
+  }
+
+  &.info {
+    background-color: color-mix(in srgb, var(--info-color), transparent 85%);
+    color: var(--info-color);
+  }
+
+  &.secondary {
+    background-color: color-mix(in srgb, var(--muted-color), transparent 85%);
+    color: var(--muted-color);
+  }
+}
+
+.widget-stat-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.widget-stat-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--heading-color);
+  line-height: 1.2;
+}
+
+.widget-stat-label {
+  font-size: 0.8125rem;
+  color: var(--muted-color);
+}
+
+.widget-stat-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+
+  &.primary { background-color: var(--accent-color); }
+  &.success { background-color: var(--success-color); }
+  &.warning { background-color: var(--warning-color); }
+  &.danger { background-color: var(--danger-color); }
+  &.info { background-color: var(--info-color); }
+  &.secondary { background-color: var(--muted-color); }
+}
+
+// ============================================================
+// Icon Stat Cards
+// ============================================================
+.widget-icon-stat {
+  .card-body {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+  }
+}
+
+.widget-icon-stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+
+  &.primary {
+    background-color: color-mix(in srgb, var(--accent-color), transparent 85%);
+    color: var(--accent-color);
+  }
+
+  &.success {
+    background-color: color-mix(in srgb, var(--success-color), transparent 85%);
+    color: var(--success-color);
+  }
+
+  &.warning {
+    background-color: color-mix(in srgb, var(--warning-color), transparent 85%);
+    color: var(--warning-color);
+  }
+
+  &.danger {
+    background-color: color-mix(in srgb, var(--danger-color), transparent 85%);
+    color: var(--danger-color);
+  }
+
+  &.info {
+    background-color: color-mix(in srgb, var(--info-color), transparent 85%);
+    color: var(--info-color);
+  }
+
+  &.secondary {
+    background-color: color-mix(in srgb, var(--muted-color), transparent 85%);
+    color: var(--muted-color);
+  }
+}
+
+.widget-icon-stat-content {
+  flex: 1;
+}
+
+.widget-icon-stat-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--heading-color);
+}
+
+.widget-icon-stat-label {
+  font-size: 0.875rem;
+  color: var(--muted-color);
+}
+
+// ============================================================
+// Icon Left Stat Cards
+// ============================================================
+.widget-icon-left-stat {
+  .card-body {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+  }
+}
+
+.widget-icon-left-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.125rem;
+  flex-shrink: 0;
+
+  &.primary {
+    background-color: color-mix(in srgb, var(--accent-color), transparent 85%);
+    color: var(--accent-color);
+  }
+
+  &.success {
+    background-color: color-mix(in srgb, var(--success-color), transparent 85%);
+    color: var(--success-color);
+  }
+
+  &.warning {
+    background-color: color-mix(in srgb, var(--warning-color), transparent 85%);
+    color: var(--warning-color);
+  }
+
+  &.danger {
+    background-color: color-mix(in srgb, var(--danger-color), transparent 85%);
+    color: var(--danger-color);
+  }
+
+  &.info {
+    background-color: color-mix(in srgb, var(--info-color), transparent 85%);
+    color: var(--info-color);
+  }
+
+  &.secondary {
+    background-color: color-mix(in srgb, var(--muted-color), transparent 85%);
+    color: var(--muted-color);
+  }
+}
+
+.widget-icon-left-content {
+  flex: 1;
+}
+
+.widget-icon-left-value {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--heading-color);
+}
+
+.widget-icon-left-label {
+  font-size: 0.8125rem;
+  color: var(--muted-color);
+}
+
+// ============================================================
+// Weather Cards
+// ============================================================
+.widget-weather-image-card {
+  overflow: hidden;
+  border: none;
+}
+
+.widget-weather-image-bg {
+  padding: 2rem;
+  min-height: 200px;
+  display: flex;
+  align-items: flex-end;
+  position: relative;
+}
+
+.widget-weather-image-content {
+  color: white;
+}
+
+.widget-weather-location {
+  font-size: 0.875rem;
+  opacity: 0.9;
+  margin-bottom: 0.5rem;
+}
+
+.widget-weather-temp-large {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+
+  i {
+    font-size: 2rem;
+  }
+
+  span {
+    font-size: 2.5rem;
+    font-weight: 600;
+    line-height: 1;
+
+    small {
+      font-size: 1rem;
+      opacity: 0.8;
+    }
+  }
+}
+
+.widget-weather-day {
+  font-size: 0.875rem;
+  opacity: 0.9;
+}
+
+// Weather Simple Card
+.widget-weather-simple {
+  .card-body {
+    padding: 1.5rem;
+  }
+}
+
+.widget-weather-simple-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.widget-weather-simple-temp {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--heading-color);
+  margin: 0;
+}
+
+.widget-weather-simple-location {
+  font-size: 0.875rem;
+  color: var(--muted-color);
+  margin: 0;
+}
+
+.widget-weather-simple-icon {
+  font-size: 2.5rem;
+  color: var(--info-color);
+}
+
+.widget-weather-simple-date {
+  font-size: 0.8125rem;
+  color: var(--muted-color);
+}
+
+// Weather Compact Card
+.widget-weather-compact {
+  .card-body {
+    padding: 1rem;
+    text-align: center;
+  }
+}
+
+.widget-weather-compact-icon {
+  font-size: 2rem;
+  color: var(--warning-color);
+  margin-bottom: 0.5rem;
+}
+
+.widget-weather-compact-temp {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--heading-color);
+  margin-bottom: 0.25rem;
+
+  small {
+    font-size: 0.75rem;
+    color: var(--muted-color);
+  }
+}
+
+.widget-weather-compact-date {
+  font-size: 0.75rem;
+  color: var(--muted-color);
+}
+
+.widget-weather-compact-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--muted-color);
+  margin-bottom: 0.5rem;
+}
+
+// Weather Week Forecast
+.widget-weather-week {
+  display: flex;
+  justify-content: space-around;
+  padding: 1rem 0;
+}
+
+.widget-weather-week-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s;
+
+  &.active {
+    background-color: var(--accent-color);
+
+    .day, .temp {
+      color: white;
+    }
+
+    i {
+      color: white;
+    }
+  }
+
+  .day {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--muted-color);
+    text-transform: uppercase;
+  }
+
+  i {
+    font-size: 1.5rem;
+    color: var(--warning-color);
+  }
+
+  .temp {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--heading-color);
+  }
+}
+
+// ============================================================
+// Crypto Cards
+// ============================================================
+.widget-crypto-card {
+  border: none;
+  color: white;
+
+  &.ethereum {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  }
+
+  &.dash {
+    background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+  }
+
+  &.bitcoin {
+    background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+  }
+
+  &.ripple {
+    background: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);
+  }
+
+  .card-body {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+  }
+}
+
+.widget-crypto-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.125rem;
+}
+
+.widget-crypto-info {
+  flex: 1;
+}
+
+.widget-crypto-name {
+  display: block;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.widget-crypto-value {
+  font-size: 0.8125rem;
+  opacity: 0.9;
+}
+
+// ============================================================
+// Crypto Stats Cards
+// ============================================================
+.widget-crypto-stats {
+  border: none;
+  color: white;
+
+  &.primary {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  }
+
+  &.success {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  }
+
+  &.danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  }
+
+  &.info {
+    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+  }
+
+  &.warning {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  }
+
+  &.secondary {
+    background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+  }
+
+  .card-body {
+    padding: 1.25rem;
+  }
+}
+
+.widget-crypto-stats-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.widget-crypto-stats-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.125rem;
+}
+
+.widget-crypto-stats-info {
+  flex: 1;
+}
+
+.widget-crypto-stats-name {
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.widget-crypto-stats-category {
+  font-size: 0.8125rem;
+  opacity: 0.8;
+}
+
+.widget-crypto-stats-grid {
+  display: flex;
+  justify-content: space-between;
+}
+
+.widget-crypto-stat-item {
+  text-align: center;
+
+  .label {
+    display: block;
+    font-size: 0.75rem;
+    opacity: 0.8;
+    margin-bottom: 0.25rem;
+  }
+
+  .value {
+    font-size: 0.875rem;
+    font-weight: 500;
+
+    &.up {
+      color: #86efac;
+    }
+
+    &.down {
+      color: #fca5a5;
+    }
+  }
+}
+
+// ============================================================
+// Simple Stat Cards
+// ============================================================
+.widget-simple-stat {
+  .card-body {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+  }
+}
+
+.widget-simple-stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.125rem;
+  flex-shrink: 0;
+
+  &.primary {
+    background-color: color-mix(in srgb, var(--accent-color), transparent 85%);
+    color: var(--accent-color);
+  }
+
+  &.success {
+    background-color: color-mix(in srgb, var(--success-color), transparent 85%);
+    color: var(--success-color);
+  }
+
+  &.warning {
+    background-color: color-mix(in srgb, var(--warning-color), transparent 85%);
+    color: var(--warning-color);
+  }
+
+  &.danger {
+    background-color: color-mix(in srgb, var(--danger-color), transparent 85%);
+    color: var(--danger-color);
+  }
+}
+
+.widget-simple-stat-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.widget-simple-stat-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--heading-color);
+}
+
+.widget-simple-stat-sublabel {
+  font-size: 0.75rem;
+  color: var(--muted-color);
+}
+
+.widget-simple-stat-value {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--heading-color);
+}
+
+// ============================================================
+// Colored Stat Cards
+// ============================================================
+.widget-colored-stat {
+  border: none;
+  color: white;
+
+  &.primary {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  }
+
+  &.success {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  }
+
+  &.info {
+    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+  }
+
+  &.danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  }
+
+  .card-body {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+  }
+}
+
+.widget-colored-stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.125rem;
+  flex-shrink: 0;
+}
+
+.widget-colored-stat-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.widget-colored-stat-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.widget-colored-stat-sublabel {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.widget-colored-stat-value {
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+// ============================================================
+// Product Item Cards
+// ============================================================
+.widget-product-item {
+  .card-body {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+  }
+}
+
+.widget-product-item-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  flex-shrink: 0;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.widget-product-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.widget-product-item-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--heading-color);
+  margin-bottom: 0.25rem;
+}
+
+.widget-product-item-author {
+  font-size: 0.8125rem;
+  color: var(--muted-color);
+  margin: 0;
+}
+
+// ============================================================
+// Info Stat Cards
+// ============================================================
+.widget-info-stat {
+  .card-body {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+  }
+}
+
+.widget-info-stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+
+  &.primary {
+    background-color: color-mix(in srgb, var(--accent-color), transparent 85%);
+    color: var(--accent-color);
+  }
+
+  &.success {
+    background-color: color-mix(in srgb, var(--success-color), transparent 85%);
+    color: var(--success-color);
+  }
+
+  &.warning {
+    background-color: color-mix(in srgb, var(--warning-color), transparent 85%);
+    color: var(--warning-color);
+  }
+
+  &.danger {
+    background-color: color-mix(in srgb, var(--danger-color), transparent 85%);
+    color: var(--danger-color);
+  }
+}
+
+.widget-info-stat-content {
+  flex: 1;
+}
+
+.widget-info-stat-value {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--heading-color);
+}
+
+.widget-info-stat-label {
+  font-size: 0.8125rem;
+  color: var(--muted-color);
+}
+
+// ============================================================
+// Progress Stat Cards
+// ============================================================
+.widget-progress-stat {
+  .card-body {
+    padding: 1.25rem;
+  }
+}
+
+.widget-progress-stat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.widget-progress-stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--heading-color);
+}
+
+.widget-progress-stat-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+
+  &.primary {
+    background-color: color-mix(in srgb, var(--accent-color), transparent 85%);
+    color: var(--accent-color);
+  }
+
+  &.success {
+    background-color: color-mix(in srgb, var(--success-color), transparent 85%);
+    color: var(--success-color);
+  }
+
+  &.info {
+    background-color: color-mix(in srgb, var(--info-color), transparent 85%);
+    color: var(--info-color);
+  }
+
+  &.danger {
+    background-color: color-mix(in srgb, var(--danger-color), transparent 85%);
+    color: var(--danger-color);
+  }
+}
+
+.widget-progress-stat-label {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--muted-color);
+  margin-bottom: 0.75rem;
+}
+
+.widget-progress-bar {
+  background-color: var(--background-color);
+}
+
+// ============================================================
+// Featured Cards
+// ============================================================
+.widget-featured-card {
+  overflow: hidden;
+}
+
+.widget-featured-image {
+  height: 180px;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+  }
+
+  &:hover img {
+    transform: scale(1.05);
+  }
+}
+
+.widget-featured-meta {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--muted-color);
+
+  i {
+    margin-right: 0.25rem;
+  }
+}
+
+.widget-featured-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--heading-color);
+  margin-bottom: 0.5rem;
+}
+
+.widget-featured-desc {
+  font-size: 0.875rem;
+  color: var(--muted-color);
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+// ============================================================
+// Bottom Progress Cards
+// ============================================================
+.widget-bottom-progress {
+  .card-body {
+    padding: 1.25rem;
+  }
+}
+
+.widget-bottom-progress-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--heading-color);
+}
+
+.widget-bottom-progress-label {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--muted-color);
+  margin-bottom: 0.75rem;
+}

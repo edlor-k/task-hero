@@ -1,0 +1,31 @@
+/*--------------------------------------------------------------
+# Helper Utilities
+# Bootstrap provides most utilities (display, flex, position, etc.)
+# This file only contains custom utilities not in Bootstrap
+--------------------------------------------------------------*/
+
+/* Cursor - not in Bootstrap */
+.cursor-pointer { cursor: pointer !important; }
+.cursor-default { cursor: default !important; }
+.cursor-not-allowed { cursor: not-allowed !important; }
+.cursor-wait { cursor: wait !important; }
+.cursor-grab { cursor: grab !important; }
+.cursor-grabbing { cursor: grabbing !important; }
+
+/* Min width/height - limited in Bootstrap */
+.min-w-0 { min-width: 0 !important; }
+.min-h-0 { min-height: 0 !important; }
+.max-w-100 { max-width: 100% !important; }
+.max-h-100 { max-height: 100% !important; }
+
+/* Z-Index - Bootstrap has limited z-index utilities */
+.z-0 { z-index: 0 !important; }
+.z-1 { z-index: 1 !important; }
+.z-2 { z-index: 2 !important; }
+.z-3 { z-index: 3 !important; }
+
+/* Aspect Ratio - custom additions */
+.ratio-1x1 { aspect-ratio: 1 / 1; }
+.ratio-4x3 { aspect-ratio: 4 / 3; }
+.ratio-16x9 { aspect-ratio: 16 / 9; }
+.ratio-21x9 { aspect-ratio: 21 / 9; }

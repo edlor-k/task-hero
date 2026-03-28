@@ -1,0 +1,261 @@
+/*--------------------------------------------------------------
+# Progress Bars
+--------------------------------------------------------------*/
+
+.progress {
+  display: flex;
+  height: 8px;
+  overflow: hidden;
+  font-size: 0.625rem;
+  background-color: var(--background-color);
+  border-radius: var(--radius-full);
+}
+
+.progress-bar {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  color: white;
+  text-align: center;
+  white-space: nowrap;
+  background-color: var(--accent-color);
+  transition: width var(--transition-slow) ease;
+}
+
+/* Progress Bar Colors */
+.progress-bar-success,
+.bg-success {
+  background-color: var(--success-color) !important;
+}
+
+.progress-bar-warning,
+.bg-warning {
+  background-color: var(--warning-color) !important;
+}
+
+.progress-bar-danger,
+.bg-danger {
+  background-color: var(--danger-color) !important;
+}
+
+.progress-bar-info,
+.bg-info {
+  background-color: var(--info-color) !important;
+}
+
+/* Striped Progress Bar */
+.progress-bar-striped {
+  background-image: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.15) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.15) 50%,
+    rgba(255, 255, 255, 0.15) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 1rem 1rem;
+}
+
+/* Animated Striped */
+.progress-bar-animated {
+  animation: progress-bar-stripes 1s linear infinite;
+}
+
+@keyframes progress-bar-stripes {
+  0% {
+    background-position-x: 1rem;
+  }
+}
+
+/* Progress Sizes */
+.progress-sm {
+  height: 4px;
+}
+
+.progress-lg {
+  height: 12px;
+}
+
+.progress-xl {
+  height: 16px;
+  font-size: 0.75rem;
+}
+
+/* Progress with Label */
+.progress-with-label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.progress-with-label .progress {
+  flex: 1;
+}
+
+.progress-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--heading-color);
+  min-width: 40px;
+  text-align: right;
+}
+
+/* Stacked Progress (Multiple bars) */
+.progress-stacked {
+  display: flex;
+}
+
+.progress-stacked .progress {
+  flex: 1;
+}
+
+/* Progress Circle */
+.progress-circle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-circle svg {
+  transform: rotate(-90deg);
+}
+
+.progress-circle-track {
+  fill: none;
+  stroke: var(--background-color);
+}
+
+.progress-circle-bar {
+  fill: none;
+  stroke: var(--accent-color);
+  stroke-linecap: round;
+  transition: stroke-dasharray var(--transition-slow) ease;
+}
+
+.progress-circle-bar.success {
+  stroke: var(--success-color);
+}
+
+.progress-circle-bar.warning {
+  stroke: var(--warning-color);
+}
+
+.progress-circle-bar.danger {
+  stroke: var(--danger-color);
+}
+
+.progress-circle-value {
+  position: absolute;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--heading-color);
+}
+
+.progress-circle-sm .progress-circle-value {
+  font-size: 0.875rem;
+}
+
+.progress-circle-lg .progress-circle-value {
+  font-size: 1.5rem;
+}
+
+/* Progress Group (Multiple progress items) */
+.progress-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.progress-group-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.progress-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.progress-group-label {
+  font-size: 0.875rem;
+  color: var(--default-color);
+}
+
+.progress-group-value {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--heading-color);
+}
+
+/* Step Progress */
+.step-progress {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.step-progress::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: var(--border-color);
+  transform: translateY(-50%);
+  z-index: 0;
+}
+
+.step-progress-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+  z-index: 1;
+}
+
+.step-progress-marker {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  background-color: var(--surface-color);
+  border: 2px solid var(--border-color);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--muted-color);
+}
+
+.step-progress-item.active .step-progress-marker {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+  color: white;
+}
+
+.step-progress-item.completed .step-progress-marker {
+  background-color: var(--success-color);
+  border-color: var(--success-color);
+  color: white;
+}
+
+.step-progress-label {
+  font-size: 0.8125rem;
+  color: var(--muted-color);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.step-progress-item.active .step-progress-label {
+  color: var(--heading-color);
+  font-weight: 500;
+}

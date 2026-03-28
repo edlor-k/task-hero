@@ -1,0 +1,170 @@
+/*--------------------------------------------------------------
+# Chart Library Overrides
+--------------------------------------------------------------*/
+
+/* ApexCharts */
+.apexcharts-canvas {
+  font-family: var(--font-default) !important;
+}
+
+.apexcharts-title-text {
+  fill: var(--heading-color) !important;
+}
+
+.apexcharts-subtitle-text {
+  fill: var(--muted-color) !important;
+}
+
+.apexcharts-legend-text {
+  color: var(--default-color) !important;
+}
+
+.apexcharts-datalabel-label {
+  fill: var(--muted-color) !important;
+}
+
+.apexcharts-datalabel-value {
+  fill: var(--heading-color) !important;
+}
+
+.apexcharts-xaxis-label,
+.apexcharts-yaxis-label {
+  fill: var(--muted-color) !important;
+}
+
+.apexcharts-gridline {
+  stroke: var(--border-color) !important;
+}
+
+.apexcharts-tooltip {
+  background-color: var(--surface-color) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+.apexcharts-tooltip-title {
+  background-color: var(--background-color) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  font-weight: 600 !important;
+}
+
+.apexcharts-tooltip-text {
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+}
+
+.apexcharts-menu {
+  background-color: var(--surface-color) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+.apexcharts-menu-item {
+  color: var(--default-color) !important;
+}
+
+.apexcharts-menu-item:hover {
+  background-color: var(--background-color) !important;
+}
+
+/* Chart.js */
+.chartjs-tooltip {
+  background-color: var(--surface-color) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-lg) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  font-family: var(--font-default) !important;
+}
+
+/* ECharts */
+.echarts-tooltip {
+  font-family: var(--font-default) !important;
+}
+
+/* Chart Containers */
+.chart-container {
+  position: relative;
+  width: 100%;
+  min-height: 300px;
+}
+
+.chart-container-sm {
+  min-height: 200px;
+}
+
+.chart-container-lg {
+  min-height: 400px;
+}
+
+/* Chart Loading State */
+.chart-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--surface-color);
+}
+
+/* Chart Legend Custom */
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  justify-content: center;
+  padding-top: var(--spacing-md);
+}
+
+.chart-legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: 0.8125rem;
+  color: var(--muted-color);
+}
+
+.chart-legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: var(--radius-sm);
+}
+
+/* Sparkline Charts */
+.sparkline-container {
+  height: 40px;
+  width: 100%;
+}
+
+/* Mini Chart Stat */
+.mini-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--spacing-md);
+}
+
+.mini-chart-info {
+  flex: 1;
+}
+
+.mini-chart-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--heading-color);
+  line-height: 1.2;
+}
+
+.mini-chart-label {
+  font-size: 0.8125rem;
+  color: var(--muted-color);
+}
+
+.mini-chart-canvas {
+  width: 100px;
+  height: 50px;
+}

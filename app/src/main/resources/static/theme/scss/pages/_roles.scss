@@ -1,0 +1,341 @@
+// =============================================================================
+// Roles & Permissions Page Styles
+// =============================================================================
+
+/*--------------------------------------------------------------
+# Roles List
+--------------------------------------------------------------*/
+.roles-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.role-list-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1.25rem;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.15s ease;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: var(--background-color);
+  }
+
+  &.active {
+    background: color-mix(in srgb, var(--accent-color), transparent 94%);
+    border-left: 3px solid var(--accent-color);
+    padding-left: calc(1.25rem - 3px);
+
+    .role-list-content h6 {
+      color: var(--accent-color);
+    }
+  }
+
+  > i {
+    color: var(--muted-color);
+    font-size: 0.75rem;
+    margin-left: auto;
+  }
+}
+
+.role-list-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+
+  &.danger {
+    background: var(--danger-color-light);
+    color: var(--danger-color);
+  }
+
+  &.warning {
+    background: var(--warning-color-light);
+    color: var(--warning-color);
+  }
+
+  &.info {
+    background: var(--info-color-light);
+    color: var(--info-color);
+  }
+
+  &.primary {
+    background: color-mix(in srgb, var(--accent-color), transparent 90%);
+    color: var(--accent-color);
+  }
+
+  &.success {
+    background: var(--success-color-light);
+    color: var(--success-color);
+  }
+
+  &.secondary {
+    background: color-mix(in srgb, var(--muted-color), transparent 85%);
+    color: var(--muted-color);
+  }
+}
+
+.role-list-content {
+  flex: 1;
+  min-width: 0;
+
+  h6 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--heading-color);
+    margin: 0;
+  }
+
+  span {
+    font-size: 0.75rem;
+    color: var(--muted-color);
+  }
+}
+
+/*--------------------------------------------------------------
+# Role Header Icon
+--------------------------------------------------------------*/
+.role-header-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.125rem;
+  flex-shrink: 0;
+
+  &.danger {
+    background: var(--danger-color-light);
+    color: var(--danger-color);
+  }
+
+  &.warning {
+    background: var(--warning-color-light);
+    color: var(--warning-color);
+  }
+
+  &.info {
+    background: var(--info-color-light);
+    color: var(--info-color);
+  }
+
+  &.primary {
+    background: color-mix(in srgb, var(--accent-color), transparent 90%);
+    color: var(--accent-color);
+  }
+}
+
+/*--------------------------------------------------------------
+# Permissions Table
+--------------------------------------------------------------*/
+.permissions-table-wrapper {
+  overflow-x: auto;
+}
+
+.permissions-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  thead th {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--muted-color);
+    background: var(--background-color);
+    white-space: nowrap;
+  }
+
+  th.perm-module {
+    width: 40%;
+  }
+
+  th.perm-action,
+  th.perm-toggle {
+    width: 12%;
+    text-align: center;
+  }
+
+  tbody td {
+    font-size: 0.875rem;
+    color: var(--default-color);
+    vertical-align: middle;
+  }
+
+  tbody td:not(:first-child) {
+    text-align: center;
+  }
+
+  tbody tr:hover {
+    background: var(--background-color);
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .form-check-input {
+    margin: 0;
+    cursor: pointer;
+  }
+}
+
+.perm-section {
+  td {
+    font-size: 0.8125rem !important;
+    font-weight: 600;
+    color: var(--heading-color) !important;
+    background: var(--background-color);
+    padding: 0.625rem 1rem !important;
+
+    i {
+      color: var(--muted-color);
+    }
+  }
+
+  &:hover td {
+    background: var(--background-color) !important;
+  }
+}
+
+.perm-na {
+  color: var(--light-color);
+  font-size: 0.75rem;
+}
+
+/*--------------------------------------------------------------
+# Role Users List
+--------------------------------------------------------------*/
+.role-users-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.role-user-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+}
+
+.role-user-info {
+  flex: 1;
+  min-width: 0;
+
+  h6 {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--heading-color);
+    margin: 0;
+  }
+
+  span {
+    font-size: 0.75rem;
+    color: var(--muted-color);
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/*--------------------------------------------------------------
+# Role Color Picker
+--------------------------------------------------------------*/
+.role-color-picker {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.role-color-option {
+  cursor: pointer;
+
+  input {
+    display: none;
+  }
+}
+
+.role-color-swatch {
+  display: block;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-md);
+  border: 2px solid transparent;
+  transition: all 0.15s ease;
+
+  &.danger {
+    background: var(--danger-color);
+  }
+
+  &.warning {
+    background: var(--warning-color);
+  }
+
+  &.primary {
+    background: var(--accent-color);
+  }
+
+  &.info {
+    background: var(--info-color);
+  }
+
+  &.success {
+    background: var(--success-color);
+  }
+
+  &.secondary {
+    background: var(--muted-color);
+  }
+
+  input:checked + & {
+    border-color: var(--heading-color);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--heading-color), transparent 80%);
+  }
+}
+
+/*--------------------------------------------------------------
+# Responsive
+--------------------------------------------------------------*/
+@media (max-width: 991.98px) {
+  .permissions-table th.perm-module {
+    width: auto;
+    min-width: 180px;
+  }
+
+  .permissions-table th.perm-action,
+  .permissions-table th.perm-toggle {
+    width: auto;
+    min-width: 70px;
+  }
+}

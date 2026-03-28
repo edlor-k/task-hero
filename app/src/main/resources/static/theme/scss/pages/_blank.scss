@@ -1,0 +1,349 @@
+/*--------------------------------------------------------------
+# Blank / Starter Page Styles
+--------------------------------------------------------------*/
+
+// Starter Steps
+.starter-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.starter-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--body-bg);
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+
+  &:hover {
+    background: color-mix(in srgb, var(--accent-color) 5%, var(--body-bg));
+  }
+}
+
+.starter-step-number {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-color);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.starter-step-content {
+  flex: 1;
+  min-width: 0;
+
+  h6 {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: var(--heading-color);
+  }
+
+  p {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    margin: 0;
+    line-height: 1.5;
+
+    code {
+      background: color-mix(in srgb, var(--accent-color) 10%, transparent);
+      color: var(--accent-color);
+      padding: 0.125rem 0.375rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+    }
+  }
+}
+
+// Starter Code Block
+.starter-code {
+  margin-top: 1.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+.starter-code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: var(--body-bg);
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-muted);
+
+  .btn {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
+}
+
+.starter-code pre {
+  margin: 0;
+  padding: 1rem;
+  background: color-mix(in srgb, var(--body-bg) 50%, var(--card-bg));
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  overflow-x: auto;
+
+  code {
+    color: var(--body-color);
+    background: none;
+    padding: 0;
+  }
+}
+
+// Components Reference
+.starter-components {
+  display: flex;
+  flex-direction: column;
+}
+
+.starter-component {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  color: var(--body-color);
+  text-decoration: none;
+  border-bottom: 1px solid var(--border-color);
+  transition: var(--transition);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: var(--body-bg);
+    color: var(--accent-color);
+
+    .starter-component-icon {
+      background: var(--accent-color);
+      color: #fff;
+    }
+
+    > .bi-chevron-right {
+      transform: translateX(4px);
+    }
+  }
+}
+
+.starter-component-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--body-bg);
+  border-radius: var(--border-radius);
+  font-size: 1.125rem;
+  color: var(--accent-color);
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+
+.starter-component-content {
+  flex: 1;
+  min-width: 0;
+
+  h6 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.125rem;
+    color: inherit;
+  }
+
+  p {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin: 0;
+    line-height: 1.4;
+  }
+}
+
+.starter-component > .bi-chevron-right {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  transition: var(--transition);
+}
+
+// Quick Reference
+.starter-reference {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.starter-reference-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px dashed var(--border-color);
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
+.starter-reference-label {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.starter-reference-item code {
+  background: color-mix(in srgb, var(--accent-color) 10%, transparent);
+  color: var(--accent-color);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+// Theme Features
+.starter-features {
+  display: flex;
+  flex-direction: column;
+}
+
+.starter-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  i {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: color-mix(in srgb, var(--accent-color) 10%, transparent);
+    color: var(--accent-color);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  div {
+    flex: 1;
+    min-width: 0;
+  }
+
+  h6 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.125rem;
+    color: var(--heading-color);
+  }
+
+  p {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin: 0;
+    line-height: 1.4;
+  }
+}
+
+// Resources Links
+.starter-resources {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.starter-resource {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  background: var(--body-bg);
+  border-radius: var(--border-radius);
+  color: var(--body-color);
+  text-decoration: none;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  transition: var(--transition);
+
+  &:hover {
+    background: color-mix(in srgb, var(--accent-color) 10%, transparent);
+    color: var(--accent-color);
+  }
+
+  i:first-child {
+    font-size: 1rem;
+    color: var(--accent-color);
+  }
+
+  span {
+    flex: 1;
+  }
+
+  i:last-child {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+}
+
+// Responsive
+@media (max-width: 991.98px) {
+  .starter-step {
+    padding: 0.875rem;
+  }
+
+  .starter-step-content {
+    h6 {
+      font-size: 0.875rem;
+    }
+
+    p {
+      font-size: 0.75rem;
+    }
+  }
+
+  .starter-code pre {
+    font-size: 0.75rem;
+    padding: 0.875rem;
+  }
+
+  .starter-component {
+    padding: 0.875rem;
+  }
+
+  .starter-component-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .starter-step {
+    flex-direction: column;
+    gap: 0.75rem;
+    text-align: center;
+    align-items: center;
+  }
+
+  .starter-step-content p code {
+    display: block;
+    margin-top: 0.25rem;
+  }
+}

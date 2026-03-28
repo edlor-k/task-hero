@@ -1,0 +1,218 @@
+/*--------------------------------------------------------------
+# Dropdowns
+--------------------------------------------------------------*/
+
+.dropdown {
+  position: relative;
+}
+
+.dropdown-toggle {
+  white-space: nowrap;
+}
+
+.dropdown-toggle::after {
+  display: inline-block;
+  margin-left: 0.5em;
+  vertical-align: 0.15em;
+  content: "";
+  border-top: 0.3em solid;
+  border-right: 0.3em solid transparent;
+  border-bottom: 0;
+  border-left: 0.3em solid transparent;
+}
+
+.dropdown-toggle:empty::after {
+  margin-left: 0;
+}
+
+.dropdown-menu {
+  position: absolute;
+  z-index: 1000;
+  display: none;
+  min-width: 180px;
+  padding: var(--spacing-sm) 0;
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--default-color);
+  text-align: left;
+  list-style: none;
+  background-color: var(--surface-color);
+  background-clip: padding-box;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+.dropdown-menu.show {
+  display: block;
+}
+
+/* Dropdown positioning */
+.dropdown-menu-end {
+  right: 0;
+  left: auto;
+}
+
+.dropdown-menu-start {
+  right: auto;
+  left: 0;
+}
+
+/* Dropup, Dropstart, Dropend */
+.dropup .dropdown-menu {
+  top: auto;
+  bottom: 100%;
+  margin-top: 0;
+  margin-bottom: var(--spacing-xs);
+}
+
+.dropup .dropdown-toggle::after {
+  border-top: 0;
+  border-bottom: 0.3em solid;
+}
+
+.dropend .dropdown-menu {
+  top: 0;
+  right: auto;
+  left: 100%;
+  margin-top: 0;
+  margin-left: var(--spacing-xs);
+}
+
+.dropstart .dropdown-menu {
+  top: 0;
+  right: 100%;
+  left: auto;
+  margin-top: 0;
+  margin-right: var(--spacing-xs);
+}
+
+/* Dropdown Items */
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  clear: both;
+  font-weight: 400;
+  color: var(--default-color);
+  text-align: inherit;
+  white-space: nowrap;
+  background-color: transparent;
+  border: 0;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  color: var(--default-color);
+  background-color: var(--background-color);
+}
+
+.dropdown-item.active,
+.dropdown-item:active {
+  color: var(--accent-color);
+  background-color: color-mix(in srgb, var(--accent-color), transparent 90%);
+}
+
+.dropdown-item:disabled,
+.dropdown-item.disabled {
+  color: var(--light-color);
+  pointer-events: none;
+  background-color: transparent;
+}
+
+/* Dropdown Item with Icon */
+.dropdown-item i {
+  width: 20px;
+  margin-right: var(--spacing-sm);
+  color: var(--muted-color);
+  text-align: center;
+}
+
+.dropdown-item:hover i {
+  color: var(--accent-color);
+}
+
+/* Dropdown Divider */
+.dropdown-divider {
+  height: 0;
+  margin: var(--spacing-sm) 0;
+  overflow: hidden;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Dropdown Header */
+.dropdown-header {
+  display: block;
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin-bottom: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted-color);
+  white-space: nowrap;
+}
+
+/* Dropdown Text */
+.dropdown-item-text {
+  display: block;
+  padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--muted-color);
+}
+
+/* Dropdown Menu Dark */
+.dropdown-menu-dark {
+  color: var(--light-color);
+  background-color: var(--heading-color);
+  border-color: transparent;
+}
+
+.dropdown-menu-dark .dropdown-item {
+  color: var(--light-color);
+}
+
+.dropdown-menu-dark .dropdown-item:hover,
+.dropdown-menu-dark .dropdown-item:focus {
+  color: white;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.dropdown-menu-dark .dropdown-divider {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dropdown-menu-dark .dropdown-header {
+  color: var(--muted-color);
+}
+
+/* Dropdown with Animation */
+.dropdown-menu[data-bs-popper] {
+  top: 100%;
+  left: 0;
+  margin-top: var(--spacing-xs);
+}
+
+/* Wide Dropdown */
+.dropdown-menu-wide {
+  min-width: 280px;
+}
+
+/* Dropdown with Scrollable Content */
+.dropdown-menu-scrollable {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Dropdown Checkbox/Radio */
+.dropdown-item-check {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.dropdown-item-check input {
+  margin: 0;
+}

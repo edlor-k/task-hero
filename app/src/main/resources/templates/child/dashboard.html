@@ -1,12 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Мой мир')}"></head>
 <body>
-<div class="th-layout">
-    <nav th:replace="~{fragments/layout :: sidebar-child}"></nav>
-    <div class="th-content">
-        <header th:replace="~{fragments/layout :: header}"></header>
-        <main class="th-main">
+<th:block th:replace="~{fragments/layout :: header}"></th:block>
+<div class="sidebar-overlay"></div>
+<th:block th:replace="~{fragments/layout :: sidebar-child}"></th:block>
+<main class="main">
+    <div class="main-content">
 
             <!-- Messages -->
             <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
@@ -244,11 +244,9 @@
                     </div>
                 </div>
             </div>
-
-        </main>
-        <footer th:replace="~{fragments/layout :: footer}"></footer>
     </div>
-</div>
+</main>
+<a href="#" class="back-to-top"><i class="bi bi-arrow-up-short"></i></a>
 
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 </body>

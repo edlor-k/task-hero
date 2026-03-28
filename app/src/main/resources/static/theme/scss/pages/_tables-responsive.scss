@@ -1,0 +1,117 @@
+/*--------------------------------------------------------------
+# Responsive Tables Page Styles
+--------------------------------------------------------------*/
+
+/* Stacked Table Pattern - transforms to card-like layout on mobile */
+@media (max-width: 767.98px) {
+  .table-stacked {
+    thead {
+      display: none;
+    }
+
+    tbody tr {
+      display: block;
+      margin-bottom: var(--spacing-md);
+      padding: var(--spacing-md);
+      background-color: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+    }
+
+    tbody td {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--spacing-sm) 0;
+      border: none;
+      border-bottom: 1px solid var(--border-color-light);
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &::before {
+        content: attr(data-label);
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--muted-color);
+        margin-right: var(--spacing-md);
+      }
+    }
+  }
+}
+
+/* Scroll Indicator Wrapper */
+.table-scroll-wrapper {
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 40px;
+    background: linear-gradient(to right, transparent, var(--surface-color));
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity var(--transition-fast);
+  }
+
+  &.scrolled-end::after {
+    opacity: 0;
+  }
+}
+
+/* Sticky Column Table */
+.table-sticky-col {
+  .sticky-col {
+    position: sticky;
+    left: 0;
+    background-color: var(--surface-color);
+    z-index: 1;
+    min-width: 200px;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 1px;
+      background-color: var(--border-color);
+    }
+  }
+
+  thead .sticky-col {
+    background-color: var(--table-header-bg);
+    z-index: 2;
+  }
+
+  tbody tr:hover .sticky-col {
+    background-color: var(--table-hover-bg);
+  }
+}
+
+/* Dark mode adjustments */
+[data-theme="dark"] {
+  .table-scroll-wrapper::after {
+    background: linear-gradient(to right, transparent, var(--surface-color));
+  }
+
+  .table-sticky-col {
+    .sticky-col {
+      background-color: var(--surface-color);
+    }
+
+    thead .sticky-col {
+      background-color: var(--table-header-bg);
+    }
+
+    tbody tr:hover .sticky-col {
+      background-color: var(--table-hover-bg);
+    }
+  }
+}

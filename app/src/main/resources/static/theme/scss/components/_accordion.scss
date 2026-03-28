@@ -1,0 +1,118 @@
+/*--------------------------------------------------------------
+# Accordion
+--------------------------------------------------------------*/
+
+.accordion {
+  --bs-accordion-bg: var(--surface-color);
+  --bs-accordion-border-color: var(--border-color);
+  --bs-accordion-btn-color: var(--heading-color);
+  --bs-accordion-btn-bg: var(--surface-color);
+  --bs-accordion-active-color: var(--accent-color);
+  --bs-accordion-active-bg: color-mix(in srgb, var(--accent-color), transparent 95%);
+}
+
+.accordion-button {
+  font-weight: 500;
+
+  &:focus {
+    box-shadow: none;
+    border-color: var(--border-color);
+  }
+
+  &:not(.collapsed) {
+    box-shadow: none;
+  }
+}
+
+.accordion-body {
+  color: var(--default-color);
+}
+
+/* Flush Accordion */
+.accordion-flush {
+  .accordion-item {
+    border-left: 0;
+    border-right: 0;
+
+    &:first-child {
+      border-top: 0;
+    }
+
+    &:last-child {
+      border-bottom: 0;
+    }
+  }
+
+  .accordion-button {
+    background-color: transparent;
+
+    &:not(.collapsed) {
+      background-color: transparent;
+    }
+  }
+}
+
+/* Colored Accordions */
+.accordion-primary {
+  .accordion-button:not(.collapsed) {
+    background-color: color-mix(in srgb, var(--accent-color), transparent 90%);
+    color: var(--accent-color);
+  }
+
+  .accordion-item {
+    border-color: color-mix(in srgb, var(--accent-color), transparent 70%);
+  }
+}
+
+.accordion-success {
+  .accordion-button:not(.collapsed) {
+    background-color: var(--success-color-light);
+    color: var(--success-color);
+  }
+
+  .accordion-item {
+    border-color: color-mix(in srgb, var(--success-color), transparent 70%);
+  }
+}
+
+.accordion-warning {
+  .accordion-button:not(.collapsed) {
+    background-color: var(--warning-color-light);
+    color: #92400e;
+  }
+
+  .accordion-item {
+    border-color: color-mix(in srgb, var(--warning-color), transparent 70%);
+  }
+}
+
+.accordion-danger {
+  .accordion-button:not(.collapsed) {
+    background-color: var(--danger-color-light);
+    color: var(--danger-color);
+  }
+
+  .accordion-item {
+    border-color: color-mix(in srgb, var(--danger-color), transparent 70%);
+  }
+}
+
+.accordion-info {
+  .accordion-button:not(.collapsed) {
+    background-color: var(--info-color-light);
+    color: var(--info-color);
+  }
+
+  .accordion-item {
+    border-color: color-mix(in srgb, var(--info-color), transparent 70%);
+  }
+}
+
+/* Dark mode adjustments */
+[data-theme="dark"] {
+  .accordion-warning {
+    .accordion-button:not(.collapsed) {
+      color: var(--warning-color);
+    }
+  }
+}

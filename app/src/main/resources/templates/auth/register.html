@@ -1,63 +1,93 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Регистрация')}"></head>
-<body class="auth-wrapper d-flex align-items-center justify-content-center">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-6 col-lg-5">
-                <div class="card shadow border-0">
-                    <div class="card-body p-4 p-md-5">
-                        <div class="text-center mb-4">
-                            <a th:href="@{/}" class="text-decoration-none">
-                                <i class="bi bi-trophy-fill text-primary fs-1"></i>
-                                <h4 class="fw-bold text-dark mt-2">TaskGamer</h4>
-                            </a>
-                            <p class="text-muted">Создайте аккаунт родителя</p>
-                        </div>
+<body>
+<div class="auth-layout auth-layout-split">
+    <!-- Form Side -->
+    <div class="auth-form-side">
+        <div class="auth-container">
+            <a th:href="@{/}" class="auth-logo">
+                <i class="bi bi-trophy-fill text-primary fs-3"></i>
+                <span>TaskGamer</span>
+            </a>
 
-                        <div th:if="${error}" class="alert alert-danger py-2">
-                            <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}">Ошибка</span>
-                        </div>
+            <div class="auth-card">
+                <div class="auth-card-header">
+                    <h1 class="auth-title">Создать аккаунт</h1>
+                    <p class="auth-subtitle">Зарегистрируйтесь как родитель и начните игру</p>
+                </div>
 
-                        <form th:action="@{/register}" method="post" th:object="${registerRequest}">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="firstName" class="form-label fw-semibold">Имя</label>
-                                    <input type="text" class="form-control" id="firstName" th:field="*{firstName}"
-                                           placeholder="Иван" required>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="surname" class="form-label fw-semibold">Фамилия</label>
-                                    <input type="text" class="form-control" id="surname" th:field="*{surname}"
-                                           placeholder="Иванов" required>
-                                </div>
+                <div th:if="${error}" class="alert alert-danger py-2">
+                    <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}">Ошибка</span>
+                </div>
+
+                <form class="auth-form" th:action="@{/register}" method="post" th:object="${registerRequest}">
+                    <div class="row g-2 mb-1">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="firstName" class="form-label">Имя</label>
+                                <input type="text" class="form-control" id="firstName" th:field="*{firstName}"
+                                       placeholder="Иван" required>
                             </div>
-                            <div class="mb-3">
-                                <label for="email" class="form-label fw-semibold">Email</label>
-                                <input type="email" class="form-control" id="email" th:field="*{email}"
-                                       placeholder="parent@example.com" required>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="surname" class="form-label">Фамилия</label>
+                                <input type="text" class="form-control" id="surname" th:field="*{surname}"
+                                       placeholder="Иванов" required>
                             </div>
-                            <div class="mb-3">
-                                <label for="password" class="form-label fw-semibold">Пароль</label>
-                                <input type="password" class="form-control" id="password" th:field="*{password}"
-                                       placeholder="Минимум 6 символов" required minlength="6">
-                            </div>
-                            <div class="mb-4">
-                                <label for="confirmPassword" class="form-label fw-semibold">Подтверждение пароля</label>
-                                <input type="password" class="form-control" id="confirmPassword"
-                                       th:field="*{confirmPassword}" placeholder="Повторите пароль" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">Зарегистрироваться</button>
-                            <div class="text-center">
-                                <span class="text-muted">Уже есть аккаунт?</span>
-                                <a th:href="@{/login}" class="fw-semibold text-decoration-none">Войти</a>
-                            </div>
-                        </form>
+                        </div>
                     </div>
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" th:field="*{email}"
+                               placeholder="parent@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password" class="form-label">Пароль</label>
+                        <input type="password" class="form-control" id="password" th:field="*{password}"
+                               placeholder="Минимум 6 символов" required minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword" class="form-label">Подтверждение пароля</label>
+                        <input type="password" class="form-control" id="confirmPassword"
+                               th:field="*{confirmPassword}" placeholder="Повторите пароль" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block">Зарегистрироваться</button>
+                </form>
+
+                <p class="auth-footer-text">
+                    Уже есть аккаунт? <a th:href="@{/login}" class="auth-link">Войти</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    <!-- Brand Side -->
+    <div class="auth-brand-side">
+        <div class="auth-brand-content">
+            <div class="auth-brand-icon">
+                <i class="bi bi-person-plus-fill"></i>
+            </div>
+            <h2 class="auth-brand-title">Добро пожаловать!</h2>
+            <p class="auth-brand-text">Создайте аккаунт родителя и начните геймифицировать воспитание детей уже сегодня!</p>
+            <div class="auth-brand-features">
+                <div class="auth-brand-feature">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span>Бесплатно для семьи</span>
+                </div>
+                <div class="auth-brand-feature">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span>Несколько детей в одном аккаунте</span>
+                </div>
+                <div class="auth-brand-feature">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span>Полный контроль и аналитика</span>
                 </div>
             </div>
         </div>
     </div>
+</div>
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 </body>
 </html>
