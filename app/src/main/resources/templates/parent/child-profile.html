@@ -84,6 +84,7 @@
                                 <th>Статус</th>
                                 <th>Награда</th>
                                 <th>Дата</th>
+                                <th></th>
                             </tr>
                             </thead>
                             <tbody>
@@ -106,6 +107,15 @@
                                 </td>
                                 <td>
                                     <small class="text-muted" th:text="${#temporals.format(a.createdAt, 'dd.MM.yyyy')}">01.01.2025</small>
+                                </td>
+                                <td class="text-end">
+                                    <form th:action="@{/parent/assignments/{id}/delete(id=${a.id})}" method="post"
+                                          onsubmit="return confirm('Удалить задание?');">
+                                        <input type="hidden" name="childId" th:value="${child.id}">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Удалить задание">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                             </tbody>

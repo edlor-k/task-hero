@@ -688,6 +688,8 @@ public class ParentController {
     @PostMapping("/assignments/{id}/delete")
     public String deleteAssignment(
             @PathVariable UUID id,
+            @RequestParam(required = false) UUID childId,
+            @RequestParam(required = false, defaultValue = "dashboard") String redirectTo,
             RedirectAttributes redirectAttributes
     ) {
         try {
@@ -697,7 +699,13 @@ public class ParentController {
             log.error("Error deleting assignment: {}", e.getMessage());
             redirectAttributes.addFlashAttribute("error", "Ошибка удаления задания");
         }
-        return "redirect:/parent/dashboard";
+        if (childId != null) {
+            return "redirect:/parent/children/" + childId;
+        }
+        return switch (redirectTo) {
+            case "review" -> "redirect:/parent/review";
+            default -> "redirect:/parent/dashboard";
+        };
     }
 
     // ==================== Shop ====================

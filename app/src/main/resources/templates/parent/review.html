@@ -63,6 +63,13 @@
                                         th:attr="data-bs-toggle='collapse', data-bs-target='#reject-' + ${a.id}">
                                     <i class="bi bi-x-lg me-1"></i>Отклонить
                                 </button>
+                                <form th:action="@{/parent/assignments/{id}/delete(id=${a.id})}" method="post"
+                                      onsubmit="return confirm('Удалить задание?');">
+                                    <input type="hidden" name="redirectTo" value="review">
+                                    <button type="submit" class="btn btn-outline-secondary" title="Удалить задание">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
                             </div>
 
                             <!-- Reject collapse -->
