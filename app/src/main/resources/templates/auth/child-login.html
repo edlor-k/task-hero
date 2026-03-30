@@ -1,74 +1,47 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Вход для ребёнка')}"></head>
-<body>
-<div class="auth-layout auth-layout-split">
-    <!-- Form Side -->
-    <div class="auth-form-side">
-        <div class="auth-container">
-            <a th:href="@{/}" class="auth-logo">
-                <i class="bi bi-trophy-fill text-primary fs-3"></i>
-                <span>TaskGamer</span>
-            </a>
+<body class="auth-wrapper d-flex align-items-center justify-content-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5 col-lg-4">
+                <div class="card shadow border-0">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="text-center mb-4">
+                            <a th:href="@{/}" class="text-decoration-none">
+                                <i class="bi bi-trophy-fill text-primary fs-1"></i>
+                                <h4 class="fw-bold text-dark mt-2">TaskGamer</h4>
+                            </a>
+                            <p class="text-muted">Вход по токену</p>
+                        </div>
 
-            <div class="auth-card">
-                <div class="auth-card-header">
-                    <h1 class="auth-title">Вход по токену</h1>
-                    <p class="auth-subtitle">Введи свой секретный токен, чтобы войти и играть!</p>
-                </div>
+                        <div th:if="${error}" class="alert alert-danger py-2">
+                            <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}">Ошибка</span>
+                        </div>
 
-                <div th:if="${error}" class="alert alert-danger py-2">
-                    <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}">Ошибка</span>
-                </div>
-
-                <form class="auth-form" th:action="@{/login/child}" method="post">
-                    <div class="form-group">
-                        <label for="loginToken" class="form-label">Твой секретный токен</label>
-                        <input type="text" class="form-control text-center text-uppercase fw-bold"
-                               id="loginToken" name="loginToken"
-                               placeholder="ABC123XY" required autofocus
-                               style="letter-spacing: 0.3em; font-size: 1.25rem;">
-                        <div class="form-text text-center mt-2">Спроси токен у родителей 👨‍👩‍👧</div>
+                        <form th:action="@{/login/child}" method="post">
+                            <div class="mb-4">
+                                <label for="loginToken" class="form-label fw-semibold">Твой секретный токен</label>
+                                <input type="text" class="form-control form-control-lg text-center text-uppercase"
+                                       id="loginToken" name="loginToken"
+                                       placeholder="ABC123XY" required autofocus
+                                       style="letter-spacing: 0.3em; font-weight: 700;">
+                                <div class="form-text text-center">Спроси токен у родителей</div>
+                            </div>
+                            <button type="submit" class="btn btn-success btn-lg w-100 mb-3">
+                                <i class="bi bi-controller me-1"></i>Войти и играть!
+                            </button>
+                            <div class="text-center">
+                                <a th:href="@{/login}" class="text-decoration-none">
+                                    <i class="bi bi-arrow-left me-1"></i>Назад к входу для родителей
+                                </a>
+                            </div>
+                        </form>
                     </div>
-
-                    <button type="submit" class="btn btn-success btn-block">
-                        <i class="bi bi-joystick me-1"></i>Войти и играть!
-                    </button>
-                </form>
-
-                <p class="auth-footer-text">
-                    <a th:href="@{/login}" class="auth-link">
-                        <i class="bi bi-arrow-left me-1"></i>Назад к входу для родителей
-                    </a>
-                </p>
-            </div>
-        </div>
-    </div>
-    <!-- Brand Side -->
-    <div class="auth-brand-side">
-        <div class="auth-brand-content">
-            <div class="auth-brand-icon">
-                <i class="bi bi-joystick"></i>
-            </div>
-            <h2 class="auth-brand-title">Время играть!</h2>
-            <p class="auth-brand-text">Выполняй задания, зарабатывай опыт и монеты, прокачивай своего персонажа и получай крутые призы!</p>
-            <div class="auth-brand-features">
-                <div class="auth-brand-feature">
-                    <i class="bi bi-check-circle-fill"></i>
-                    <span>Задания за монеты и опыт</span>
-                </div>
-                <div class="auth-brand-feature">
-                    <i class="bi bi-check-circle-fill"></i>
-                    <span>Магазин с призами</span>
-                </div>
-                <div class="auth-brand-feature">
-                    <i class="bi bi-check-circle-fill"></i>
-                    <span>Прокачка персонажа до уровня 100</span>
                 </div>
             </div>
         </div>
     </div>
-</div>
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 </body>
 </html>

@@ -1,12 +1,12 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Профиль ребёнка')}"></head>
 <body>
-<th:block th:replace="~{fragments/layout :: header}"></th:block>
-<div class="sidebar-overlay"></div>
-<th:block th:replace="~{fragments/layout :: sidebar-admin}"></th:block>
-<main class="main">
-    <div class="main-content">
+<div class="th-layout">
+    <nav th:replace="~{fragments/layout :: sidebar-admin}"></nav>
+    <div class="th-content">
+        <header th:replace="~{fragments/layout :: header}"></header>
+        <main class="th-main">
 
             <div class="d-flex align-items-center justify-content-between mb-4">
                 <div class="d-flex align-items-center gap-2">
@@ -123,9 +123,11 @@
                     </div>
                 </div>
             </div>
+
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
     </div>
-</main>
-<a href="#" class="back-to-top"><i class="bi bi-arrow-up-short"></i></a>
+</div>
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 </body>
 </html>

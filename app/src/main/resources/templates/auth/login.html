@@ -1,81 +1,53 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Вход')}"></head>
-<body>
-<div class="auth-layout auth-layout-split">
-    <!-- Form Side -->
-    <div class="auth-form-side">
-        <div class="auth-container">
-            <a th:href="@{/}" class="auth-logo">
-                <i class="bi bi-trophy-fill text-primary fs-3"></i>
-                <span>TaskGamer</span>
-            </a>
+<body class="auth-wrapper d-flex align-items-center justify-content-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5 col-lg-4">
+                <div class="card shadow border-0">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="text-center mb-4">
+                            <a th:href="@{/}" class="text-decoration-none">
+                                <i class="bi bi-trophy-fill text-primary fs-1"></i>
+                                <h4 class="fw-bold text-dark mt-2">TaskGamer</h4>
+                            </a>
+                            <p class="text-muted">Вход в систему</p>
+                        </div>
 
-            <div class="auth-card">
-                <div class="auth-card-header">
-                    <h1 class="auth-title">Вход в систему</h1>
-                    <p class="auth-subtitle">Введите email и пароль для входа в панель</p>
-                </div>
+                        <div th:if="${error}" class="alert alert-danger py-2">
+                            <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}">Ошибка</span>
+                        </div>
+                        <div th:if="${message}" class="alert alert-success py-2">
+                            <i class="bi bi-check-circle me-2"></i><span th:text="${message}">Сообщение</span>
+                        </div>
 
-                <div th:if="${error}" class="alert alert-danger py-2">
-                    <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}">Ошибка</span>
-                </div>
-                <div th:if="${message}" class="alert alert-success py-2">
-                    <i class="bi bi-check-circle me-2"></i><span th:text="${message}">Сообщение</span>
-                </div>
-
-                <form class="auth-form" th:action="@{/login}" method="post">
-                    <div class="form-group">
-                        <label for="username" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="username" name="username"
-                               placeholder="parent@example.com" required autofocus>
+                        <form th:action="@{/login}" method="post">
+                            <div class="mb-3">
+                                <label for="username" class="form-label fw-semibold">Email</label>
+                                <input type="email" class="form-control form-control-lg" id="username"
+                                       name="username" placeholder="parent@example.com" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="password" class="form-label fw-semibold">Пароль</label>
+                                <input type="password" class="form-control form-control-lg" id="password"
+                                       name="password" placeholder="Введите пароль" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">Войти</button>
+                            <div class="text-center mb-3">
+                                <span class="text-muted">Нет аккаунта?</span>
+                                <a th:href="@{/register}" class="fw-semibold text-decoration-none">Зарегистрироваться</a>
+                            </div>
+                            <hr>
+                            <a th:href="@{/login/child}" class="btn btn-outline-success w-100">
+                                <i class="bi bi-controller me-1"></i>Войти как ребёнок (по токену)
+                            </a>
+                        </form>
                     </div>
-                    <div class="form-group">
-                        <label for="password" class="form-label">Пароль</label>
-                        <input type="password" class="form-control" id="password" name="password"
-                               placeholder="Введите пароль" required>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary btn-block">Войти</button>
-
-                    <div class="auth-divider"><span>или</span></div>
-
-                    <a th:href="@{/login/child}" class="btn btn-outline-success btn-block">
-                        <i class="bi bi-joystick me-1"></i>Войти как ребёнок (по токену)
-                    </a>
-                </form>
-
-                <p class="auth-footer-text">
-                    Нет аккаунта? <a th:href="@{/register}" class="auth-link">Зарегистрироваться</a>
-                </p>
-            </div>
-        </div>
-    </div>
-    <!-- Brand Side -->
-    <div class="auth-brand-side">
-        <div class="auth-brand-content">
-            <div class="auth-brand-icon">
-                <i class="bi bi-trophy-fill"></i>
-            </div>
-            <h2 class="auth-brand-title">Семейный геймификатор</h2>
-            <p class="auth-brand-text">Превращайте домашние задания в увлекательные квесты. Дети зарабатывают опыт и монеты за выполнение заданий!</p>
-            <div class="auth-brand-features">
-                <div class="auth-brand-feature">
-                    <i class="bi bi-check-circle-fill"></i>
-                    <span>Задания с наградами</span>
-                </div>
-                <div class="auth-brand-feature">
-                    <i class="bi bi-check-circle-fill"></i>
-                    <span>Магазин призов</span>
-                </div>
-                <div class="auth-brand-feature">
-                    <i class="bi bi-check-circle-fill"></i>
-                    <span>Прокачка персонажа</span>
                 </div>
             </div>
         </div>
     </div>
-</div>
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 </body>
 </html>
