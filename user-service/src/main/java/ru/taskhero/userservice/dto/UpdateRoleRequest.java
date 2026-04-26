@@ -13,4 +13,4 @@ public record UpdateRoleRequest(
         @NotNull(message = "Роль обязательна")
         @Schema(description = "Новая роль пользователя", example = "PARENT")
         Role newRole
-) {}
+) { }

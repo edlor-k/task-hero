@@ -9,7 +9,7 @@ import ru.taskhero.common.model.enums.TaskStatus;
 import ru.taskhero.taskservice.entity.TaskAssignment;
 import ru.taskhero.taskservice.repository.TaskAssignmentRepository;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -29,9 +29,9 @@ public class DeadlineExpirationScheduler {
     @Scheduled(fixedRate = 3600000)
     @Transactional
     public void expireOverdueTasks() {
-        LocalDateTime today = LocalDateTime.now();
+        Instant now = Instant.now();
         List<TaskAssignment> overdue = assignmentRepository
-                .findAllByDueDateBeforeAndStatus(today, TaskStatus.CREATED);
+                .findAllByDueDateBeforeAndStatus(now, TaskStatus.CREATED);
 
         if (!overdue.isEmpty()) {
             log.info("Найдено {} просроченных заданий, переводим в EXPIRED", overdue.size());

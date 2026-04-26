@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.8.xsd">
+
+    <changeSet id="010-1" author="task-hero">
+        <comment>Store assignment due dates as UTC instants</comment>
+        <sql>
+            ALTER TABLE task_assignments 
+            ALTER COLUMN due_date TYPE timestamp with time zone 
+            USING due_date AT TIME ZONE 'Europe/Moscow';
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

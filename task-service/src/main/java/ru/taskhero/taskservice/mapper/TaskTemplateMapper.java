@@ -14,7 +14,6 @@ import ru.taskhero.taskservice.entity.TaskTemplate;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.IntStream;
 
 /**
  * Маппер для преобразования между TaskTemplate и DTO.

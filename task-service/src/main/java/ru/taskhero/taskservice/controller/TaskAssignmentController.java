@@ -33,6 +33,7 @@ import ru.taskhero.taskservice.dto.TaskSubmitRequest;
 import ru.taskhero.taskservice.service.TaskAssignmentService;
 import ru.taskhero.taskservice.util.SecurityUtils;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -433,7 +434,7 @@ public class TaskAssignmentController {
     ) {
         UUID parentId = SecurityUtils.getCurrentUserId();
         TaskAssignmentResponseDto response = assignmentService.extendDeadline(
-                id, parentId, java.time.LocalDateTime.parse(newDueDate));
+                id, parentId, Instant.parse(newDueDate));
         return ResponseEntity.ok(response);
     }
 

@@ -19,4 +19,4 @@ public record UpdateParentRequest(
         @Size(min = 2, max = 50, message = "Фамилия должна быть от 2 до 50 символов")
         @Schema(description = "Фамилия родителя", example = "Иванов")
         String surname
-) {}
+) { }

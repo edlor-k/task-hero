@@ -88,7 +88,9 @@
 
                         <div class="card-footer bg-transparent text-muted small">
                             <i class="bi bi-clock me-1"></i>
-                            <span th:text="${#temporals.format(a.submittedAt, 'dd.MM.yyyy HH:mm')}" th:if="${a.submittedAt}">01.01.2025</span>
+                            <span th:if="${a.submittedAt}"
+                                  th:attr="data-utc-datetime=${a.submittedAt}"
+                                  th:text="${a.submittedAt}">2025-01-01T09:00:00Z</span>
                         </div>
                     </div>
                 </div>

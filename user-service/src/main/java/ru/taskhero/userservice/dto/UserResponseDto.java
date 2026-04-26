@@ -24,4 +24,4 @@ public record UserResponseDto(
 
         @Schema(description = "Активен ли пользователь")
         boolean isActive
-) {}
+) { }

@@ -49,9 +49,8 @@
                         </div>
                         <div class="text-end">
                             <small class="text-muted d-block" th:if="${a.reviewedAt}"
-                                   th:text="${#temporals.format(a.reviewedAt, 'dd.MM.yyyy')}">01.01.2025</small>
-                            <small class="text-muted d-block" th:if="${a.reviewedAt}"
-                                   th:text="${#temporals.format(a.reviewedAt, 'HH:mm')}">12:00</small>
+                                   th:attr="data-utc-datetime=${a.reviewedAt}"
+                                   th:text="${a.reviewedAt}">2025-01-01T09:00:00Z</small>
                         </div>
                     </div>
                 </div>

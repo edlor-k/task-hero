@@ -64,11 +64,11 @@
                                 <td>
                                     <span class="badge bg-info" th:text="${parent['totalChildren'] != null ? parent['totalChildren'] : 0}">0</span>
                                 </td>
-                                <td>
+                                <td th:with="userActive=${parent['user'] != null && (parent['user']['isActive'] == true || parent['user']['active'] == true)}">
                                     <span class="badge"
                                           th:if="${parent['user'] != null}"
-                                          th:classappend="${parent['user']['active'] == true ? 'bg-success' : 'bg-secondary'}"
-                                          th:text="${parent['user']['active'] == true ? 'Активен' : 'Заблокирован'}">Status</span>
+                                          th:classappend="${userActive ? 'bg-success' : 'bg-secondary'}"
+                                          th:text="${userActive ? 'Активен' : 'Заблокирован'}">Status</span>
                                 </td>
                                 <td class="text-end">
                                     <a th:href="@{/admin/parents/{id}(id=${parent['id']})}"

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import ru.taskhero.common.model.enums.TaskStatus;
 import ru.taskhero.taskservice.entity.TaskAssignment;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -136,7 +136,7 @@ public interface TaskAssignmentRepository extends JpaRepository<TaskAssignment, 
      * @param status статус задания
      * @return список просроченных назначений
      */
-    List<TaskAssignment> findAllByDueDateBeforeAndStatus(LocalDateTime date, TaskStatus status);
+    List<TaskAssignment> findAllByDueDateBeforeAndStatus(Instant date, TaskStatus status);
 
     /**
      * Подсчитать количество назначений ребёнка с определённым статусом.
@@ -168,5 +168,5 @@ public interface TaskAssignmentRepository extends JpaRepository<TaskAssignment, 
     @Query("SELECT a FROM TaskAssignment a JOIN FETCH a.template WHERE a.template.parentId = :parentId "
             + "AND (a.status = ru.taskhero.common.model.enums.TaskStatus.EXPIRED "
             + "OR (a.status = ru.taskhero.common.model.enums.TaskStatus.CREATED AND a.dueDate IS NOT NULL AND a.dueDate < :now))")
-    List<TaskAssignment> findOverdueByParent(@Param("parentId") UUID parentId, @Param("now") LocalDateTime now);
+    List<TaskAssignment> findOverdueByParent(@Param("parentId") UUID parentId, @Param("now") Instant now);
 }

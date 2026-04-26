@@ -6,8 +6,6 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-import java.util.TimeZone;
-
 /**
  * Точка запуска User Service
  */
@@ -20,7 +18,6 @@ import java.util.TimeZone;
 @EnableFeignClients(basePackages = "ru.taskhero")
 public class UserServiceApplication {
     public static void main(String[] args) {
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/Moscow"));
         SpringApplication.run(UserServiceApplication.class, args);
     }
 }

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,6 +37,36 @@ public class ChildController {
     private final TaskServiceClient taskServiceClient;
     private final UserServiceClient userServiceClient;
 
+    @ModelAttribute("sidebarActiveTaskCount")
+    public int sidebarActiveTaskCount() {
+        try {
+            return taskServiceClient.getMyActiveAssignments().size();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    @ModelAttribute("sidebarPendingPurchaseCount")
+    public int sidebarPendingPurchaseCount() {
+        try {
+            return (int) userServiceClient.getMyPurchases().stream()
+                    .filter(p -> "PENDING".equals(p.status()))
+                    .count();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    @ModelAttribute("sidebarUnseenRewardCount")
+    public int sidebarUnseenRewardCount() {
+        try {
+            ChildDto childProfile = userServiceClient.getMyChildProfile();
+            return userServiceClient.getUnseenRewards(childProfile.id()).size();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
     /**
      * Dashboard ребёнка.
      */
@@ -58,14 +89,8 @@ public class ChildController {
                     .count();
             long pendingCount = activeAssignments.size();
 
-            int totalExp = allAssignments.stream()
-                    .filter(a -> a.expEarned() != null)
-                    .mapToInt(TaskAssignmentDto::expEarned)
-                    .sum();
-            int totalCoins = allAssignments.stream()
-                    .filter(a -> a.coinsEarned() != null)
-                    .mapToInt(TaskAssignmentDto::coinsEarned)
-                    .sum();
+            int totalExp = childProfile.exp();
+            int totalCoins = childProfile.coins();
 
             model.addAttribute("activeAssignments", activeAssignments);
             model.addAttribute("completedCount", completedCount);

@@ -32,4 +32,4 @@ public record RegisterResponseDto(
 
         @Schema(description = "Активен ли пользователь")
         boolean isActive
-) {}
+) { }

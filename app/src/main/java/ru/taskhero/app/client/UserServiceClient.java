@@ -2,6 +2,7 @@ package ru.taskhero.app.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
+import ru.taskhero.app.dto.AdminUserDto;
 import ru.taskhero.app.dto.ChildDto;
 import ru.taskhero.app.dto.CreateChildRequest;
 import ru.taskhero.app.dto.LevelInfoDto;
@@ -23,6 +24,9 @@ import java.util.UUID;
         url = "${services.user-service.url}"
 )
 public interface UserServiceClient {
+
+    @GetMapping("/users/me")
+    AdminUserDto getCurrentUser();
 
     /**
      * Вход пользователя.

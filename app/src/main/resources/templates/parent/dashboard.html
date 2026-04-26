@@ -62,7 +62,13 @@
                             <tbody>
                                 <tr th:each="expired : ${expiredAssignments}">
                                     <td class="fw-semibold" th:text="${expired.template.title}">Задание</td>
-                                    <td><span class="text-danger" th:text="${expired.dueDate != null ? #temporals.format(expired.dueDate, 'dd.MM.yyyy в HH:mm') : '---'}">---</span></td>
+                                    <td>
+                                        <span class="text-danger"
+                                              th:if="${expired.dueDate != null}"
+                                              th:attr="data-utc-datetime=${expired.dueDate}"
+                                              th:text="${expired.dueDate}">---</span>
+                                        <span th:unless="${expired.dueDate != null}">---</span>
+                                    </td>
                                     <td>
                                         <span class="badge bg-success-subtle text-success" th:text="${expired.template.expReward} + ' EXP'">10 EXP</span>
                                         <span class="badge bg-warning-subtle text-warning" th:text="${expired.template.coinsReward} + ' коинов'">5 коинов</span>

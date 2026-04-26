@@ -1,6 +1,8 @@
 package ru.taskhero.userservice.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import ru.taskhero.common.model.enums.CharacterType;
+import ru.taskhero.common.model.enums.DifficultyTrajectory;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -14,9 +16,11 @@ public record ChildDetailDto(
         @Schema(description = "ID ребенка")
         UUID id,
 
-        @Schema(description = "Имя ребенка")
+        @Schema(description = "Имя")
         String firstName,
 
+        @Schema(description = "Фамилия")
+        String surname,
 
         @Schema(description = "Токен для входа")
         String loginToken,
@@ -24,11 +28,17 @@ public record ChildDetailDto(
         @Schema(description = "Опыт")
         int exp,
 
-        @Schema(description = "Монеты")
+        @Schema(description = "Коины")
         int coins,
 
         @Schema(description = "Уровень")
         int level,
+
+        @Schema(description = "Траектория сложности")
+        DifficultyTrajectory difficultyTrajectory,
+
+        @Schema(description = "Тип персонажа")
+        CharacterType characterType,
 
         @Schema(description = "Информация о родителе")
         ParentResponseDto parent,
@@ -38,4 +48,4 @@ public record ChildDetailDto(
 
         @Schema(description = "Дата последнего обновления")
         Instant updatedAt
-) {}
+) { }

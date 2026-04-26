@@ -106,7 +106,7 @@
                                     <span class="text-warning" th:if="${a.template?.coinsReward}"><i class="bi bi-coin me-1"></i><span th:text="${a.template.coinsReward}">5</span></span>
                                 </td>
                                 <td>
-                                    <small class="text-muted" th:text="${#temporals.format(a.createdAt, 'dd.MM.yyyy')}">01.01.2025</small>
+                                    <small class="text-muted" th:attr="data-utc-datetime=${a.createdAt}" th:text="${a.createdAt}">2025-01-01T09:00:00Z</small>
                                 </td>
                                 <td class="text-end">
                                     <form th:action="@{/parent/assignments/{id}/delete(id=${a.id})}" method="post"

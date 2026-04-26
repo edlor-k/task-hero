@@ -69,6 +69,49 @@ public class ParentController {
         }
     }
 
+    @ModelAttribute("sidebarPendingReviewCount")
+    public int sidebarPendingReviewCount() {
+        try {
+            return taskServiceClient.getPendingReview().size();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    @ModelAttribute("sidebarPendingPurchaseCount")
+    public int sidebarPendingPurchaseCount() {
+        try {
+            return userServiceClient.getPendingPurchases().size();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    @ModelAttribute("sidebarExpiredAssignmentCount")
+    public int sidebarExpiredAssignmentCount() {
+        try {
+            return taskServiceClient.getExpiredAssignments().size();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    @ModelAttribute("sidebarRewardAlertCount")
+    public int sidebarRewardAlertCount() {
+        try {
+            int count = 0;
+            for (ChildDto child : userServiceClient.getChildren()) {
+                Map<String, Integer> unfilledInfo = userServiceClient.getUnfilledCount(child.id());
+                if (unfilledInfo.getOrDefault("unfilledCount", 0) < 5) {
+                    count++;
+                }
+            }
+            return count;
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
     /**
      * Страница онбординга для новых родителей.
      */
@@ -115,10 +158,12 @@ public class ParentController {
         try {
             List<ChildDto> children = userServiceClient.getChildren();
             List<TaskAssignmentDto> pendingReview = taskServiceClient.getPendingReview();
+            List<TaskTemplateDto> templates = taskServiceClient.getActiveTemplates();
 
             model.addAttribute("children", children);
             model.addAttribute("pendingReview", pendingReview);
             model.addAttribute("pendingCount", pendingReview.size());
+            model.addAttribute("templates", templates);
 
             // Check onboarding completeness
             boolean hasChildren = !children.isEmpty();
@@ -127,7 +172,7 @@ public class ParentController {
             boolean hasTemplates = false;
             try {
                 hasShopItems = !userServiceClient.getShopItems().isEmpty();
-                hasTemplates = !taskServiceClient.getActiveTemplates().isEmpty();
+                hasTemplates = !templates.isEmpty();
                 if (hasChildren) {
                     hasLevelRewards = children.stream().allMatch(child -> {
                         try {
@@ -449,8 +494,13 @@ public class ParentController {
         }
         StringBuilder redirect = new StringBuilder("redirect:/parent/library");
         String sep = "?";
-        if (onboarding) { redirect.append(sep).append("onboarding=true"); sep = "&"; }
-        if (category != null && !category.isBlank()) { redirect.append(sep).append("category=").append(category); }
+        if (onboarding) {
+            redirect.append(sep).append("onboarding=true");
+            sep = "&";
+        }
+        if (category != null && !category.isBlank()) {
+            redirect.append(sep).append("category=").append(category);
+        }
         return redirect.toString();
     }
 
@@ -741,7 +791,7 @@ public class ParentController {
             @RequestParam String title,
             @RequestParam(required = false) String description,
             @RequestParam int priceCoins,
-            @RequestParam(defaultValue = "bi-gift") String iconName,
+            @RequestParam(required = false) String iconName,
             @RequestParam List<UUID> childIds,
             @RequestParam(defaultValue = "false") boolean onboarding,
             RedirectAttributes redirectAttributes
@@ -751,7 +801,7 @@ public class ParentController {
             request.put("title", title);
             request.put("description", description);
             request.put("priceCoins", priceCoins);
-            request.put("iconName", iconName);
+            request.put("iconName", normalizeRewardIcon(iconName));
             request.put("childIds", childIds.stream().map(UUID::toString).toList());
 
             userServiceClient.createShopItem(request);
@@ -799,9 +849,7 @@ public class ParentController {
             request.put("title", title);
             request.put("description", description);
             request.put("priceCoins", priceCoins);
-            if (iconName != null && !iconName.isBlank()) {
-                request.put("iconName", iconName);
-            }
+            request.put("iconName", normalizeRewardIcon(iconName));
             if (childIds != null && !childIds.isEmpty()) {
                 request.put("childIds", childIds.stream().map(UUID::toString).toList());
             }
@@ -1039,5 +1087,9 @@ public class ParentController {
             redirectAttributes.addFlashAttribute("error", msg);
         }
         return "redirect:/parent/shop/marketplace" + (onboarding ? "?onboarding=true" : "");
+    }
+
+    private String normalizeRewardIcon(String iconName) {
+        return iconName != null && !iconName.isBlank() ? iconName.trim() : "🎁";
     }
 }

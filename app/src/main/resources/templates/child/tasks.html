@@ -76,15 +76,10 @@
 
                             <!-- Deadline -->
                             <div th:if="${a.dueDate}" class="mb-2">
-                                <small th:classappend="${a.dueDate.isBefore(T(java.time.LocalDateTime).now()) ? 'text-danger fw-semibold' : 'text-muted'}">
-                                    <i class="bi bi-clock me-1"></i>Дедлайн: <span th:text="${#temporals.format(a.dueDate, 'dd.MM.yyyy ''в'' HH:mm')}">01.01.2026 в 21:15</span>
-                                    <span th:with="hoursLeft=${T(java.time.Duration).between(T(java.time.LocalDateTime).now(), a.dueDate).toHours()}"
-                                          th:if="${hoursLeft >= 0}"
-                                          th:text="' (' + ${hoursLeft < 1 ? 'менее часа' : hoursLeft < 24 ? hoursLeft + ' ч.' : (hoursLeft / 24) + ' дн.'} + ')'"></span>
-                                    <span th:with="hoursLeft=${T(java.time.Duration).between(T(java.time.LocalDateTime).now(), a.dueDate).toHours()}"
-                                          th:if="${hoursLeft < 0}"
-                                          class="text-danger fw-semibold"
-                                          th:text="' (просрочено на ' + ${(-hoursLeft) < 24 ? (-hoursLeft) + ' ч.' : ((-hoursLeft) / 24) + ' дн.'} + ')'"></span>
+                                <small class="text-muted" th:attr="data-deadline-state=${a.dueDate}">
+                                    <i class="bi bi-clock me-1"></i>Дедлайн:
+                                    <span th:attr="data-utc-datetime=${a.dueDate}" th:text="${a.dueDate}">2026-01-01T18:15:00Z</span>
+                                    <span>(<span data-deadline-label></span>)</span>
                                 </small>
                             </div>
 
@@ -121,7 +116,7 @@
                             </div>
                         </div>
                         <div class="card-footer bg-transparent border-0 pb-3 px-3"
-                             th:if="${a.status == 'CREATED' and (a.dueDate == null or !a.dueDate.isBefore(T(java.time.LocalDateTime).now()))}">
+                             th:if="${a.status == 'CREATED' and (a.dueDate == null or !a.dueDate.isBefore(T(java.time.Instant).now()))}">
                             <form th:action="@{/child/tasks/{id}/submit(id=${a.id})}" method="post">
                                 <button type="submit" class="btn btn-success w-100">
                                     <i class="bi bi-check-lg me-1"></i>Сдать задание
@@ -129,7 +124,7 @@
                             </form>
                         </div>
                         <div class="card-footer bg-transparent border-0 pb-3 px-3"
-                             th:if="${a.status == 'CREATED' and a.dueDate != null and a.dueDate.isBefore(T(java.time.LocalDateTime).now())}">
+                             th:if="${a.status == 'CREATED' and a.dueDate != null and a.dueDate.isBefore(T(java.time.Instant).now())}">
                             <span class="badge bg-danger w-100 py-2">Дедлайн истёк</span>
                         </div>
                     </div>

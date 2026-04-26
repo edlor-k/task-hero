@@ -121,7 +121,17 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Иконка (Bootstrap Icons)</label>
-                                <input type="text" name="iconName" class="form-control" placeholder="bi-gift"/>
+                                <div class="d-flex flex-wrap gap-2 mb-2">
+                                    <button type="button" class="btn btn-outline-secondary icon-choice" onclick="selectMarketplaceIcon('createMarketplaceIcon', this, 'bi-gift')"><i class="bi bi-gift"></i></button>
+                                    <button type="button" class="btn btn-outline-secondary icon-choice" onclick="selectMarketplaceIcon('createMarketplaceIcon', this, 'bi-controller')"><i class="bi bi-controller"></i></button>
+                                    <button type="button" class="btn btn-outline-secondary icon-choice" onclick="selectMarketplaceIcon('createMarketplaceIcon', this, 'bi-ticket-perforated')"><i class="bi bi-ticket-perforated"></i></button>
+                                    <button type="button" class="btn btn-outline-secondary icon-choice" onclick="selectMarketplaceIcon('createMarketplaceIcon', this, 'bi-cup-straw')"><i class="bi bi-cup-straw"></i></button>
+                                    <button type="button" class="btn btn-outline-secondary icon-choice" onclick="selectMarketplaceIcon('createMarketplaceIcon', this, 'bi-star-fill')"><i class="bi bi-star-fill"></i></button>
+                                    <button type="button" class="btn btn-outline-secondary icon-choice" onclick="selectMarketplaceIcon('createMarketplaceIcon', this, 'bi-trophy-fill')"><i class="bi bi-trophy-fill"></i></button>
+                                    <button type="button" class="btn btn-outline-secondary icon-choice" onclick="selectMarketplaceIcon('createMarketplaceIcon', this, 'bi-music-note-beamed')"><i class="bi bi-music-note-beamed"></i></button>
+                                    <button type="button" class="btn btn-outline-secondary icon-choice" onclick="selectMarketplaceIcon('createMarketplaceIcon', this, 'bi-phone')"><i class="bi bi-phone"></i></button>
+                                </div>
+                                <input type="text" id="createMarketplaceIcon" name="iconName" class="form-control" value="bi-gift" placeholder="bi-gift"/>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -158,7 +168,18 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Иконка (Bootstrap Icons)</label>
+                                <div class="d-flex flex-wrap gap-2 mb-2">
+                                    <button type="button" class="btn btn-outline-secondary icon-choice" th:onclick="|selectMarketplaceIcon('editMarketplaceIcon-${item['id']}', this, 'bi-gift')|"><i class="bi bi-gift"></i></button>
+                                    <button type="button" class="btn btn-outline-secondary icon-choice" th:onclick="|selectMarketplaceIcon('editMarketplaceIcon-${item['id']}', this, 'bi-controller')|"><i class="bi bi-controller"></i></button>
+                                    <button type="button" class="btn btn-outline-secondary icon-choice" th:onclick="|selectMarketplaceIcon('editMarketplaceIcon-${item['id']}', this, 'bi-ticket-perforated')|"><i class="bi bi-ticket-perforated"></i></button>
+                                    <button type="button" class="btn btn-outline-secondary icon-choice" th:onclick="|selectMarketplaceIcon('editMarketplaceIcon-${item['id']}', this, 'bi-cup-straw')|"><i class="bi bi-cup-straw"></i></button>
+                                    <button type="button" class="btn btn-outline-secondary icon-choice" th:onclick="|selectMarketplaceIcon('editMarketplaceIcon-${item['id']}', this, 'bi-star-fill')|"><i class="bi bi-star-fill"></i></button>
+                                    <button type="button" class="btn btn-outline-secondary icon-choice" th:onclick="|selectMarketplaceIcon('editMarketplaceIcon-${item['id']}', this, 'bi-trophy-fill')|"><i class="bi bi-trophy-fill"></i></button>
+                                    <button type="button" class="btn btn-outline-secondary icon-choice" th:onclick="|selectMarketplaceIcon('editMarketplaceIcon-${item['id']}', this, 'bi-music-note-beamed')|"><i class="bi bi-music-note-beamed"></i></button>
+                                    <button type="button" class="btn btn-outline-secondary icon-choice" th:onclick="|selectMarketplaceIcon('editMarketplaceIcon-${item['id']}', this, 'bi-phone')|"><i class="bi bi-phone"></i></button>
+                                </div>
                                 <input type="text" name="iconName" class="form-control"
+                                       th:id="'editMarketplaceIcon-' + ${item['id']}"
                                        th:value="${item['iconName']}"/>
                             </div>
                         </div>
@@ -176,6 +197,22 @@
 </div>
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 <script>
+function selectMarketplaceIcon(inputId, button, iconName) {
+    var input = document.getElementById(inputId);
+    if (input) {
+        input.value = iconName;
+    }
+    var group = button.closest('.d-flex');
+    if (group) {
+        group.querySelectorAll('.icon-choice').forEach(function(btn) {
+            btn.classList.remove('btn-primary');
+            btn.classList.add('btn-outline-secondary');
+        });
+    }
+    button.classList.remove('btn-outline-secondary');
+    button.classList.add('btn-primary');
+}
+
 function filterMarketplace() {
     var query = document.getElementById('marketplaceSearch').value.toLowerCase();
     var rows = document.querySelectorAll('#marketplaceTable tbody tr');

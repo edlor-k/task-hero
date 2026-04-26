@@ -28,4 +28,4 @@ public record SystemStatisticsDto(
 
         @Schema(description = "Распределение пользователей по ролям")
         Map<Role, Long> usersByRole
-) {}
+) { }

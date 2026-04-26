@@ -12,4 +12,4 @@ public record ParentResponseDto(
         String firstName,
         String surname,
         List<UUID> childIds
-) {}
+) { }

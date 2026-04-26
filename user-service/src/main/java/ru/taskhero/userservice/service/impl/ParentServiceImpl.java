@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.taskhero.common.aop.LogMethod;
 import ru.taskhero.common.exception.ResourceNotFoundException;
-import ru.taskhero.common.exception.ValidationException;
 import ru.taskhero.userservice.dto.ParentDetailDto;
 import ru.taskhero.userservice.dto.ParentResponseDto;
 import ru.taskhero.userservice.dto.ParentWithChildrenDto;

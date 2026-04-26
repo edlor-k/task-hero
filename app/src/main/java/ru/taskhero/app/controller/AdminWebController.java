@@ -97,7 +97,7 @@ public class AdminWebController {
             RedirectAttributes redirectAttributes
     ) {
         try {
-            adminServiceClient.updateUserRole(id, Map.of("role", role));
+            adminServiceClient.updateUserRole(id, Map.of("newRole", role));
             redirectAttributes.addFlashAttribute("success", "Роль обновлена");
         } catch (Exception e) {
             log.error("Error updating user role: {}", e.getMessage());
@@ -371,7 +371,7 @@ public class AdminWebController {
                     "title", title,
                     "description", description != null ? description : "",
                     "priceCoins", priceCoins,
-                    "iconName", iconName != null && !iconName.isBlank() ? iconName : "bi-gift"
+                    "iconName", normalizeBootstrapIcon(iconName)
             ));
             redirectAttributes.addFlashAttribute("success", "Товар создан");
         } catch (Exception e) {
@@ -396,7 +396,7 @@ public class AdminWebController {
                     "title", title,
                     "description", description != null ? description : "",
                     "priceCoins", priceCoins,
-                    "iconName", iconName != null && !iconName.isBlank() ? iconName : "bi-gift"
+                    "iconName", normalizeBootstrapIcon(iconName)
             ));
             redirectAttributes.addFlashAttribute("success", "Товар обновлён");
         } catch (Exception e) {
@@ -502,5 +502,9 @@ public class AdminWebController {
             redirectAttributes.addFlashAttribute("error", extractMessage(e));
         }
         return "redirect:/admin/templates";
+    }
+
+    private String normalizeBootstrapIcon(String iconName) {
+        return iconName != null && !iconName.isBlank() ? iconName.trim() : "bi-gift";
     }
 }

@@ -18,4 +18,4 @@ public record UserLoginRequestDto(
         @NotBlank(message = "Пароль не может быть пустым")
         @Schema(description = "Пароль пользователя", example = "secret123")
         String password
-) {}
+) { }

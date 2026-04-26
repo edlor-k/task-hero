@@ -5,8 +5,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-import java.util.TimeZone;
-
 /**
  * Главный класс приложения Task Service.
  * Отвечает за управление заданиями, шаблонами и наградами.
@@ -20,7 +18,6 @@ import java.util.TimeZone;
 public class TaskServiceApplication {
 
     public static void main(String[] args) {
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/Moscow"));
         SpringApplication.run(TaskServiceApplication.class, args);
     }
 }

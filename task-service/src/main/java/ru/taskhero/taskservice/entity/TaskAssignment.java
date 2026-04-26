@@ -18,7 +18,6 @@ import ru.taskhero.common.model.entity.BaseEntity;
 import ru.taskhero.common.model.enums.TaskStatus;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
@@ -59,7 +58,7 @@ public class TaskAssignment extends BaseEntity {
      * Срок выполнения задания.
      */
     @Column(name = "due_date")
-    private LocalDateTime dueDate;
+    private Instant dueDate;
 
     /**
      * Комментарий ребёнка при сдаче задания.

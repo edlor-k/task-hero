@@ -24,7 +24,6 @@ import ru.taskhero.taskservice.service.RewardService;
 import ru.taskhero.taskservice.service.TaskAssignmentService;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -179,7 +178,7 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
             throw new ValidationException("Задание уже было сдано или проверено");
         }
 
-        if (assignment.getDueDate() != null && assignment.getDueDate().isBefore(LocalDateTime.now())) {
+        if (assignment.getDueDate() != null && assignment.getDueDate().isBefore(Instant.now())) {
             log.warn("Попытка сдать просроченное задание {}", assignmentId);
             throw new ValidationException("Дедлайн задания истёк");
         }
@@ -265,7 +264,7 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
     public List<TaskAssignmentResponseDto> getExpiredByParent(UUID parentId) {
         log.debug("Получение просроченных заданий для родителя: {}", parentId);
 
-        return assignmentRepository.findOverdueByParent(parentId, LocalDateTime.now())
+        return assignmentRepository.findOverdueByParent(parentId, Instant.now())
                 .stream()
                 .map(assignmentMapper::toDto)
                 .toList();
@@ -274,7 +273,7 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
     @Override
     @Transactional
     @LogMethod("assignment-extend-deadline")
-    public TaskAssignmentResponseDto extendDeadline(UUID assignmentId, UUID parentId, LocalDateTime newDueDate) {
+    public TaskAssignmentResponseDto extendDeadline(UUID assignmentId, UUID parentId, Instant newDueDate) {
         log.info("Продление дедлайна задания {} родителем {}", assignmentId, parentId);
 
         TaskAssignment assignment = findAssignmentAndVerifyParent(assignmentId, parentId);
@@ -282,7 +281,7 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
         if (assignment.getStatus() != TaskStatus.EXPIRED
                 && !(assignment.getStatus() == TaskStatus.CREATED
                      && assignment.getDueDate() != null
-                     && assignment.getDueDate().isBefore(LocalDateTime.now()))) {
+                     && assignment.getDueDate().isBefore(Instant.now()))) {
             throw new ValidationException("Продлить дедлайн можно только для просроченных заданий");
         }
 

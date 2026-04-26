@@ -12,4 +12,4 @@ public record ChildLoginRequestDto(
         @NotBlank(message = "Токен входа обязателен")
         @Schema(description = "Токен для входа ребёнка", example = "f87c5a9c8c3d4e3b8a6b7f")
         String loginToken
-) {}
+) { }

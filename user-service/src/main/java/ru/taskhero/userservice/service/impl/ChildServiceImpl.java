@@ -168,10 +168,13 @@ public class ChildServiceImpl implements ChildService {
         return new ChildDetailDto(
                 child.getId(),
                 child.getFirstName(),
+                child.getSurname(),
                 child.getLoginToken(),
                 child.getExp(),
                 child.getCoins(),
                 child.getLevel(),
+                child.getDifficultyTrajectory(),
+                child.getCharacterType(),
                 parentMapper.toParentResponseDto(child.getParent()),
                 child.getCreatedAt(),
                 child.getUpdatedAt()

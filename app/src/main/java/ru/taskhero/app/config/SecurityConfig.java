@@ -3,10 +3,13 @@ package ru.taskhero.app.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import ru.taskhero.app.security.ActiveUserSessionFilter;
 
 /**
  * Конфигурация безопасности для веб-приложения.
@@ -16,6 +19,8 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final ActiveUserSessionFilter activeUserSessionFilter;
 
     /**
      * Настройка цепочки фильтров безопасности.
@@ -59,9 +64,18 @@ public class SecurityConfig {
                 )
                 .exceptionHandling(ex -> ex
                         .accessDeniedPage("/access-denied")
-                );
+                )
+                .addFilterAfter(activeUserSessionFilter, AuthorizationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public FilterRegistrationBean<ActiveUserSessionFilter> activeUserSessionFilterRegistration() {
+        FilterRegistrationBean<ActiveUserSessionFilter> registration =
+                new FilterRegistrationBean<>(activeUserSessionFilter);
+        registration.setEnabled(false);
+        return registration;
     }
 
     /**

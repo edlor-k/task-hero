@@ -20,16 +20,18 @@
 
             <!-- Reassigned task notifications -->
             <div th:if="${reassignedAssignments != null && !reassignedAssignments.isEmpty()}" th:each="ra : ${reassignedAssignments}"
-                 class="alert alert-info alert-dismissible fade show border-start border-4 border-info">
+                 class="alert alert-info alert-dismissible fade show border-start border-4 border-info"
+                 th:attr="data-notification-key=${'task-reassigned-' + ra.id}">
                 <i class="bi bi-arrow-repeat me-2"></i>
                 <strong>Задание возвращено!</strong> «<span th:text="${ra.template?.title}">Задание</span>»
-                <span th:if="${ra.dueDate}">было продлено до <span th:text="${#temporals.format(ra.dueDate, 'dd.MM.yyyy ''в'' HH:mm')}">01.01.2026 в 21:15</span>.</span>
+                <span th:if="${ra.dueDate}">было продлено до <span th:attr="data-utc-datetime=${ra.dueDate}" th:text="${ra.dueDate}">2026-01-01T18:15:00Z</span>.</span>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
 
             <!-- Recent results (approved/rejected tasks, purchases) -->
             <div th:if="${recentResults != null && !recentResults.isEmpty()}" th:each="r : ${recentResults}"
                  class="alert alert-dismissible fade show border-start border-4"
+                 th:attr="data-notification-key=${'task-result-' + r.id}"
                  th:classappend="${r.status == 'APPROVED' ? 'alert-success border-success' : 'alert-danger border-danger'}">
                 <div th:if="${r.status == 'APPROVED'}">
                     <i class="bi bi-check-circle-fill text-success me-2"></i>
@@ -48,6 +50,7 @@
             <!-- Recent purchases -->
             <div th:if="${recentPurchases != null && !recentPurchases.isEmpty()}" th:each="p : ${recentPurchases}"
                  class="alert alert-dismissible fade show border-start border-4"
+                 th:attr="data-notification-key=${'purchase-result-' + p.id}"
                  th:classappend="${p.status == 'APPROVED' ? 'alert-success border-success' : p.status == 'REJECTED' ? 'alert-danger border-danger' : 'alert-warning border-warning'}">
                 <div th:if="${p.status == 'APPROVED'}">
                     <i class="bi bi-bag-check-fill text-success me-2"></i>
@@ -208,15 +211,10 @@
                                     </div>
                                     <!-- Deadline -->
                                     <div th:if="${a.dueDate}" class="mt-1">
-                                        <small th:classappend="${a.dueDate.isBefore(T(java.time.LocalDateTime).now()) ? 'text-danger fw-semibold' : 'text-muted'}">
-                                            <i class="bi bi-clock me-1"></i>Дедлайн: <span th:text="${#temporals.format(a.dueDate, 'dd.MM.yyyy ''в'' HH:mm')}">01.01.2026 в 21:15</span>
-                                            <span th:with="hoursLeft=${T(java.time.Duration).between(T(java.time.LocalDateTime).now(), a.dueDate).toHours()}"
-                                                  th:if="${hoursLeft >= 0}"
-                                                  th:text="' (' + ${hoursLeft < 1 ? 'менее часа' : hoursLeft < 24 ? hoursLeft + ' ч.' : (hoursLeft / 24) + ' дн.'} + ')'"></span>
-                                            <span th:with="hoursLeft=${T(java.time.Duration).between(T(java.time.LocalDateTime).now(), a.dueDate).toHours()}"
-                                                  th:if="${hoursLeft < 0}"
-                                                  class="text-danger fw-semibold"
-                                                  th:text="' (просрочено на ' + ${(-hoursLeft) < 24 ? (-hoursLeft) + ' ч.' : ((-hoursLeft) / 24) + ' дн.'} + ')'"></span>
+                                        <small class="text-muted" th:attr="data-deadline-state=${a.dueDate}">
+                                            <i class="bi bi-clock me-1"></i>Дедлайн:
+                                            <span th:attr="data-utc-datetime=${a.dueDate}" th:text="${a.dueDate}">2026-01-01T18:15:00Z</span>
+                                            <span>(<span data-deadline-label></span>)</span>
                                         </small>
                                     </div>
                                     <!-- Sub-items -->
@@ -229,13 +227,13 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <form th:if="${a.status == 'CREATED' and (a.dueDate == null or !a.dueDate.isBefore(T(java.time.LocalDateTime).now()))}"
+                                    <form th:if="${a.status == 'CREATED' and (a.dueDate == null or !a.dueDate.isBefore(T(java.time.Instant).now()))}"
                                           th:action="@{/child/tasks/{id}/submit(id=${a.id})}" method="post">
                                         <button type="submit" class="btn btn-sm btn-success">
                                             <i class="bi bi-check-lg me-1"></i>Сдать
                                         </button>
                                     </form>
-                                    <span th:if="${a.status == 'CREATED' and a.dueDate != null and a.dueDate.isBefore(T(java.time.LocalDateTime).now())}"
+                                    <span th:if="${a.status == 'CREATED' and a.dueDate != null and a.dueDate.isBefore(T(java.time.Instant).now())}"
                                           class="badge bg-danger">Просрочено</span>
                                     <span th:if="${a.status == 'SUBMITTED'}" class="badge bg-warning text-dark">На проверке</span>
                                 </div>

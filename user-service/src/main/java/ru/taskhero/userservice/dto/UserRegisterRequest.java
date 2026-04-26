@@ -3,7 +3,6 @@ package ru.taskhero.userservice.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import ru.taskhero.userservice.entity.User;
 
 /**
  * DTO для регистрации пользователя (родителя/админа)
@@ -22,4 +21,4 @@ public record UserRegisterRequest(
 
         @NotBlank(message = "Фамилия не может быть пустой")
         String surname
-) {}
+) { }

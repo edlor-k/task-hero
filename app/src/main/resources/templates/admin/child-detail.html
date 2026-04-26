@@ -109,11 +109,16 @@
                                     <td class="fw-semibold" th:text="${a.template() != null ? a.template().title() : '—'}">Задание</td>
                                     <td>
                                         <span class="badge"
-                                              th:classappend="${a.status().name() == 'APPROVED' ? 'bg-success' : (a.status().name() == 'REJECTED' ? 'bg-danger' : (a.status().name() == 'SUBMITTED' ? 'bg-info' : (a.status().name() == 'EXPIRED' ? 'bg-warning text-dark' : 'bg-primary')))}"
+                                              th:classappend="${a.status() == 'APPROVED' ? 'bg-success' : (a.status() == 'REJECTED' ? 'bg-danger' : (a.status() == 'SUBMITTED' ? 'bg-info' : (a.status() == 'EXPIRED' ? 'bg-warning text-dark' : 'bg-primary')))}"
                                               th:text="${a.status()}">Статус</span>
                                         <span class="badge bg-danger ms-1" th:if="${a.important()}"><i class="bi bi-exclamation-triangle-fill"></i></span>
                                     </td>
-                                    <td th:text="${a.dueDate() != null ? a.dueDate() : '—'}">Дата</td>
+                                    <td>
+                                        <span th:if="${a.dueDate() != null}"
+                                              th:attr="data-utc-datetime=${a.dueDate()}"
+                                              th:text="${a.dueDate()}">2026-01-01T18:15:00Z</span>
+                                        <span th:unless="${a.dueDate() != null}">—</span>
+                                    </td>
                                     <td th:text="${a.expEarned() != null ? a.expEarned() : (a.template() != null ? a.template().expReward() : '—')}">0</td>
                                     <td th:text="${a.coinsEarned() != null ? a.coinsEarned() : (a.template() != null ? a.template().coinsReward() : '—')}">0</td>
                                 </tr>

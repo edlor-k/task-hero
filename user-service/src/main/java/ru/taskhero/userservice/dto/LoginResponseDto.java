@@ -16,4 +16,4 @@ public record LoginResponseDto(
 
         @Schema(description = "Роль пользователя")
         String role
-) {}
+) { }

@@ -67,6 +67,46 @@
     background: var(--th-sidebar-active-bg);
     font-weight: 600;
 }
+.sidebar-badge {
+    min-width: 22px;
+    height: 22px;
+    padding: 0 0.4rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    line-height: 1;
+    color: #0f172a;
+    box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.95), 0 0 14px rgba(255, 255, 255, 0.24);
+    animation: sidebar-badge-pop 1.8s ease-in-out infinite;
+}
+.sidebar-badge i {
+    width: auto;
+    font-size: 0.78rem;
+}
+.sidebar-badge-warning {
+    background: #facc15;
+}
+.sidebar-badge-info {
+    background: #38bdf8;
+}
+.sidebar-badge-danger {
+    background: #fb7185;
+    color: #ffffff;
+}
+.sidebar-badge-star {
+    background: #fbbf24;
+}
+@keyframes sidebar-badge-pop {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.12);
+    }
+}
 
 /* --- Topbar --- */
 .th-topbar {

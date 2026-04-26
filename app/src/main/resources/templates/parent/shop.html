@@ -55,7 +55,7 @@
                                     <span th:text="${p.shopItem?.title}">Товар</span>
                                 </td>
                                 <td><span class="badge bg-warning text-dark" th:text="${p.shopItem?.priceCoins} + ' коинов'">10</span></td>
-                                <td><small class="text-muted" th:text="${#temporals.format(p.createdAt, 'dd.MM.yyyy')}">01.01.2025</small></td>
+                                <td><small class="text-muted" th:attr="data-utc-datetime=${p.createdAt}" th:text="${p.createdAt}">2025-01-01T09:00:00Z</small></td>
                                 <td class="text-end">
                                     <form th:action="@{/parent/shop/purchases/{id}/approve(id=${p.id})}" method="post" class="d-inline">
                                         <button class="btn btn-sm btn-success"><i class="bi bi-check-lg"></i></button>
@@ -147,11 +147,12 @@
                                               th:text="${p.status == 'PENDING' ? 'Ожидает' :
                                                          p.status == 'APPROVED' ? 'Одобрено' : 'Отклонено'}">Статус</span>
                                     </td>
-                                    <td><small class="text-muted" th:text="${#temporals.format(p.createdAt, 'dd.MM.yyyy HH:mm')}">01.01.2025</small></td>
+                                    <td><small class="text-muted" th:attr="data-utc-datetime=${p.createdAt}" th:text="${p.createdAt}">2025-01-01T09:00:00Z</small></td>
                                     <td>
                                         <small class="text-muted"
                                                th:if="${p.reviewedAt}"
-                                               th:text="${#temporals.format(p.reviewedAt, 'dd.MM.yyyy HH:mm')}">01.01.2025</small>
+                                               th:attr="data-utc-datetime=${p.reviewedAt}"
+                                               th:text="${p.reviewedAt}">2025-01-01T09:00:00Z</small>
                                         <small class="text-muted" th:unless="${p.reviewedAt}">—</small>
                                     </td>
                                     <td><small class="text-muted" th:text="${p.parentComment ?: '—'}">—</small></td>

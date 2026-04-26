@@ -43,4 +43,4 @@ public record ChildResponseDto(
         int nextLevelExp,
         @Schema(description = "Информация о родителе")
         ParentResponseDto parent
-) {}
+) { }

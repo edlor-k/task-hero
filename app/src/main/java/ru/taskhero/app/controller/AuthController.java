@@ -48,10 +48,14 @@ public class AuthController {
     public String loginPage(
             @RequestParam(required = false) String error,
             @RequestParam(required = false) String logout,
+            @RequestParam(required = false) String blocked,
             Model model
     ) {
         if (error != null) {
             model.addAttribute("error", "Неверный email или пароль");
+        }
+        if (blocked != null) {
+            model.addAttribute("error", "Аккаунт заблокирован");
         }
         if (logout != null) {
             model.addAttribute("message", "Вы успешно вышли из системы");

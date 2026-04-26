@@ -1,7 +1,6 @@
 package ru.taskhero.taskservice.mapper;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import ru.taskhero.taskservice.dto.TaskAssignmentResponseDto;
 import ru.taskhero.taskservice.entity.TaskAssignment;

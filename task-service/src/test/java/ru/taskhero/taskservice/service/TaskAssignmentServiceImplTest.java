@@ -24,7 +24,7 @@ import ru.taskhero.taskservice.repository.TaskTemplateRepository;
 import ru.taskhero.taskservice.service.impl.TaskAssignmentServiceImpl;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -83,7 +83,7 @@ class TaskAssignmentServiceImplTest {
                 .template(template)
                 .childId(childId)
                 .status(TaskStatus.CREATED)
-                .dueDate(LocalDateTime.now().plusDays(7))
+                .dueDate(Instant.now().plus(Duration.ofDays(7)))
                 .build();
 
         TaskTemplateResponseDto templateDto = new TaskTemplateResponseDto(
@@ -93,7 +93,7 @@ class TaskAssignmentServiceImplTest {
         );
 
         responseDto = new TaskAssignmentResponseDto(
-                assignmentId, childId, TaskStatus.CREATED, LocalDateTime.now().plusDays(7),
+                assignmentId, childId, TaskStatus.CREATED, Instant.now().plus(Duration.ofDays(7)),
                 null, null, null, null, null, null,
                 null, null, templateDto, Instant.now(), null
         );
@@ -104,7 +104,7 @@ class TaskAssignmentServiceImplTest {
     void shouldAssignTaskToChild() {
         // Given
         TaskAssignRequest request = new TaskAssignRequest(
-                templateId, childId, LocalDateTime.now().plusDays(7), null
+                templateId, childId, Instant.now().plus(Duration.ofDays(7)), null
         );
 
         when(templateRepository.findById(templateId)).thenReturn(Optional.of(template));

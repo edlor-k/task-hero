@@ -32,4 +32,4 @@ public record ParentDetailDto(
 
         @Schema(description = "Дата последнего обновления")
         Instant updatedAt
-) {}
+) { }

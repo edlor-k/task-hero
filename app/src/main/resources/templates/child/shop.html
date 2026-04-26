@@ -95,7 +95,7 @@
                                                      p.status == 'APPROVED' ? 'Одобрено' :
                                                      p.status == 'REJECTED' ? 'Отклонено' : p.status}">Статус</span>
                                 </td>
-                                <td><small class="text-muted" th:text="${#temporals.format(p.createdAt, 'dd.MM.yyyy HH:mm')}">01.01.2025</small></td>
+                                <td><small class="text-muted" th:attr="data-utc-datetime=${p.createdAt}" th:text="${p.createdAt}">2025-01-01T09:00:00Z</small></td>
                             </tr>
                             </tbody>
                         </table>

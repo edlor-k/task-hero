@@ -17,4 +17,4 @@ public record AuditLogDto(
         UUID targetId,
         String details,
         Instant createdAt
-) {}
+) { }

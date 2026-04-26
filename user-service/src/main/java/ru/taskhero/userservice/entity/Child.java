@@ -7,7 +7,6 @@ import ru.taskhero.common.model.entity.BaseEntity;
 import ru.taskhero.common.model.enums.CharacterType;
 import ru.taskhero.common.model.enums.DifficultyTrajectory;
 
-import java.util.UUID;
 
 /**
  * Сущность профиля ребёнка.

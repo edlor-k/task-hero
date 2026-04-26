@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import ru.taskhero.common.model.enums.TaskStatus;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
@@ -23,7 +22,7 @@ public record TaskAssignmentResponseDto(
         TaskStatus status,
 
         @Schema(description = "Срок выполнения")
-        LocalDateTime dueDate,
+        Instant dueDate,
 
         @Schema(description = "Комментарий ребёнка при сдаче")
         String childComment,

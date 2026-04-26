@@ -28,4 +28,4 @@ public record ParentWithChildrenDto(
 
         @Schema(description = "Общее количество детей")
         int totalChildren
-) {}
+) { }
