@@ -56,7 +56,7 @@ public class ParentController {
             boolean hasLevelRewards = children.stream().allMatch(child -> {
                 try {
                     List<LevelRewardDto> rewards = userServiceClient.getLevelRewards(child.id());
-                    return rewards != null && rewards.size() >= 9;
+                    return rewards != null && rewards.size() >= 2;
                 } catch (Exception e) {
                     return false;
                 }
@@ -128,7 +128,7 @@ public class ParentController {
                 hasLevelRewards = children.stream().allMatch(child -> {
                     try {
                         List<LevelRewardDto> rewards = userServiceClient.getLevelRewards(child.id());
-                        return rewards != null && rewards.size() >= 9;
+                        return rewards != null && rewards.size() >= 2;
                     } catch (Exception e) {
                         return false;
                     }
@@ -177,7 +177,7 @@ public class ParentController {
                     hasLevelRewards = children.stream().allMatch(child -> {
                         try {
                             List<LevelRewardDto> rewards = userServiceClient.getLevelRewards(child.id());
-                            return rewards != null && rewards.size() >= 9;
+                            return rewards != null && rewards.size() >= 2;
                         } catch (Exception ex) {
                             return false;
                         }
@@ -502,6 +502,84 @@ public class ParentController {
             redirect.append(sep).append("category=").append(category);
         }
         return redirect.toString();
+    }
+
+    // ==================== Presets ====================
+
+    @PostMapping("/presets/apply")
+    public String applyPreset(
+            @RequestParam String presetName,
+            @RequestParam(defaultValue = "false") boolean onboarding,
+            RedirectAttributes redirectAttributes
+    ) {
+        List<Map<String, Object>> tasks = buildPresetTasks(presetName);
+        if (tasks == null) {
+            redirectAttributes.addFlashAttribute("error", "Пресет не найден");
+            return "redirect:/parent/library" + (onboarding ? "?onboarding=true" : "");
+        }
+        int created = 0;
+        for (Map<String, Object> task : tasks) {
+            try {
+                taskServiceClient.createTemplate(task);
+                created++;
+            } catch (Exception e) {
+                log.warn("Preset task creation failed: {}", e.getMessage());
+            }
+        }
+        redirectAttributes.addFlashAttribute("success", "Пресет применён: добавлено " + created + " заданий");
+        return "redirect:/parent/library" + (onboarding ? "?onboarding=true" : "");
+    }
+
+    private List<Map<String, Object>> buildPresetTasks(String presetName) {
+        return switch (presetName) {
+            case "study" -> List.of(
+                presetTask("Сделать домашнее задание", "Выполнить все задания на день", "FREQ=DAILY;BYDAY=MO,TU,WE,TH,FR", 20, 20, "STUDY"),
+                presetTask("Собрать портфель на завтра", "Проверить тетради, учебники, форму", "FREQ=DAILY;BYDAY=MO,TU,WE,TH,FR", 3, 3, "STUDY"),
+                presetTask("Прочитать 10 страниц", "Любая книга: школьная или художественная", "FREQ=DAILY;BYDAY=MO,TU,WE,TH,FR", 5, 5, "READING"),
+                presetTask("Уборка рабочего места", "Разложить всё после занятий на свои места", "FREQ=DAILY;BYDAY=MO,TU,WE,TH,FR", 5, 5, "STUDY")
+            );
+            case "sports" -> List.of(
+                presetTask("Утренняя зарядка", "5–10 минут простой разминки", "FREQ=DAILY;BYDAY=MO,TU,WE,TH,FR", 10, 10, "SPORTS"),
+                presetTask("Прогулка / 5000 шагов", "Любая активная прогулка, шаги", "FREQ=DAILY;BYDAY=MO,TU,WE,TH,FR", 15, 15, "SPORTS"),
+                presetTask("Тренировка", "Секция, бассейн, футбол, танцы или домашний спорт", "FREQ=WEEKLY;BYDAY=MO,WE,FR", 20, 20, "SPORTS"),
+                presetTask("Растяжка", "5–10 минут после активности", "FREQ=WEEKLY;BYDAY=MO,TU,TH,SA", 5, 5, "SPORTS"),
+                presetTask("Мини-челлендж", "10 отжиманий / 20 приседаний / планка", "FREQ=WEEKLY;BYDAY=MO,TU,TH,SA", 5, 5, "SPORTS")
+            );
+            case "household" -> List.of(
+                presetTask("Застелить кровать", "Сразу после подъёма", "FREQ=DAILY", 5, 5, "HOUSEHOLD"),
+                presetTask("Убрать игрушки / вещи", "Убрать за собой после игры", "FREQ=DAILY", 5, 5, "HOUSEHOLD"),
+                presetTask("Протереть стол после занятий", "Убрать стол после уроков/творчества", "FREQ=DAILY;BYDAY=MO,TU,WE,TH,FR", 5, 5, "HOUSEHOLD"),
+                presetTask("Помочь накрыть / убрать со стола", "Любая помощь на кухне", "FREQ=DAILY;BYDAY=MO,TU,WE,TH,FR", 10, 10, "HOUSEHOLD"),
+                presetTask("Убрать свою комнату", "Полноценная уборка комнаты", "FREQ=WEEKLY;BYDAY=TU,FR", 20, 20, "HOUSEHOLD")
+            );
+            case "routine" -> List.of(
+                presetTask("Почистить зубы утром и вечером", "Выполнить оба раза за день", "FREQ=DAILY", 5, 5, "HYGIENE"),
+                presetTask("Собраться утром без напоминаний", "Одеться, умыться, подготовиться", "FREQ=DAILY;BYDAY=MO,TU,WE,TH,FR", 10, 10, "HYGIENE"),
+                presetTask("Лечь спать вовремя", "По времени, которое задаёт родитель", "FREQ=DAILY", 5, 5, "HYGIENE"),
+                presetTask("Собрать вещи на завтра", "Одежда / рюкзак / нужные вещи", "FREQ=DAILY;BYDAY=MO,TU,WE,TH,FR", 7, 7, "HYGIENE")
+            );
+            case "hobby" -> List.of(
+                presetTask("20 минут любимого хобби", "Рисование, музыка, конструктор, лепка, шахматы и т.д.", "FREQ=WEEKLY;BYDAY=MO,TU,TH,SA", 15, 15, "CREATIVITY"),
+                presetTask("Практика / репетиция", "Целенаправленно потренироваться", "FREQ=WEEKLY;BYDAY=MO,WE,FR", 20, 20, "CREATIVITY"),
+                presetTask("Закончить маленький проект", "Доделать рисунок, поделку, мелодию, модель", "FREQ=WEEKLY", 25, 25, "CREATIVITY"),
+                presetTask("Попробовать что-то новое", "Новый материал, техника, формат", "FREQ=WEEKLY", 25, 25, "CREATIVITY")
+            );
+            default -> null;
+        };
+    }
+
+    private Map<String, Object> presetTask(String title, String description, String rrule,
+                                            int expReward, int coinsReward, String category) {
+        Map<String, Object> t = new HashMap<>();
+        t.put("title", title);
+        t.put("description", description);
+        t.put("recurrenceRule", rrule);
+        t.put("expReward", expReward);
+        t.put("coinsReward", coinsReward);
+        t.put("category", category);
+        t.put("repeatable", true);
+        t.put("difficulty", "NORMAL");
+        return t;
     }
 
     // ==================== Assignments ====================
@@ -938,10 +1016,9 @@ public class ParentController {
                         .collect(Collectors.toSet());
                 model.addAttribute("rewardedLevels", rewardedLevels);
 
-                // Determine range for level info: from next unrewarded to +10
                 int maxRewarded = rewards.stream().mapToInt(LevelRewardDto::level).max().orElse(1);
-                int from = Math.max(2, selectedChild.level() + 1);
-                int to = Math.max(maxRewarded + 10, from + 9);
+                int from = Math.max(2, Math.max(selectedChild.level() + 1, maxRewarded + 1));
+                int to = from + 1;
                 List<LevelInfoDto> levelInfoList = userServiceClient.getLevelInfo(selectedChild.id(), from, to);
                 model.addAttribute("levelInfoList", levelInfoList);
 

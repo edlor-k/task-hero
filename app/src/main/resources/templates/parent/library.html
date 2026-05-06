@@ -25,6 +25,142 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
 
+            <!-- Presets section -->
+            <div class="card mb-4">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-lightning-charge me-2"></i>Быстрый старт: готовые пресеты</h5>
+                    <button class="btn btn-sm btn-outline-secondary" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#presetsCollapse" aria-expanded="true">
+                        <i class="bi bi-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="collapse show" id="presetsCollapse">
+                    <div class="card-body">
+                        <p class="text-muted small mb-3">Добавьте сразу несколько шаблонов одним нажатием. Созданные задания можно изменить в разделе «Мои шаблоны».</p>
+                        <div class="row g-3">
+
+                            <!-- Preset: Учёба -->
+                            <div class="col-md-6 col-xl-4">
+                                <div class="card border h-100">
+                                    <div class="card-body d-flex flex-column">
+                                        <h6 class="fw-bold mb-1">📚 Учёба</h6>
+                                        <p class="text-muted small mb-2">Домашние задания, чтение и порядок — для учебного ритма.</p>
+                                        <ul class="list-unstyled small mb-3 flex-grow-1">
+                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Сделать домашнее задание <span class="text-warning fw-semibold">20</span></li>
+                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Собрать портфель на завтра <span class="text-warning fw-semibold">3</span></li>
+                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Прочитать 10 страниц <span class="text-warning fw-semibold">5</span></li>
+                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Уборка рабочего места <span class="text-warning fw-semibold">5</span></li>
+                                        </ul>
+                                        <form th:action="@{/parent/presets/apply}" method="post">
+                                            <input type="hidden" name="presetName" value="study"/>
+                                            <input type="hidden" name="onboarding" th:value="${onboarding}"/>
+                                            <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                                                <i class="bi bi-plus-circle me-1"></i>Применить пресет
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Preset: Спорт -->
+                            <div class="col-md-6 col-xl-4">
+                                <div class="card border h-100">
+                                    <div class="card-body d-flex flex-column">
+                                        <h6 class="fw-bold mb-1">🏃 Спорт</h6>
+                                        <p class="text-muted small mb-2">Зарядка, прогулки и тренировки — для активного ребёнка.</p>
+                                        <ul class="list-unstyled small mb-3 flex-grow-1">
+                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Утренняя зарядка <span class="text-warning fw-semibold">10</span></li>
+                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Прогулка / 5000 шагов <span class="text-warning fw-semibold">15</span></li>
+                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Тренировка <span class="text-warning fw-semibold">20</span></li>
+                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Растяжка <span class="text-warning fw-semibold">5</span></li>
+                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Мини-челлендж <span class="text-warning fw-semibold">5</span></li>
+                                        </ul>
+                                        <form th:action="@{/parent/presets/apply}" method="post">
+                                            <input type="hidden" name="presetName" value="sports"/>
+                                            <input type="hidden" name="onboarding" th:value="${onboarding}"/>
+                                            <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                                                <i class="bi bi-plus-circle me-1"></i>Применить пресет
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Preset: Уборка -->
+                            <div class="col-md-6 col-xl-4">
+                                <div class="card border h-100">
+                                    <div class="card-body d-flex flex-column">
+                                        <h6 class="fw-bold mb-1">🧹 Уборка</h6>
+                                        <p class="text-muted small mb-2">Кровать, игрушки, комната — для привычки к порядку.</p>
+                                        <ul class="list-unstyled small mb-3 flex-grow-1">
+                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Застелить кровать <span class="text-warning fw-semibold">5</span></li>
+                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Убрать игрушки / вещи <span class="text-warning fw-semibold">5</span></li>
+                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Протереть стол после занятий <span class="text-warning fw-semibold">5</span></li>
+                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Помочь накрыть / убрать со стола <span class="text-warning fw-semibold">10</span></li>
+                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Убрать свою комнату <span class="text-warning fw-semibold">20</span></li>
+                                        </ul>
+                                        <form th:action="@{/parent/presets/apply}" method="post">
+                                            <input type="hidden" name="presetName" value="household"/>
+                                            <input type="hidden" name="onboarding" th:value="${onboarding}"/>
+                                            <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                                                <i class="bi bi-plus-circle me-1"></i>Применить пресет
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Preset: Ежедневная рутина -->
+                            <div class="col-md-6 col-xl-4">
+                                <div class="card border h-100">
+                                    <div class="card-body d-flex flex-column">
+                                        <h6 class="fw-bold mb-1">☀️ Ежедневная рутина</h6>
+                                        <p class="text-muted small mb-2">Базовые привычки — подходит для самых младших.</p>
+                                        <ul class="list-unstyled small mb-3 flex-grow-1">
+                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Почистить зубы утром и вечером <span class="text-warning fw-semibold">5</span></li>
+                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Собраться утром без напоминаний <span class="text-warning fw-semibold">10</span></li>
+                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Лечь спать вовремя <span class="text-warning fw-semibold">5</span></li>
+                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Собрать вещи на завтра <span class="text-warning fw-semibold">7</span></li>
+                                        </ul>
+                                        <form th:action="@{/parent/presets/apply}" method="post">
+                                            <input type="hidden" name="presetName" value="routine"/>
+                                            <input type="hidden" name="onboarding" th:value="${onboarding}"/>
+                                            <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                                                <i class="bi bi-plus-circle me-1"></i>Применить пресет
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Preset: Хобби -->
+                            <div class="col-md-6 col-xl-4">
+                                <div class="card border h-100">
+                                    <div class="card-body d-flex flex-column">
+                                        <h6 class="fw-bold mb-1">🎨 Хобби</h6>
+                                        <p class="text-muted small mb-2">Творчество, практика и новые идеи — для увлечённого ребёнка.</p>
+                                        <ul class="list-unstyled small mb-3 flex-grow-1">
+                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>20 минут любимого хобби <span class="text-warning fw-semibold">15</span></li>
+                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Практика / репетиция <span class="text-warning fw-semibold">20</span></li>
+                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Закончить маленький проект <span class="text-warning fw-semibold">25</span></li>
+                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Попробовать что-то новое <span class="text-warning fw-semibold">25</span></li>
+                                        </ul>
+                                        <form th:action="@{/parent/presets/apply}" method="post">
+                                            <input type="hidden" name="presetName" value="hobby"/>
+                                            <input type="hidden" name="onboarding" th:value="${onboarding}"/>
+                                            <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                                                <i class="bi bi-plus-circle me-1"></i>Применить пресет
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Category filter -->
             <div class="d-flex flex-wrap gap-2 mb-4">
                 <a th:href="@{/parent/library(onboarding=${onboarding ?: null})}"

@@ -125,34 +125,6 @@
                         <h5 class="fw-bold mb-0"><i class="bi bi-plus-circle me-2"></i>Добавить награды</h5>
                     </div>
                     <div class="card-body">
-                        <!-- Level info table -->
-                        <div th:if="${levelInfoList != null && !levelInfoList.isEmpty()}" class="mb-4">
-                            <h6 class="fw-semibold mb-3">Информация об уровнях</h6>
-                            <div class="table-responsive">
-                                <table class="table table-sm table-bordered align-middle">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Уровень</th>
-                                            <th>XP для уровня</th>
-                                            <th title="Простые задания">Лёгких</th>
-                                            <th title="Средние задания">Средних</th>
-                                            <th title="Сложные задания">Сложных</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr th:each="info : ${levelInfoList}">
-                                            <td><span class="fw-semibold" th:text="'Ур. ' + ${info.level()}">2</span></td>
-                                            <td th:text="${info.expRequired()}">100</td>
-                                            <td class="text-success" th:text="'~' + ${info.approxEasyTasks()}">~12</td>
-                                            <td class="text-primary" th:text="'~' + ${info.approxNormalTasks()}">~10</td>
-                                            <td class="text-danger" th:text="'~' + ${info.approxHardTasks()}">~7</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <small class="text-muted">Примерное количество заданий для достижения уровня.</small>
-                        </div>
-
                         <form th:action="@{/parent/level-rewards/{childId}/add(childId=${selectedChild.id})}" method="post">
                             <input type="hidden" name="onboarding" th:value="${onboarding}"/>
                             <div id="rewardsContainer">
