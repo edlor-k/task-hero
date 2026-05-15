@@ -17,6 +17,9 @@ public record ChildCreateRequestDto(
         @NotBlank(message = "Фамилия не может быть пустой")
         String surname,
 
-        DifficultyTrajectory difficultyTrajectory
+        DifficultyTrajectory difficultyTrajectory,
+
+        @Size(message = "Никнейм не должен превышать 64 символа", max = 64)
+        String nickname
 ) {
 }

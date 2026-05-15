@@ -68,6 +68,13 @@ public class ShopItem extends BaseEntity {
     private boolean marketplaceItem = false;
 
     /**
+     * Группа пресета (STUDY, SPORTS, CLEAN, ROUTINE, HOBBY, GAMER).
+     * Используется для группировки в маркетплейсе и применения пресетов целиком.
+     */
+    @Column(name = "preset_group", length = 64)
+    private String presetGroup;
+
+    /**
      * Дети, для которых доступен этот товар.
      */
     @ManyToMany

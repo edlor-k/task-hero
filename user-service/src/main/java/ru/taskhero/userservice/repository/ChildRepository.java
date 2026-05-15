@@ -43,6 +43,13 @@ public interface ChildRepository extends JpaRepository<Child, UUID> {
     Optional<Child> findByIdWithParent(@Param("id") UUID id);
 
     /**
+     * Получить ребёнка по ID с загруженными родителем и его учётной записью (User).
+     * Не загружает коллекции (children, shopItems), чтобы избежать MultipleBagFetchException.
+     */
+    @Query("SELECT c FROM Child c LEFT JOIN FETCH c.parent p LEFT JOIN FETCH p.user WHERE c.id = :id")
+    Optional<Child> findByIdWithParentAndUser(@Param("id") UUID id);
+
+    /**
      * Проверить, принадлежит ли ребёнок родителю (без загрузки сущностей).
      */
     @Query("SELECT COUNT(c) > 0 FROM Child c WHERE c.id = :childId AND c.parent.id = :parentId")

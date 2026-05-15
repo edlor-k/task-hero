@@ -12,6 +12,8 @@ public record CreateChildRequest(
         @NotBlank(message = "Фамилия обязательна")
         String surname,
 
-        String difficultyTrajectory
+        String difficultyTrajectory,
+
+        String nickname
 ) {
 }

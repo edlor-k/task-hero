@@ -67,4 +67,10 @@ public class Child extends BaseEntity {
     @Builder.Default
     @Column(name = "character_selected", nullable = false)
     private boolean characterSelected = false;
+
+    /**
+     * Никнейм ребёнка (отображается вместо имени в публичном UI).
+     */
+    @Column(name = "nickname", length = 64)
+    private String nickname;
 }

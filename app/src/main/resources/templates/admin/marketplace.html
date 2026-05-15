@@ -63,7 +63,12 @@
                             <tbody>
                             <tr th:each="item : ${items}">
                                 <td>
-                                    <i class="bi fs-4" th:classappend="${item['iconName'] ?: 'bi-gift'}"></i>
+                                    <i class="bi fs-4"
+                                       th:if="${item['iconName'] != null and item['iconName'].startsWith('bi-')}"
+                                       th:classappend="${item['iconName']}"></i>
+                                    <span class="fs-4"
+                                          th:unless="${item['iconName'] != null and item['iconName'].startsWith('bi-')}"
+                                          th:text="${item['iconName'] ?: '🎁'}"></span>
                                 </td>
                                 <td class="fw-semibold" th:text="${item['title']}">—</td>
                                 <td>

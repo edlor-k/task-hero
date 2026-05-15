@@ -36,9 +36,9 @@
                             <select name="role" class="form-select">
                                 <option value="">Все роли</option>
                                 <option value="PARENT" th:selected="${selectedRole == 'PARENT'}">Родитель</option>
-                                <option value="CHILD" th:selected="${selectedRole == 'CHILD'}">Ребёнок</option>
                                 <option value="ADMIN" th:selected="${selectedRole == 'ADMIN'}">Админ</option>
                             </select>
+                            <small class="text-muted"><a th:href="@{/admin/children}">Дети — в отдельном разделе</a></small>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label fw-semibold">Статус</label>
@@ -111,13 +111,6 @@
                                                 th:data-bs-target="'#roleModal-' + ${user['id']}"
                                                 title="Изменить роль">
                                             <i class="bi bi-person-gear"></i>
-                                        </button>
-                                        <!-- Delete -->
-                                        <button type="button" class="btn btn-sm btn-outline-danger"
-                                                data-bs-toggle="modal"
-                                                th:data-bs-target="'#deleteModal-' + ${user['id']}"
-                                                title="Удалить">
-                                            <i class="bi bi-trash"></i>
                                         </button>
                                     </div>
                                 </td>
@@ -196,26 +189,6 @@
                                     <button type="submit" class="btn btn-primary">Сохранить</button>
                                 </div>
                             </form>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal fade" th:id="'deleteModal-' + ${user['id']}" tabindex="-1">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Удаление пользователя</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body">
-                                <p>Вы уверены, что хотите удалить пользователя <strong th:text="${user['email']}">email</strong>?</p>
-                                <p class="text-danger"><i class="bi bi-exclamation-triangle me-1"></i>Это действие необратимо.</p>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                                <form method="post" th:action="@{/admin/users/{id}/delete(id=${user['id']})}">
-                                    <button type="submit" class="btn btn-danger">Удалить</button>
-                                </form>
-                            </div>
                         </div>
                     </div>
                 </div>

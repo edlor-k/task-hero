@@ -49,7 +49,8 @@
                                  style="width: 72px; height: 72px; font-size: 1.75rem;">
                                 <span th:text="${#strings.substring(child.firstName, 0, 1)}">И</span>
                             </div>
-                            <h5 class="fw-bold" th:text="${child.firstName + ' ' + child.surname}">Имя</h5>
+                            <h5 class="fw-bold" th:text="${child.nickname ?: (child.firstName + ' ' + child.surname)}">Имя</h5>
+                            <p class="text-muted small mb-0" th:if="${child.nickname}" th:text="${child.firstName + ' ' + child.surname}"></p>
                             <div class="d-flex justify-content-center gap-2 my-3">
                                 <span class="badge bg-warning text-dark" th:text="'Ур. ' + ${child.level}">Ур. 1</span>
                                 <span class="badge bg-success" th:text="${child.exp} + ' EXP'">0 EXP</span>
@@ -92,6 +93,11 @@
                     <div class="mb-3">
                         <label for="surname" class="form-label fw-semibold">Фамилия</label>
                         <input type="text" class="form-control" id="surname" name="surname" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="nickname" class="form-label fw-semibold">Никнейм <span class="text-muted fw-normal">(необязательно)</span></label>
+                        <input type="text" class="form-control" id="nickname" name="nickname" maxlength="64"
+                               placeholder="Отображается вместо настоящего имени">
                     </div>
                     <div class="alert alert-info py-2">
                         <i class="bi bi-info-circle me-2"></i>После добавления будет сгенерирован уникальный токен для входа.

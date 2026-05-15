@@ -69,6 +69,9 @@ public record TaskTemplateUpdateRequest(
         @Schema(description = "Категория задания")
         TaskCategory category,
 
+        @Schema(description = "Автоматическое подтверждение: задание сразу получает статус APPROVED при назначении")
+        Boolean autoSubmit,
+
         @Schema(description = "Подпункты задания")
         List<String> subItems
 ) {

@@ -41,11 +41,14 @@ public record ChildDetailDto(
         CharacterType characterType,
 
         @Schema(description = "Информация о родителе")
-        ParentResponseDto parent,
+        ParentSummaryDto parent,
 
         @Schema(description = "Дата создания")
         Instant createdAt,
 
         @Schema(description = "Дата последнего обновления")
-        Instant updatedAt
+        Instant updatedAt,
+
+        @Schema(description = "Никнейм ребёнка")
+        String nickname
 ) { }

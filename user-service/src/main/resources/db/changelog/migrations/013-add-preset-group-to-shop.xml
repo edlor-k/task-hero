@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="013-add-preset-group-to-shop" author="task-hero">
+        <!-- Группа пресета наград (STUDY, SPORTS, CLEAN, ROUTINE, HOBBY, GAMER) -->
+        <addColumn tableName="shop_items">
+            <column name="preset_group" type="varchar(64)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="013-seed-gamer-preset" author="task-hero">
+        <!-- Пресет «Геймер»: обновляем существующие маркетплейс-товары -->
+        <update tableName="shop_items">
+            <column name="preset_group" value="GAMER"/>
+            <where>id = 'a1000000-0000-0000-0000-000000000001'</where>
+        </update>
+        <update tableName="shop_items">
+            <column name="preset_group" value="GAMER"/>
+            <where>id = 'a1000000-0000-0000-0000-000000000007'</where>
+        </update>
+        <update tableName="shop_items">
+            <column name="preset_group" value="GAMER"/>
+            <where>id = 'a1000000-0000-0000-0000-000000000002'</where>
+        </update>
+        <update tableName="shop_items">
+            <column name="preset_group" value="GAMER"/>
+            <where>id = 'a1000000-0000-0000-0000-000000000003'</where>
+        </update>
+        <update tableName="shop_items">
+            <column name="preset_group" value="GAMER"/>
+            <where>id = 'a1000000-0000-0000-0000-000000000008'</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="013-seed-universal-rewards" author="task-hero">
+        <!-- Новые товары для пресетов Учёба, Спорт, Уборка и т.д. — по данным presets.md -->
+        <insert tableName="shop_items">
+            <column name="id" value="b1000000-0000-0000-0000-000000000001"/>
+            <column name="parent_id" value="00000000-0000-0000-0000-000000000001"/>
+            <column name="title" value="Поход в кафе с родителями"/>
+            <column name="description" value="Обед или ужин в любимом кафе"/>
+            <column name="price_coins" valueNumeric="250"/>
+            <column name="icon_name" value="☕"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="is_marketplace" valueBoolean="true"/>
+            <column name="preset_group" value="STUDY"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="shop_items">
+            <column name="id" value="b1000000-0000-0000-0000-000000000002"/>
+            <column name="parent_id" value="00000000-0000-0000-0000-000000000001"/>
+            <column name="title" value="Доп. 30 минут игры"/>
+            <column name="description" value="Дополнительные 30 минут компьютера/телефона/приставки"/>
+            <column name="price_coins" valueNumeric="200"/>
+            <column name="icon_name" value="🎮"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="is_marketplace" valueBoolean="true"/>
+            <column name="preset_group" value="SPORTS"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="shop_items">
+            <column name="id" value="b1000000-0000-0000-0000-000000000003"/>
+            <column name="parent_id" value="00000000-0000-0000-0000-000000000001"/>
+            <column name="title" value="Заказать пиццу/роллы"/>
+            <column name="description" value="Заказать пиццу или роллы на ужин"/>
+            <column name="price_coins" valueNumeric="150"/>
+            <column name="icon_name" value="🍕"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="is_marketplace" valueBoolean="true"/>
+            <column name="preset_group" value="CLEAN"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="shop_items">
+            <column name="id" value="b1000000-0000-0000-0000-000000000004"/>
+            <column name="parent_id" value="00000000-0000-0000-0000-000000000001"/>
+            <column name="title" value="Лечь спать на час позже"/>
+            <column name="description" value="Один вечер можно лечь спать на час позже обычного"/>
+            <column name="price_coins" valueNumeric="60"/>
+            <column name="icon_name" value="🌙"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="is_marketplace" valueBoolean="true"/>
+            <column name="preset_group" value="ROUTINE"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="shop_items">
+            <column name="id" value="b1000000-0000-0000-0000-000000000005"/>
+            <column name="parent_id" value="00000000-0000-0000-0000-000000000001"/>
+            <column name="title" value="Поход в кино"/>
+            <column name="description" value="Поход в кинотеатр на любой фильм"/>
+            <column name="price_coins" valueNumeric="150"/>
+            <column name="icon_name" value="🎬"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="is_marketplace" valueBoolean="true"/>
+            <column name="preset_group" value="HOBBY"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

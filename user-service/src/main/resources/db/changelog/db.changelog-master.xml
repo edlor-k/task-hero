@@ -17,4 +17,6 @@
     <include file="db/changelog/migrations/010-create-audit-log.xml"/>
     <include file="db/changelog/migrations/011-seed-master-admin.xml"/>
     <include file="db/changelog/migrations/012-fix-admin-email.xml"/>
+    <include file="db/changelog/migrations/013-add-preset-group-to-shop.xml"/>
+    <include file="db/changelog/migrations/014-add-nickname-to-children.xml"/>
 </databaseChangeLog>

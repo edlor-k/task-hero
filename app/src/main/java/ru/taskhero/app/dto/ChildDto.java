@@ -23,6 +23,7 @@ public record ChildDto(
         int currentLevelExp,
         int nextLevelExp,
         Instant createdAt,
-        Instant updatedAt
+        Instant updatedAt,
+        String nickname
 ) {
 }

@@ -35,6 +35,10 @@
                                         <td class="text-muted" style="width:40%">Имя</td>
                                         <td class="fw-semibold" th:text="${child['firstName'] + ' ' + child['surname']}">Имя</td>
                                     </tr>
+                                    <tr th:if="${child['nickname'] != null}">
+                                        <td class="text-muted">Никнейм</td>
+                                        <td th:text="${child['nickname']}"></td>
+                                    </tr>
                                     <tr>
                                         <td class="text-muted">Уровень</td>
                                         <td><span class="badge bg-primary bg-opacity-10 text-primary" th:text="'Ур. ' + ${child['level']}">1</span></td>
@@ -75,6 +79,10 @@
                                             <td class="text-muted" style="width:40%">Имя</td>
                                             <td class="fw-semibold"
                                                 th:text="${child['parent']['firstName'] + ' ' + child['parent']['surname']}">Имя</td>
+                                        </tr>
+                                        <tr th:if="${child['parent']['email'] != null}">
+                                            <td class="text-muted">Email</td>
+                                            <td th:text="${child['parent']['email']}">email@example.com</td>
                                         </tr>
                                     </table>
                                 </div>

@@ -25,7 +25,8 @@
                             </div>
                         </div>
                         <div class="col">
-                            <h4 class="fw-bold mb-1" th:text="${child.firstName + ' ' + child.surname}">Имя</h4>
+                            <h4 class="fw-bold mb-1" th:text="${child.nickname ?: (child.firstName + ' ' + child.surname)}">Имя</h4>
+                            <p class="text-muted small mb-1" th:if="${child.nickname}" th:text="${child.firstName + ' ' + child.surname}"></p>
                             <div class="d-flex flex-wrap gap-2 mb-2">
                                 <span class="badge bg-warning text-dark fs-6" th:text="'Уровень ' + ${child.level}">Уровень 1</span>
                                 <span class="badge bg-primary fs-6" th:if="${child.characterType}"
@@ -109,7 +110,8 @@
                                     <small class="text-muted" th:attr="data-utc-datetime=${a.createdAt}" th:text="${a.createdAt}">2025-01-01T09:00:00Z</small>
                                 </td>
                                 <td class="text-end">
-                                    <form th:action="@{/parent/assignments/{id}/delete(id=${a.id})}" method="post"
+                                    <form th:if="${a.status != 'APPROVED'}"
+                                          th:action="@{/parent/assignments/{id}/delete(id=${a.id})}" method="post"
                                           onsubmit="return confirm('Удалить задание?');">
                                         <input type="hidden" name="childId" th:value="${child.id}">
                                         <button type="submit" class="btn btn-sm btn-outline-danger" title="Удалить задание">

@@ -84,7 +84,7 @@
 
             <div th:unless="${#lists.isEmpty(items)}" class="row g-4">
                 <div th:each="item : ${items}" class="col-md-6 col-lg-4">
-                    <div class="card h-100">
+                    <div class="card h-100" th:classappend="${!item.active} ? 'opacity-50 border-secondary' : ''">
                         <div class="card-body text-center">
                             <div class="display-4 mb-2" th:if="${item.iconName}" th:text="${item.iconName}">🎁</div>
                             <div class="display-4 mb-2" th:unless="${item.iconName}">🎁</div>
@@ -92,14 +92,16 @@
                             <p class="text-muted small" th:text="${item.description}" th:if="${item.description}">Описание</p>
                             <div class="mb-3">
                                 <span class="badge bg-warning text-dark fs-6" th:text="${item.priceCoins} + ' коинов'">10 коинов</span>
+                                <span th:if="${!item.active}" class="badge bg-secondary ms-1">Архивный</span>
                             </div>
                         </div>
-                        <div class="card-footer bg-transparent border-0 pb-3 px-3">
+                        <div class="card-footer bg-transparent border-0 pb-3 px-3" th:if="${item.active}">
                             <div class="d-flex gap-2">
                                 <button type="button" class="btn btn-outline-primary btn-sm flex-fill"
                                         onclick="openEditItemModal(this)"
                                         th:attr="data-id=${item.id}, data-title=${item.title}, data-description=${item.description},
-                                                 data-priceCoins=${item.priceCoins}, data-iconName=${item.iconName}">
+                                                 data-priceCoins=${item.priceCoins}, data-iconName=${item.iconName},
+                                                 data-child-ids=${item.childIds != null ? #strings.listJoin(item.childIds, ',') : ''}">
                                     <i class="bi bi-pencil me-1"></i>Изменить
                                 </button>
                                 <form th:action="@{/parent/shop/{id}/delete(id=${item.id})}" method="post" class="flex-fill">
@@ -263,7 +265,7 @@
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Доступен для</label>
                         <div th:each="child : ${children}" class="form-check">
-                            <input class="form-check-input edit-child-check" type="checkbox" name="childIds" th:value="${child.id}" th:id="'edit-child-' + ${child.id}" checked>
+                            <input class="form-check-input edit-child-check" type="checkbox" name="childIds" th:value="${child.id}" th:id="'edit-child-' + ${child.id}">
                             <label class="form-check-label" th:for="'edit-child-' + ${child.id}" th:text="${child.firstName + ' ' + child.surname}">Ребёнок</label>
                         </div>
                     </div>
@@ -304,6 +306,12 @@
         document.getElementById('editItemDescription').value = el.getAttribute('data-description') || '';
         document.getElementById('editItemPrice').value = el.getAttribute('data-priceCoins') || '10';
         document.getElementById('editItemIcon').value = el.getAttribute('data-iconName') || '';
+        // Sync child checkboxes based on item's assigned children
+        const rawIds = el.getAttribute('data-child-ids') || '';
+        const assignedIds = rawIds.split(',').map(s => s.trim()).filter(s => s.length > 0);
+        document.querySelectorAll('.edit-child-check').forEach(cb => {
+            cb.checked = assignedIds.includes(cb.value);
+        });
         // Reset icon buttons
         document.querySelectorAll('.edit-icon-btn').forEach(b => {
             b.classList.remove('btn-primary');

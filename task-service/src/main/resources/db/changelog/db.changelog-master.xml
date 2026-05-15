@@ -15,4 +15,5 @@
     <include file="db/changelog/migrations/008-add-important-to-task-assignments.xml"/>
     <include file="db/changelog/migrations/009-change-due-date-to-timestamp-and-add-reassigned.xml"/>
     <include file="db/changelog/migrations/010-store-due-date-as-utc-instant.xml"/>
+    <include file="db/changelog/migrations/011-add-auto-submit-to-templates.xml"/>
 </databaseChangeLog>

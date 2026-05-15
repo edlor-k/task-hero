@@ -74,6 +74,7 @@ public class ChildServiceImpl implements ChildService {
                 .parent(parent)
                 .firstName(request.firstName())
                 .surname(request.surname())
+                .nickname(request.nickname())
                 .exp(0)
                 .coins(0)
                 .level(1)
@@ -158,13 +159,12 @@ public class ChildServiceImpl implements ChildService {
     public ChildDetailDto getDetailById(UUID childId) {
         log.info("Получение детальной информации о ребенке: {}", childId);
 
-        Child child = childRepository.findByIdWithParent(childId)
+        Child child = childRepository.findByIdWithParentAndUser(childId)
                 .orElseThrow(() -> {
                     log.error("Ребенок с ID: {} не найден.", childId);
                     return new ResourceNotFoundException("Ребенок с ID " + childId + " не найден");
                 });
 
-        // Маппим parent вручную, чтобы избежать циклической зависимости
         return new ChildDetailDto(
                 child.getId(),
                 child.getFirstName(),
@@ -175,9 +175,10 @@ public class ChildServiceImpl implements ChildService {
                 child.getLevel(),
                 child.getDifficultyTrajectory(),
                 child.getCharacterType(),
-                parentMapper.toParentResponseDto(child.getParent()),
+                child.getParent() != null ? parentMapper.toSummary(child.getParent()) : null,
                 child.getCreatedAt(),
-                child.getUpdatedAt()
+                child.getUpdatedAt(),
+                child.getNickname()
         );
     }
 
@@ -226,6 +227,9 @@ public class ChildServiceImpl implements ChildService {
         }
         if (request.level() != null) {
             child.setLevel(request.level());
+        }
+        if (request.nickname() != null) {
+            child.setNickname(request.nickname().isBlank() ? null : request.nickname().trim());
         }
 
         child = childRepository.save(child);

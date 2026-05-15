@@ -50,6 +50,9 @@ public class ShopServiceImpl implements ShopService {
     public ShopItemResponseDto createItem(UUID parentId, ShopItemCreateRequest request) {
         log.info("Создание товара '{}' родителем: {}", request.title(), parentId);
 
+        if (request.childIds() == null || request.childIds().isEmpty()) {
+            throw new ValidationException("Нужно указать хотя бы одного ребёнка");
+        }
         Set<Child> children = new HashSet<>(childRepository.findAllById(request.childIds()));
         if (children.isEmpty()) {
             throw new ValidationException("Не найдены указанные дети");
@@ -98,8 +101,9 @@ public class ShopServiceImpl implements ShopService {
         if (!item.getParentId().equals(parentId)) {
             throw new UnauthorizedException("Вы не можете управлять этим товаром");
         }
-        shopItemRepository.delete(item);
-        log.info("Товар {} удалён", itemId);
+        item.setActive(false);
+        shopItemRepository.save(item);
+        log.info("Товар {} деактивирован (архив)", itemId);
     }
 
     @Override
@@ -340,6 +344,42 @@ public class ShopServiceImpl implements ShopService {
         return toItemDto(copy);
     }
 
+    @Override
+    @Transactional
+    @LogMethod("shop-apply-preset")
+    public int applyPreset(UUID parentId, UUID childId, String presetGroup) {
+        log.info("Применение пресета '{}' родителем {} для ребёнка {}", presetGroup, parentId, childId);
+
+        List<ShopItem> presetItems = shopItemRepository
+                .findAllByMarketplaceItemTrueAndActiveAndPresetGroup(true, presetGroup);
+        if (presetItems.isEmpty()) {
+            throw new ValidationException("Пресет '" + presetGroup + "' не найден или пуст");
+        }
+
+        Child child = childRepository.findById(childId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ребёнок не найден"));
+
+        Set<Child> children = Set.of(child);
+        int count = 0;
+        for (ShopItem source : presetItems) {
+            ShopItem copy = ShopItem.builder()
+                    .parentId(parentId)
+                    .title(source.getTitle())
+                    .description(source.getDescription())
+                    .priceCoins(source.getPriceCoins())
+                    .iconName(source.getIconName())
+                    .active(true)
+                    .marketplaceItem(false)
+                    .presetGroup(source.getPresetGroup())
+                    .children(new HashSet<>(children))
+                    .build();
+            shopItemRepository.save(copy);
+            count++;
+        }
+        log.info("Пресет '{}' применён: {} товаров добавлено", presetGroup, count);
+        return count;
+    }
+
     /**
      * Конвертировать ShopItem в DTO.
      */
@@ -357,7 +397,8 @@ public class ShopServiceImpl implements ShopService {
                 item.isActive(),
                 childIds,
                 item.getCreatedAt(),
-                item.isMarketplaceItem()
+                item.isMarketplaceItem(),
+                item.getPresetGroup()
         );
     }
 

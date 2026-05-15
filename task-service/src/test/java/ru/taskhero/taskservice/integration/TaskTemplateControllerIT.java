@@ -5,28 +5,22 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import ru.taskhero.taskservice.dto.TaskTemplateCreateRequest;
 import ru.taskhero.taskservice.dto.TaskTemplateUpdateRequest;
 import ru.taskhero.taskservice.entity.TaskTemplate;
 import ru.taskhero.taskservice.repository.TaskTemplateRepository;
 
+import java.util.Collections;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -34,28 +28,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@Testcontainers
-@Transactional
-@ActiveProfiles("test")
 @DisplayName("TaskTemplateController Integration Tests")
-class TaskTemplateControllerIT {
-
-    @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine")
-            .withDatabaseName("taskhero_test")
-            .withUsername("test")
-            .withPassword("test");
-
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-        registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
-        registry.add("spring.liquibase.enabled", () -> "false");
-    }
+class TaskTemplateControllerIT extends AbstractIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -72,6 +46,20 @@ class TaskTemplateControllerIT {
     void setUp() {
         parentId = UUID.randomUUID();
         templateRepository.deleteAll();
+    }
+
+    private RequestPostProcessor parentAuth() {
+        return authentication(new UsernamePasswordAuthenticationToken(
+                parentId, null,
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_PARENT"))
+        ));
+    }
+
+    private RequestPostProcessor childAuth() {
+        return authentication(new UsernamePasswordAuthenticationToken(
+                UUID.randomUUID(), null,
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_CHILD"))
+        ));
     }
 
     @Test
@@ -96,7 +84,7 @@ class TaskTemplateControllerIT {
 
         // When & Then
         mockMvc.perform(post("/templates")
-                        .with(user(parentId.toString()).roles("PARENT"))
+                        .with(parentAuth())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
@@ -128,7 +116,7 @@ class TaskTemplateControllerIT {
 
         // When & Then
         mockMvc.perform(post("/templates")
-                        .with(user(parentId.toString()).roles("PARENT"))
+                        .with(parentAuth())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
@@ -143,7 +131,7 @@ class TaskTemplateControllerIT {
 
         // When & Then
         mockMvc.perform(get("/templates")
-                        .with(user(parentId.toString()).roles("PARENT")))
+                        .with(parentAuth()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(2)));
     }
@@ -156,7 +144,7 @@ class TaskTemplateControllerIT {
 
         // When & Then
         mockMvc.perform(get("/templates/{id}", template.getId())
-                        .with(user(parentId.toString()).roles("PARENT")))
+                        .with(parentAuth()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title", is("Тестовое задание")));
     }
@@ -185,7 +173,7 @@ class TaskTemplateControllerIT {
 
         // When & Then
         mockMvc.perform(put("/templates/{id}", template.getId())
-                        .with(user(parentId.toString()).roles("PARENT"))
+                        .with(parentAuth())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -201,22 +189,22 @@ class TaskTemplateControllerIT {
 
         // When & Then
         mockMvc.perform(delete("/templates/{id}", template.getId())
-                        .with(user(parentId.toString()).roles("PARENT")))
+                        .with(parentAuth()))
                 .andExpect(status().isNoContent());
     }
 
     @Test
-    @DisplayName("Должен вернуть 401 без аутентификации")
-    void shouldReturn401WithoutAuthentication() throws Exception {
+    @DisplayName("Должен вернуть 403 без аутентификации")
+    void shouldReturn403WithoutAuthentication() throws Exception {
         mockMvc.perform(get("/templates"))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
     }
 
     @Test
     @DisplayName("Должен вернуть 403 для ребёнка")
     void shouldReturn403ForChild() throws Exception {
         mockMvc.perform(get("/templates")
-                        .with(user(UUID.randomUUID().toString()).roles("CHILD")))
+                        .with(childAuth()))
                 .andExpect(status().isForbidden());
     }
 

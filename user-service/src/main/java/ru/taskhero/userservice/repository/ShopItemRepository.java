@@ -55,4 +55,9 @@ public interface ShopItemRepository extends JpaRepository<ShopItem, UUID> {
      */
     @Query("SELECT DISTINCT si FROM ShopItem si LEFT JOIN FETCH si.children WHERE si.marketplaceItem = true")
     List<ShopItem> findAllMarketplaceWithChildren();
+
+    /**
+     * Найти активные элементы маркетплейса по группе пресета.
+     */
+    List<ShopItem> findAllByMarketplaceItemTrueAndActiveAndPresetGroup(boolean active, String presetGroup);
 }

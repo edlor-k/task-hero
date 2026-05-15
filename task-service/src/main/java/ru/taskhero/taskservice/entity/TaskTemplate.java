@@ -141,6 +141,14 @@ public class TaskTemplate extends BaseEntity {
     private boolean active = true;
 
     /**
+     * Автоматическое подтверждение: при создании назначения на базе этого шаблона
+     * задание сразу переводится в статус APPROVED.
+     */
+    @Builder.Default
+    @Column(name = "auto_submit", nullable = false)
+    private boolean autoSubmit = false;
+
+    /**
      * ID исходного шаблона библиотеки, из которого был скопирован этот шаблон.
      */
     @Column(name = "source_template_id")

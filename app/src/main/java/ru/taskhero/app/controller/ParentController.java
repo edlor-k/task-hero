@@ -249,11 +249,13 @@ public class ParentController {
     public String addChild(
             @RequestParam String firstName,
             @RequestParam String surname,
+            @RequestParam(required = false) String nickname,
             @RequestParam(defaultValue = "false") boolean onboarding,
             RedirectAttributes redirectAttributes
     ) {
         try {
-            CreateChildRequest request = new CreateChildRequest(firstName, surname, "NORMAL");
+            String trimmedNickname = (nickname != null && !nickname.isBlank()) ? nickname.trim() : null;
+            CreateChildRequest request = new CreateChildRequest(firstName, surname, "NORMAL", trimmedNickname);
             ChildDto child = userServiceClient.createChild(request);
 
             redirectAttributes.addFlashAttribute("success",
@@ -326,6 +328,7 @@ public class ParentController {
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String recurrenceRule,
             @RequestParam(required = false) List<String> subItems,
+            @RequestParam(defaultValue = "false") boolean autoSubmit,
             @RequestParam(defaultValue = "false") boolean onboarding,
             RedirectAttributes redirectAttributes
     ) {
@@ -333,6 +336,7 @@ public class ParentController {
             Map<String, Object> request = buildTemplateRequest(title, description, expReward, coinsReward,
                     repeatable, repeatCount, repeatInterval, repeatUnit,
                     difficulty, category, recurrenceRule, subItems);
+            request.put("autoSubmit", autoSubmit);
 
             taskServiceClient.createTemplate(request);
 
@@ -360,6 +364,7 @@ public class ParentController {
             @RequestParam(defaultValue = "NORMAL") String difficulty,
             @RequestParam(required = false) String category,
             @RequestParam(required = false) List<String> subItems,
+            @RequestParam(defaultValue = "false") boolean autoSubmit,
             RedirectAttributes redirectAttributes
     ) {
         try {
@@ -369,6 +374,7 @@ public class ParentController {
             request.put("expReward", expReward);
             request.put("coinsReward", coinsReward);
             request.put("difficulty", difficulty);
+            request.put("autoSubmit", autoSubmit);
             if (category != null && !category.isBlank()) {
                 request.put("category", category);
             }
@@ -825,7 +831,7 @@ public class ParentController {
             redirectAttributes.addFlashAttribute("success", "Задание удалено");
         } catch (Exception e) {
             log.error("Error deleting assignment: {}", e.getMessage());
-            redirectAttributes.addFlashAttribute("error", "Ошибка удаления задания");
+            redirectAttributes.addFlashAttribute("error", extractMessage(e, "Ошибка удаления задания"));
         }
         if (childId != null) {
             return "redirect:/parent/children/" + childId;
@@ -1124,6 +1130,15 @@ public class ParentController {
 
     // ==================== Marketplace ====================
 
+    private static final Map<String, String> PRESET_LABELS = Map.of(
+            "STUDY", "Учёба",
+            "SPORTS", "Спорт",
+            "CLEAN", "Уборка",
+            "ROUTINE", "Режим дня",
+            "HOBBY", "Хобби",
+            "GAMER", "Геймер"
+    );
+
     /**
      * Страница маркетплейса готовых наград.
      */
@@ -1133,7 +1148,23 @@ public class ParentController {
         try {
             List<ShopItemDto> marketplaceItems = userServiceClient.getMarketplaceItems();
             List<ChildDto> children = userServiceClient.getChildren();
+
+            // Group items by presetGroup; items without group go into ungroupedItems
+            var grouped = new java.util.LinkedHashMap<String, List<ShopItemDto>>();
+            var ungrouped = new java.util.ArrayList<ShopItemDto>();
+            for (ShopItemDto item : marketplaceItems) {
+                String pg = item.presetGroup();
+                if (pg != null && !pg.isBlank()) {
+                    grouped.computeIfAbsent(pg, k -> new java.util.ArrayList<>()).add(item);
+                } else {
+                    ungrouped.add(item);
+                }
+            }
+
             model.addAttribute("marketplaceItems", marketplaceItems);
+            model.addAttribute("groupedItems", grouped);
+            model.addAttribute("ungroupedItems", ungrouped);
+            model.addAttribute("presetLabels", PRESET_LABELS);
             model.addAttribute("children", children);
             model.addAttribute("onboarding", onboarding);
         } catch (Exception e) {
@@ -1166,7 +1197,42 @@ public class ParentController {
         return "redirect:/parent/shop/marketplace" + (onboarding ? "?onboarding=true" : "");
     }
 
+    /**
+     * Применить пресет наград: массово добавить все товары группы для ребёнка.
+     */
+    @PostMapping("/shop/preset/apply")
+    public String applyShopPreset(
+            @RequestParam String presetGroup,
+            @RequestParam UUID childId,
+            @RequestParam(required = false) boolean onboarding,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            Map<String, Object> result = userServiceClient.applyPreset(presetGroup, childId);
+            int added = result.get("added") instanceof Number n ? n.intValue() : 0;
+            redirectAttributes.addFlashAttribute("success",
+                    "Пресет применён: " + added + " наград добавлено в ваш магазин!");
+        } catch (Exception e) {
+            log.error("Error applying shop preset: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error",
+                    extractMessage(e, "Ошибка применения пресета"));
+        }
+        return "redirect:/parent/shop/marketplace" + (onboarding ? "?onboarding=true" : "");
+    }
+
     private String normalizeRewardIcon(String iconName) {
         return iconName != null && !iconName.isBlank() ? iconName.trim() : "🎁";
+    }
+
+    private String extractMessage(Exception e, String fallback) {
+        String msg = e.getMessage();
+        if (msg != null && msg.contains("\"message\":\"")) {
+            int start = msg.indexOf("\"message\":\"") + 11;
+            int end = msg.indexOf("\"", start);
+            if (end > start) {
+                return msg.substring(start, end);
+            }
+        }
+        return msg != null ? msg : fallback;
     }
 }

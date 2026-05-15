@@ -40,6 +40,9 @@ public record ShopItemResponseDto(
         Instant createdAt,
 
         @Schema(description = "Элемент маркетплейса (системный шаблон)")
-        boolean marketplaceItem
+        boolean marketplaceItem,
+
+        @Schema(description = "Группа пресета (STUDY, SPORTS, CLEAN, ROUTINE, HOBBY, GAMER)")
+        String presetGroup
 ) {
 }

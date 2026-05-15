@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+
+  liquibase:
+    enabled: false
+
+jwt:
+  secret: test-secret-key-for-testing-purposes-must-be-at-least-256-bits-long-for-hs256
+  expiration: 86400000
+
+logging:
+  level:
+    root: WARN
+    ru.taskhero: DEBUG

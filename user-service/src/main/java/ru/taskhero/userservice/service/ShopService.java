@@ -92,4 +92,12 @@ public interface ShopService {
      * Удалить системный товар маркетплейса (для админа).
      */
     void deleteMarketplaceItem(UUID itemId);
+
+    /**
+     * Применить пресет наград: скопировать все активные товары маркетплейса из группы presetGroup
+     * в магазин родителя для указанного ребёнка.
+     *
+     * @return количество добавленных товаров
+     */
+    int applyPreset(UUID parentId, UUID childId, String presetGroup);
 }

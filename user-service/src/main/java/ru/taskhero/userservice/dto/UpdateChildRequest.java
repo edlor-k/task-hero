@@ -25,5 +25,9 @@ public record UpdateChildRequest(
 
         @Min(value = 1, message = "Минимальный уровень 1")
         @Schema(description = "Уровень ребенка", example = "3")
-        Integer level
+        Integer level,
+
+        @Size(max = 64, message = "Никнейм не должен превышать 64 символа")
+        @Schema(description = "Никнейм ребёнка (необязательно)", example = "Супергерой")
+        String nickname
 ) { }

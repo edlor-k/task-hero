@@ -5,6 +5,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;
 import ru.taskhero.userservice.dto.ParentResponseDto;
+import ru.taskhero.userservice.dto.ParentSummaryDto;
 import ru.taskhero.userservice.entity.Child;
 import ru.taskhero.userservice.entity.Parent;
 
@@ -22,6 +23,11 @@ public interface ParentMapper {
     @Mapping(source = "surname", target = "surname")
     ParentResponseDto toParentResponseDto(Parent parent);
 
+    @Mapping(target = "userId", expression = "java(parent.getUser() != null ? parent.getUser().getId() : null)")
+    @Mapping(target = "email", expression = "java(parent.getUser() != null ? parent.getUser().getEmail() : null)")
+    @Mapping(source = "firstName", target = "firstName")
+    @Mapping(source = "surname", target = "surname")
+    ParentSummaryDto toSummary(Parent parent);
 
     default List<UUID> childrenToChildIds(List<Child> children) {
         if (children == null) {

@@ -60,7 +60,8 @@
                                         <li><a class="dropdown-item" href="#" onclick="openEditModal(this)"
                                                th:attr="data-id=${t.id}, data-title=${t.title}, data-description=${t.description},
                                                         data-category=${t.category}, data-expReward=${t.expReward},
-                                                        data-coinsReward=${t.coinsReward}, data-difficulty=${t.difficulty}">
+                                                        data-coinsReward=${t.coinsReward}, data-difficulty=${t.difficulty},
+                                                        data-autoSubmit=${t.autoSubmit}">
                                             <i class="bi bi-pencil me-2"></i>Редактировать</a></li>
                                         <li><hr class="dropdown-divider"></li>
                                         <li>
@@ -92,6 +93,9 @@
                                                         t.difficulty == 'NORMAL' ? 'bg-warning text-dark' :
                                                         t.difficulty == 'HARD' ? 'bg-danger' : 'bg-secondary'}"
                                       th:text="${t.difficulty}">EASY</span>
+                                <span class="badge bg-info text-dark" th:if="${t.autoSubmit}">
+                                    <i class="bi bi-lightning-fill me-1"></i>Авто
+                                </span>
                             </div>
 
                             <div class="d-flex gap-3">
@@ -172,6 +176,14 @@
                                 <option value="HARD">Сложная</option>
                             </select>
                         </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="autoSubmit" value="true" id="addAutoSubmit">
+                                <label class="form-check-label" for="addAutoSubmit">
+                                    <i class="bi bi-lightning-fill text-info me-1"></i>Автоподтверждение — коины начисляются сразу при назначении
+                                </label>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Sub-items -->
@@ -244,6 +256,14 @@
                                 <option value="HARD">Сложная</option>
                             </select>
                         </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="autoSubmit" value="true" id="editAutoSubmit">
+                                <label class="form-check-label" for="editAutoSubmit">
+                                    <i class="bi bi-lightning-fill text-info me-1"></i>Автоподтверждение — коины начисляются сразу при назначении
+                                </label>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Sub-items -->
@@ -290,6 +310,7 @@
         document.getElementById('editExpReward').value = el.getAttribute('data-expReward') || '0';
         document.getElementById('editCoinsReward').value = el.getAttribute('data-coinsReward') || '0';
         document.getElementById('editDifficulty').value = el.getAttribute('data-difficulty') || 'NORMAL';
+        document.getElementById('editAutoSubmit').checked = el.getAttribute('data-autoSubmit') === 'true';
         document.getElementById('subItemsContainer-edit').innerHTML = '';
         subItemCounters.edit = 0;
         new bootstrap.Modal(document.getElementById('editTemplateModal')).show();

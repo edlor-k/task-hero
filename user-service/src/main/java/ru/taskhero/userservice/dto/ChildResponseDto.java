@@ -42,5 +42,8 @@ public record ChildResponseDto(
         @Schema(description = "EXP следующего уровня (порог)")
         int nextLevelExp,
         @Schema(description = "Информация о родителе")
-        ParentResponseDto parent
+        ParentResponseDto parent,
+
+        @Schema(description = "Никнейм ребёнка (отображается вместо имени в публичном UI)")
+        String nickname
 ) { }

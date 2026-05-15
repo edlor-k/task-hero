@@ -87,6 +87,18 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
         assignment = assignmentRepository.save(assignment);
         log.info("Задание назначено с ID: {}", assignment.getId());
 
+        // Автоподтверждение: если шаблон помечен autoSubmit, сразу начислить награду
+        if (template.isAutoSubmit()) {
+            int expToGrant = template.getExpReward();
+            int coinsToGrant = template.getCoinsReward();
+            assignment.setStatus(TaskStatus.APPROVED);
+            assignment.setReviewedAt(Instant.now());
+            assignment.setExpEarned(expToGrant);
+            assignment.setCoinsEarned(coinsToGrant);
+            rewardService.grantReward(request.childId(), expToGrant, coinsToGrant, false);
+            log.info("Задание {} автоподтверждено: {} EXP, {} коинов", assignment.getId(), expToGrant, coinsToGrant);
+        }
+
         return assignmentMapper.toDto(assignment);
     }
 
@@ -336,6 +348,9 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
     public void deleteAssignment(UUID assignmentId, UUID parentId) {
         log.info("Удаление назначения {} родителем {}", assignmentId, parentId);
         TaskAssignment assignment = findAssignmentAndVerifyParent(assignmentId, parentId);
+        if (assignment.getStatus() == TaskStatus.APPROVED) {
+            throw new ValidationException("Нельзя удалить выполненное задание");
+        }
         assignmentRepository.delete(assignment);
         log.info("Назначение {} удалено", assignmentId);
     }

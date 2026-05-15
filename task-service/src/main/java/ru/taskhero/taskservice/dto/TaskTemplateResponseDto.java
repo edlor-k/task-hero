@@ -63,6 +63,9 @@ public record TaskTemplateResponseDto(
         @Schema(description = "Является ли библиотечным шаблоном")
         boolean libraryTemplate,
 
+        @Schema(description = "Автоматическое подтверждение задания при назначении")
+        boolean autoSubmit,
+
         @Schema(description = "ID исходного шаблона библиотеки")
         UUID sourceTemplateId,
 

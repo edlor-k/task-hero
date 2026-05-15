@@ -17,6 +17,7 @@ public record ShopItemDto(
         boolean active,
         List<UUID> childIds,
         Instant createdAt,
-        boolean marketplaceItem
+        boolean marketplaceItem,
+        String presetGroup
 ) {
 }

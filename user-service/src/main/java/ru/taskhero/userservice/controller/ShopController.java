@@ -212,4 +212,20 @@ public class ShopController {
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 shopService.copyFromMarketplace(id, parentId, childIds));
     }
+
+    /**
+     * Применить пресет наград: массово скопировать все товары группы в магазин родителя.
+     */
+    @PostMapping("/marketplace/preset/apply")
+    @PreAuthorize("hasRole('PARENT')")
+    @Operation(summary = "Применить пресет наград",
+            description = "Массово добавить все товары группы маркетплейса в свой магазин")
+    public ResponseEntity<Map<String, Object>> applyPreset(
+            @RequestParam String presetGroup,
+            @RequestParam UUID childId
+    ) {
+        UUID parentId = getParentId();
+        int count = shopService.applyPreset(parentId, childId, presetGroup);
+        return ResponseEntity.ok(Map.of("added", count, "presetGroup", presetGroup));
+    }
 }

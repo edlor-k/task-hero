@@ -162,6 +162,13 @@ public interface UserServiceClient {
     @PostMapping("/shop/marketplace/{id}/copy")
     ShopItemDto copyFromMarketplace(@PathVariable("id") UUID id, @RequestBody Map<String, Object> request);
 
+    /**
+     * Применить пресет наград (массовое добавление).
+     */
+    @PostMapping("/shop/marketplace/preset/apply")
+    Map<String, Object> applyPreset(@RequestParam("presetGroup") String presetGroup,
+                                    @RequestParam("childId") UUID childId);
+
     // ==================== Level Rewards ====================
 
     /**

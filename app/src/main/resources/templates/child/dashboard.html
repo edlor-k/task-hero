@@ -95,7 +95,7 @@
                                            childProfile.characterType == 'KNIGHT' ? '🛡️' : '🎮'}">🎮</div>
                         </div>
                         <div class="col">
-                            <h3 class="fw-bold mb-1" th:text="${childProfile.firstName}">Герой</h3>
+                            <h3 class="fw-bold mb-1" th:text="${childProfile.nickname ?: childProfile.firstName}">Герой</h3>
                             <span class="badge bg-white bg-opacity-25 fs-6"
                                   th:if="${childProfile.characterType}"
                                   th:text="${childProfile.characterType == 'WARRIOR' ? 'Воин' :

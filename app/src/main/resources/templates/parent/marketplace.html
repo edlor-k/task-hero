@@ -11,7 +11,7 @@
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
                     <h4 class="fw-bold mb-0"><i class="bi bi-shop-window me-2"></i>Маркетплейс наград</h4>
-                    <p class="text-muted mb-0 small">Готовые шаблоны наград — добавьте в свой магазин одним кликом</p>
+                    <p class="text-muted mb-0 small">Готовые шаблоны наград — добавьте в свой магазин одним кликом или применить весь пресет</p>
                 </div>
                 <div class="d-flex gap-2">
                     <a th:if="${onboarding}" th:href="@{/parent/onboarding}" class="btn btn-outline-secondary">
@@ -39,36 +39,48 @@
                 Сначала <a th:href="@{/parent/children}" class="alert-link">добавьте ребёнка</a>, чтобы добавлять награды в магазин.
             </div>
 
-            <!-- Marketplace items grid -->
+            <!-- Empty marketplace -->
             <div th:if="${marketplaceItems == null or marketplaceItems.isEmpty()}" class="text-center py-5">
                 <i class="bi bi-shop display-1 text-muted"></i>
                 <h4 class="mt-3 text-muted">Маркетплейс пуст</h4>
                 <p class="text-muted">Сейчас нет готовых наград в каталоге</p>
             </div>
 
-            <div th:unless="${marketplaceItems == null or marketplaceItems.isEmpty()}" class="row g-4">
-                <div th:each="item : ${marketplaceItems}" class="col-md-6 col-lg-4">
-                    <div class="card h-100 shadow-sm">
-                        <div class="card-body text-center">
-                            <div class="display-3 mb-2" th:if="${item.iconName}" th:text="${item.iconName}">🎁</div>
-                            <div class="display-3 mb-2" th:unless="${item.iconName}">🎁</div>
-                            <h5 class="fw-bold" th:text="${item.title}">Награда</h5>
-                            <p class="text-muted small" th:text="${item.description}" th:if="${item.description}">Описание</p>
-                            <div class="mb-3">
-                                <span class="badge bg-warning text-dark fs-6" th:text="${item.priceCoins} + ' коинов'">10 коинов</span>
-                            </div>
-                        </div>
-                        <div class="card-footer bg-transparent border-0 pb-3 px-3"
-                             th:if="${children != null and !children.isEmpty()}">
-                            <button type="button" class="btn btn-primary w-100"
-                                    data-bs-toggle="modal" data-bs-target="#addFromMarketplaceModal"
-                                    onclick="openMarketplaceModal(this)"
-                                    th:attr="data-id=${item.id}, data-title=${item.title}, data-icon=${item.iconName}, data-price=${item.priceCoins}">
-                                <i class="bi bi-plus-circle me-1"></i>Добавить в магазин
-                            </button>
+            <div th:unless="${marketplaceItems == null or marketplaceItems.isEmpty()}">
+
+                <!-- Items without a presetGroup (ungrouped) -->
+                <div th:if="${ungroupedItems != null and !ungroupedItems.isEmpty()}">
+                    <h5 class="fw-semibold mb-3"><i class="bi bi-grid me-2"></i>Прочее</h5>
+                    <div class="row g-4 mb-4">
+                        <div th:each="item : ${ungroupedItems}" class="col-md-6 col-lg-4">
+                            <div th:replace="~{this :: itemCard(${item})}"></div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Grouped items by presetGroup -->
+                <div th:each="entry : ${groupedItems}">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-semibold mb-0">
+                            <i class="bi bi-collection me-2"></i>
+                            <span th:text="${presetLabels[entry.key] ?: entry.key}">Группа</span>
+                        </h5>
+                        <button th:if="${children != null and !children.isEmpty()}"
+                                type="button" class="btn btn-sm btn-success"
+                                data-bs-toggle="modal" data-bs-target="#applyPresetModal"
+                                th:attr="data-preset=${entry.key}, data-preset-label=${presetLabels[entry.key] ?: entry.key}"
+                                onclick="openPresetModal(this)">
+                            <i class="bi bi-lightning-fill me-1"></i>Применить пресет
+                        </button>
+                    </div>
+                    <div class="row g-4 mb-4">
+                        <div th:each="item : ${entry.value}" class="col-md-6 col-lg-4">
+                            <div th:replace="~{this :: itemCard(${item})}"></div>
+                        </div>
+                    </div>
+                    <hr class="mb-4"/>
+                </div>
+
             </div>
 
         </main>
@@ -76,7 +88,37 @@
     </div>
 </div>
 
-<!-- Modal: Add from Marketplace -->
+<!-- Fragment: single item card -->
+<th:block th:fragment="itemCard(item)">
+    <div class="card h-100 shadow-sm">
+        <div class="card-body text-center">
+            <div class="mb-2">
+                <i class="bi fs-2"
+                   th:if="${item.iconName != null and item.iconName.startsWith('bi-')}"
+                   th:classappend="${item.iconName}"></i>
+                <span class="fs-2"
+                      th:unless="${item.iconName != null and item.iconName.startsWith('bi-')}"
+                      th:text="${item.iconName ?: '🎁'}">🎁</span>
+            </div>
+            <h5 class="fw-bold" th:text="${item.title}">Награда</h5>
+            <p class="text-muted small" th:text="${item.description}" th:if="${item.description}">Описание</p>
+            <div class="mb-3">
+                <span class="badge bg-warning text-dark fs-6" th:text="${item.priceCoins} + ' коинов'">10 коинов</span>
+            </div>
+        </div>
+        <div class="card-footer bg-transparent border-0 pb-3 px-3"
+             th:if="${children != null and !children.isEmpty()}">
+            <button type="button" class="btn btn-primary w-100"
+                    data-bs-toggle="modal" data-bs-target="#addFromMarketplaceModal"
+                    onclick="openMarketplaceModal(this)"
+                    th:attr="data-id=${item.id}, data-title=${item.title}, data-icon=${item.iconName}, data-price=${item.priceCoins}">
+                <i class="bi bi-plus-circle me-1"></i>Добавить в магазин
+            </button>
+        </div>
+    </div>
+</th:block>
+
+<!-- Modal: Add single item from Marketplace -->
 <div class="modal fade" id="addFromMarketplaceModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -102,7 +144,7 @@
                             <input class="form-check-input marketplace-child-check" type="checkbox"
                                    name="childIds" th:value="${child.id}" th:id="'mp-child-' + ${child.id}" checked>
                             <label class="form-check-label" th:for="'mp-child-' + ${child.id}"
-                                   th:text="${child.firstName + ' ' + child.surname}">Ребёнок</label>
+                                   th:text="${child.nickname ?: (child.firstName + ' ' + child.surname)}">Ребёнок</label>
                         </div>
                     </div>
 
@@ -115,6 +157,50 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-cart-plus me-1"></i>Добавить в магазин
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Apply preset -->
+<div class="modal fade" id="applyPresetModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="presetForm" method="post" th:action="@{/parent/shop/preset/apply}">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <input type="hidden" name="onboarding" th:value="${onboarding}"/>
+                <input type="hidden" id="presetGroupInput" name="presetGroup" value=""/>
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">
+                        <i class="bi bi-lightning-fill me-2 text-success"></i>Применить пресет
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Будут добавлены все награды из пресета <strong id="presetLabelDisplay"></strong> в ваш магазин.</p>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Для кого применить пресет?</label>
+                        <div th:each="child, childStat : ${children}" class="form-check">
+                            <input class="form-check-input preset-child-radio" type="radio"
+                                   name="childId" th:value="${child.id}" th:id="'preset-child-' + ${child.id}"
+                                   th:checked="${childStat.first}">
+                            <label class="form-check-label" th:for="'preset-child-' + ${child.id}"
+                                   th:text="${child.nickname ?: (child.firstName + ' ' + child.surname)}">Ребёнок</label>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info py-2 small">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Награды будут добавлены с ценами из маркетплейса. Вы сможете изменить цены позже.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-lightning-fill me-1"></i>Применить
                     </button>
                 </div>
             </form>
@@ -137,8 +223,17 @@
         const form = document.getElementById('marketplaceForm');
         form.action = '/parent/shop/marketplace/' + id + '/copy';
 
-        // Reset checkboxes
         document.querySelectorAll('.marketplace-child-check').forEach(cb => cb.checked = true);
+    }
+
+    function openPresetModal(el) {
+        const preset = el.getAttribute('data-preset');
+        const label = el.getAttribute('data-preset-label');
+        document.getElementById('presetGroupInput').value = preset;
+        document.getElementById('presetLabelDisplay').textContent = label;
+        // select first child radio by default
+        const firstRadio = document.querySelector('.preset-child-radio');
+        if (firstRadio) firstRadio.checked = true;
     }
 </script>
 </body>
