@@ -77,6 +77,11 @@ public interface TaskTemplateRepository extends JpaRepository<TaskTemplate, UUID
     List<TaskTemplate> findAllByLibraryTemplateTrueAndCategory(TaskCategory category);
 
     /**
+     * Найти шаблоны родителя по категории с пагинацией.
+     */
+    Page<TaskTemplate> findAllByParentIdAndCategory(UUID parentId, TaskCategory category, Pageable pageable);
+
+    /**
      * Найти все шаблоны родителя, скопированные из библиотеки.
      *
      * @param parentId ID родителя

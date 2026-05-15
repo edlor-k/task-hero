@@ -143,6 +143,15 @@ public class TaskTemplateServiceImpl implements TaskTemplateService {
 
     @Override
     @Transactional(readOnly = true)
+    @LogMethod("template-get-by-parent-and-category")
+    public Page<TaskTemplateResponseDto> getByParentAndCategory(UUID parentId, TaskCategory category, Pageable pageable) {
+        log.debug("Получение шаблонов родителя: {}, категория: {}", parentId, category);
+        return templateRepository.findAllByParentIdAndCategory(parentId, category, pageable)
+                .map(templateMapper::toDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     @LogMethod("template-get-active-by-parent")
     public List<TaskTemplateResponseDto> getActiveByParent(UUID parentId) {
         log.debug("Получение активных шаблонов родителя: {}", parentId);

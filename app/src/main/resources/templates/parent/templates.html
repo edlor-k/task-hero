@@ -30,6 +30,37 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
 
+            <!-- Category filter -->
+            <div class="d-flex flex-wrap gap-2 mb-4">
+                <a th:href="@{/parent/templates(onboarding=${onboarding})}"
+                   th:classappend="${selectedCategory == null} ? 'btn-primary' : 'btn-outline-secondary'"
+                   class="btn btn-sm">Все</a>
+                <a th:href="@{/parent/templates(onboarding=${onboarding}, category='STUDY')}"
+                   th:classappend="${selectedCategory == 'STUDY'} ? 'btn-primary' : 'btn-outline-secondary'"
+                   class="btn btn-sm"><i class="bi bi-book me-1"></i>Учёба</a>
+                <a th:href="@{/parent/templates(onboarding=${onboarding}, category='HOUSEHOLD')}"
+                   th:classappend="${selectedCategory == 'HOUSEHOLD'} ? 'btn-primary' : 'btn-outline-secondary'"
+                   class="btn btn-sm"><i class="bi bi-house me-1"></i>По дому</a>
+                <a th:href="@{/parent/templates(onboarding=${onboarding}, category='SPORTS')}"
+                   th:classappend="${selectedCategory == 'SPORTS'} ? 'btn-primary' : 'btn-outline-secondary'"
+                   class="btn btn-sm"><i class="bi bi-trophy me-1"></i>Спорт</a>
+                <a th:href="@{/parent/templates(onboarding=${onboarding}, category='CREATIVITY')}"
+                   th:classappend="${selectedCategory == 'CREATIVITY'} ? 'btn-primary' : 'btn-outline-secondary'"
+                   class="btn btn-sm"><i class="bi bi-palette me-1"></i>Творчество</a>
+                <a th:href="@{/parent/templates(onboarding=${onboarding}, category='HYGIENE')}"
+                   th:classappend="${selectedCategory == 'HYGIENE'} ? 'btn-primary' : 'btn-outline-secondary'"
+                   class="btn btn-sm"><i class="bi bi-droplet me-1"></i>Гигиена</a>
+                <a th:href="@{/parent/templates(onboarding=${onboarding}, category='SOCIAL')}"
+                   th:classappend="${selectedCategory == 'SOCIAL'} ? 'btn-primary' : 'btn-outline-secondary'"
+                   class="btn btn-sm"><i class="bi bi-chat me-1"></i>Общение</a>
+                <a th:href="@{/parent/templates(onboarding=${onboarding}, category='READING')}"
+                   th:classappend="${selectedCategory == 'READING'} ? 'btn-primary' : 'btn-outline-secondary'"
+                   class="btn btn-sm"><i class="bi bi-journal me-1"></i>Чтение</a>
+                <a th:href="@{/parent/templates(onboarding=${onboarding}, category='OTHER')}"
+                   th:classappend="${selectedCategory == 'OTHER'} ? 'btn-primary' : 'btn-outline-secondary'"
+                   class="btn btn-sm"><i class="bi bi-three-dots me-1"></i>Другое</a>
+            </div>
+
             <!-- Empty state -->
             <div th:if="${#lists.isEmpty(templates)}" class="text-center py-5">
                 <i class="bi bi-journal-plus display-1 text-muted"></i>

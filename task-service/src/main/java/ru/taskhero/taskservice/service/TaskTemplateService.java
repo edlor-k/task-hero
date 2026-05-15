@@ -61,6 +61,11 @@ public interface TaskTemplateService {
     Page<TaskTemplateResponseDto> getByParent(UUID parentId, Pageable pageable);
 
     /**
+     * Получить шаблоны родителя по категории с пагинацией.
+     */
+    Page<TaskTemplateResponseDto> getByParentAndCategory(UUID parentId, TaskCategory category, Pageable pageable);
+
+    /**
      * Получить все активные шаблоны родителя.
      *
      * @param parentId ID родителя

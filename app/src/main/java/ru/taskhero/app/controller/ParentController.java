@@ -250,6 +250,7 @@ public class ParentController {
             @RequestParam String firstName,
             @RequestParam String surname,
             @RequestParam(required = false) String nickname,
+            @RequestParam(required = false) List<String> presetGroups,
             @RequestParam(defaultValue = "false") boolean onboarding,
             RedirectAttributes redirectAttributes
     ) {
@@ -258,8 +259,24 @@ public class ParentController {
             CreateChildRequest request = new CreateChildRequest(firstName, surname, "NORMAL", trimmedNickname);
             ChildDto child = userServiceClient.createChild(request);
 
-            redirectAttributes.addFlashAttribute("success",
-                    "Ребёнок добавлен! Токен для входа: " + child.loginToken());
+            int presetsApplied = 0;
+            if (presetGroups != null && !presetGroups.isEmpty()) {
+                for (String presetGroup : presetGroups) {
+                    try {
+                        Map<String, Object> result = userServiceClient.applyPreset(presetGroup, child.id());
+                        Object added = result.get("added");
+                        if (added instanceof Number n) presetsApplied += n.intValue();
+                    } catch (Exception ex) {
+                        log.warn("Failed to apply preset {} for child {}: {}", presetGroup, child.id(), ex.getMessage());
+                    }
+                }
+            }
+
+            String msg = "Ребёнок добавлен! Токен для входа: " + child.loginToken();
+            if (presetsApplied > 0) {
+                msg += ". Добавлено " + presetsApplied + " наград из пресетов.";
+            }
+            redirectAttributes.addFlashAttribute("success", msg);
 
         } catch (Exception e) {
             log.error("Error adding child: {}", e.getMessage());
@@ -299,11 +316,16 @@ public class ParentController {
      * Список шаблонов заданий.
      */
     @GetMapping("/templates")
-    public String templates(@RequestParam(required = false) boolean onboarding, Model model) {
+    public String templates(
+            @RequestParam(required = false) boolean onboarding,
+            @RequestParam(required = false) String category,
+            Model model
+    ) {
         try {
-            Map<String, Object> response = taskServiceClient.getTemplates(0, 50);
+            Map<String, Object> response = taskServiceClient.getTemplates(0, 50, category);
             model.addAttribute("templates", response.get("content"));
             model.addAttribute("onboarding", onboarding);
+            model.addAttribute("selectedCategory", category);
         } catch (Exception e) {
             log.error("Error loading templates: {}", e.getMessage());
             model.addAttribute("error", "Ошибка загрузки шаблонов");

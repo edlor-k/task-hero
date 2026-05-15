@@ -75,37 +75,98 @@
     </div>
 </div>
 
-<!-- Modal: Add child -->
+<!-- Modal: Add child (2-step wizard) -->
 <div class="modal fade" id="addChildModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form th:action="@{/parent/children/add}" method="post">
+            <form th:action="@{/parent/children/add}" method="post" id="addChildForm">
                 <input type="hidden" name="onboarding" th:value="${onboarding}" />
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold"><i class="bi bi-person-plus me-2"></i>Добавить ребёнка</h5>
+                    <h5 class="modal-title fw-bold">
+                        <i class="bi bi-person-plus me-2"></i>
+                        <span id="addChildModalTitle">Добавить ребёнка</span>
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="firstName" class="form-label fw-semibold">Имя</label>
-                        <input type="text" class="form-control" id="firstName" name="firstName" required>
+
+                    <!-- Step 1: Basic info -->
+                    <div id="addChildStep1">
+                        <div class="mb-3">
+                            <label for="firstName" class="form-label fw-semibold">Имя</label>
+                            <input type="text" class="form-control" id="firstName" name="firstName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="surname" class="form-label fw-semibold">Фамилия</label>
+                            <input type="text" class="form-control" id="surname" name="surname" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="nickname" class="form-label fw-semibold">Никнейм <span class="text-muted fw-normal">(необязательно)</span></label>
+                            <input type="text" class="form-control" id="nickname" name="nickname" maxlength="64"
+                                   placeholder="Отображается вместо настоящего имени">
+                        </div>
+                        <div class="alert alert-info py-2">
+                            <i class="bi bi-info-circle me-2"></i>После добавления будет сгенерирован уникальный токен для входа.
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="surname" class="form-label fw-semibold">Фамилия</label>
-                        <input type="text" class="form-control" id="surname" name="surname" required>
+
+                    <!-- Step 2: Preset selection -->
+                    <div id="addChildStep2" style="display:none">
+                        <p class="text-muted mb-3">Выберите пресеты наград, которые автоматически появятся в магазине ребёнка. Можно пропустить — пресеты доступны в маркетплейсе позже.</p>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <label class="d-flex align-items-center gap-2 p-2 border rounded cursor-pointer">
+                                    <input class="form-check-input m-0" type="checkbox" name="presetGroups" value="STUDY">
+                                    <span>📚 Учёба</span>
+                                </label>
+                            </div>
+                            <div class="col-6">
+                                <label class="d-flex align-items-center gap-2 p-2 border rounded cursor-pointer">
+                                    <input class="form-check-input m-0" type="checkbox" name="presetGroups" value="CLEAN">
+                                    <span>🧹 Уборка</span>
+                                </label>
+                            </div>
+                            <div class="col-6">
+                                <label class="d-flex align-items-center gap-2 p-2 border rounded cursor-pointer">
+                                    <input class="form-check-input m-0" type="checkbox" name="presetGroups" value="SPORTS">
+                                    <span>⚽ Спорт</span>
+                                </label>
+                            </div>
+                            <div class="col-6">
+                                <label class="d-flex align-items-center gap-2 p-2 border rounded cursor-pointer">
+                                    <input class="form-check-input m-0" type="checkbox" name="presetGroups" value="HOBBY">
+                                    <span>🎨 Хобби</span>
+                                </label>
+                            </div>
+                            <div class="col-6">
+                                <label class="d-flex align-items-center gap-2 p-2 border rounded cursor-pointer">
+                                    <input class="form-check-input m-0" type="checkbox" name="presetGroups" value="ROUTINE">
+                                    <span>🌙 Режим дня</span>
+                                </label>
+                            </div>
+                            <div class="col-6">
+                                <label class="d-flex align-items-center gap-2 p-2 border rounded cursor-pointer">
+                                    <input class="form-check-input m-0" type="checkbox" name="presetGroups" value="GAMER">
+                                    <span>🎮 Геймер</span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="nickname" class="form-label fw-semibold">Никнейм <span class="text-muted fw-normal">(необязательно)</span></label>
-                        <input type="text" class="form-control" id="nickname" name="nickname" maxlength="64"
-                               placeholder="Отображается вместо настоящего имени">
-                    </div>
-                    <div class="alert alert-info py-2">
-                        <i class="bi bi-info-circle me-2"></i>После добавления будет сгенерирован уникальный токен для входа.
-                    </div>
+
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer" id="addChildFooter1">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                    <button type="submit" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Добавить</button>
+                    <button type="button" class="btn btn-primary" onclick="addChildNextStep()">
+                        Далее <i class="bi bi-arrow-right ms-1"></i>
+                    </button>
+                </div>
+                <div class="modal-footer" id="addChildFooter2" style="display:none">
+                    <button type="button" class="btn btn-outline-secondary" onclick="addChildPrevStep()">
+                        <i class="bi bi-arrow-left me-1"></i>Назад
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-plus-lg me-1"></i>Создать ребёнка
+                    </button>
                 </div>
             </form>
         </div>
@@ -113,5 +174,40 @@
 </div>
 
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+<script>
+    function addChildNextStep() {
+        const form = document.getElementById('addChildForm');
+        const firstName = document.getElementById('firstName');
+        const surname = document.getElementById('surname');
+        if (!firstName.value.trim() || !surname.value.trim()) {
+            firstName.reportValidity();
+            surname.reportValidity();
+            return;
+        }
+        document.getElementById('addChildStep1').style.display = 'none';
+        document.getElementById('addChildStep2').style.display = '';
+        document.getElementById('addChildFooter1').style.display = 'none';
+        document.getElementById('addChildFooter2').style.display = '';
+        document.getElementById('addChildModalTitle').textContent = 'Выберите пресеты наград';
+    }
+
+    function addChildPrevStep() {
+        document.getElementById('addChildStep2').style.display = 'none';
+        document.getElementById('addChildStep1').style.display = '';
+        document.getElementById('addChildFooter2').style.display = 'none';
+        document.getElementById('addChildFooter1').style.display = '';
+        document.getElementById('addChildModalTitle').textContent = 'Добавить ребёнка';
+    }
+
+    // Reset wizard when modal is closed/reopened
+    document.getElementById('addChildModal').addEventListener('hidden.bs.modal', function() {
+        document.getElementById('addChildStep1').style.display = '';
+        document.getElementById('addChildStep2').style.display = 'none';
+        document.getElementById('addChildFooter1').style.display = '';
+        document.getElementById('addChildFooter2').style.display = 'none';
+        document.getElementById('addChildModalTitle').textContent = 'Добавить ребёнка';
+        document.getElementById('addChildForm').reset();
+    });
+</script>
 </body>
 </html>

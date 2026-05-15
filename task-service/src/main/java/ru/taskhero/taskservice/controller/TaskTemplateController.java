@@ -117,12 +117,15 @@ public class TaskTemplateController {
             )
     })
     public ResponseEntity<Page<TaskTemplateResponseDto>> getAll(
-            @PageableDefault(size = 20, sort = "createdAt") Pageable pageable
+            @PageableDefault(size = 20, sort = "createdAt") Pageable pageable,
+            @RequestParam(required = false) TaskCategory category
     ) {
         UUID parentId = SecurityUtils.getCurrentUserId();
-        log.info("Запрос списка шаблонов родителя: {}", parentId);
+        log.info("Запрос списка шаблонов родителя: {}, категория: {}", parentId, category);
 
-        Page<TaskTemplateResponseDto> response = templateService.getByParent(parentId, pageable);
+        Page<TaskTemplateResponseDto> response = category != null
+                ? templateService.getByParentAndCategory(parentId, category, pageable)
+                : templateService.getByParent(parentId, pageable);
         return ResponseEntity.ok(response);
     }
 
