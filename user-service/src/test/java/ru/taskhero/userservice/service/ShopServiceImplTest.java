@@ -31,6 +31,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -251,16 +252,19 @@ class ShopServiceImplTest {
     }
 
     @Test
-    @DisplayName("Должен удалить товар из магазина")
+    @DisplayName("Должен архивировать товар из магазина (soft-delete)")
     void shouldDeleteShopItem() {
         // Given
         when(shopItemRepository.findById(itemId)).thenReturn(Optional.of(shopItem));
+        when(shopItemRepository.save(shopItem)).thenReturn(shopItem);
 
         // When
         shopService.deleteItem(itemId, parentId);
 
         // Then
-        verify(shopItemRepository).delete(shopItem);
+        assertThat(shopItem.isActive()).isFalse();
+        verify(shopItemRepository).save(shopItem);
+        verify(shopItemRepository, never()).delete(shopItem);
     }
 
     @Test
