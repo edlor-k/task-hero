@@ -89,7 +89,7 @@ class TaskAssignmentServiceImplTest {
         TaskTemplateResponseDto templateDto = new TaskTemplateResponseDto(
                 templateId, parentId, "Убраться в комнате", null,
                 25, 10, false, null, null, null, null,
-                null, null, null, true, false, null, null, Instant.now(), null
+                null, null, null, true, false, false, null, null, Instant.now(), null
         );
 
         responseDto = new TaskAssignmentResponseDto(

@@ -95,7 +95,7 @@ class ChildServiceImplTest {
                 childId, "Алиса", "Петрова",
                 0, 0, 1, null, "TOKEN-ABC",
                 DifficultyTrajectory.NORMAL, null, false, null,
-                50, 0, 50, null
+                50, 0, 50, null, null
         );
     }
 
@@ -103,7 +103,7 @@ class ChildServiceImplTest {
     @DisplayName("Должен создать ребёнка для родителя")
     void shouldCreateChildForParent() {
         // Given
-        ChildCreateRequestDto request = new ChildCreateRequestDto("Алиса", "Петрова", DifficultyTrajectory.NORMAL);
+        ChildCreateRequestDto request = new ChildCreateRequestDto("Алиса", "Петрова", DifficultyTrajectory.NORMAL, null);
         when(parentRepository.findById(parentId)).thenReturn(Optional.of(parent));
         when(childRepository.findByLoginToken(anyString())).thenReturn(Optional.empty());
         when(childRepository.save(any(Child.class))).thenReturn(child);
@@ -122,7 +122,7 @@ class ChildServiceImplTest {
     @DisplayName("Должен выбросить исключение при создании ребёнка несуществующим родителем")
     void shouldThrowExceptionWhenParentNotFound() {
         // Given
-        ChildCreateRequestDto request = new ChildCreateRequestDto("Алиса", "Петрова", null);
+        ChildCreateRequestDto request = new ChildCreateRequestDto("Алиса", "Петрова", null, null);
         when(parentRepository.findById(parentId)).thenReturn(Optional.empty());
 
         // When & Then
@@ -182,7 +182,7 @@ class ChildServiceImplTest {
                 new ChildResponseDto(childId, "Алиса", "Петрова",
                         25, 10, 1, null, "TOKEN-ABC",
                         DifficultyTrajectory.NORMAL, null, false, null,
-                        25, 25, 50, null)
+                        25, 25, 50, null, null)
         );
 
         // When

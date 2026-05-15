@@ -95,7 +95,7 @@ class ChildControllerIT extends AbstractIntegrationTest {
     @DisplayName("Должен создать ребёнка для авторизованного родителя")
     void shouldCreateChildForParent() throws Exception {
         // Given
-        ChildCreateRequestDto request = new ChildCreateRequestDto("Алиса", "Петрова", DifficultyTrajectory.NORMAL);
+        ChildCreateRequestDto request = new ChildCreateRequestDto("Алиса", "Петрова", DifficultyTrajectory.NORMAL, null);
 
         // When & Then
         mockMvc.perform(post("/children")
@@ -113,7 +113,7 @@ class ChildControllerIT extends AbstractIntegrationTest {
     @DisplayName("Должен вернуть 403 при создании ребёнка без роли PARENT")
     void shouldReturn403ForChildRole() throws Exception {
         // Given
-        ChildCreateRequestDto request = new ChildCreateRequestDto("Боб", "Иванов", null);
+        ChildCreateRequestDto request = new ChildCreateRequestDto("Боб", "Иванов", null, null);
 
         // When & Then
         mockMvc.perform(post("/children")
