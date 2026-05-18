@@ -225,4 +225,10 @@ public interface UserServiceClient {
      */
     @PostMapping("/level-rewards/{id}/seen")
     void markRewardSeen(@PathVariable("id") UUID id);
+
+    /**
+     * Ребёнок меняет свой никнейм (только если разблокировано).
+     */
+    @PostMapping("/children/me/nickname")
+    ChildDto updateMyNickname(@RequestBody Map<String, String> request);
 }

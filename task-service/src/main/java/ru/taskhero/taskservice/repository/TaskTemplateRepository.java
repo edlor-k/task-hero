@@ -88,4 +88,14 @@ public interface TaskTemplateRepository extends JpaRepository<TaskTemplate, UUID
      * @return список шаблонов с заполненным sourceTemplateId
      */
     List<TaskTemplate> findAllByParentIdAndSourceTemplateIdIsNotNull(UUID parentId);
+
+    /**
+     * Найти библиотечные шаблоны по группе пресета.
+     */
+    List<TaskTemplate> findAllByLibraryTemplateTrueAndPresetGroup(String presetGroup);
+
+    /**
+     * Найти системный шаблон вводного задания.
+     */
+    java.util.Optional<TaskTemplate> findByParentIdAndTitleAndLibraryTemplateFalse(UUID parentId, String title);
 }

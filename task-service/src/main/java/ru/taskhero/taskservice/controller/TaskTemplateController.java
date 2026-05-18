@@ -311,4 +311,18 @@ public class TaskTemplateController {
         Set<UUID> copiedIds = templateService.getCopiedLibraryTemplateIds(parentId);
         return ResponseEntity.ok(copiedIds);
     }
+
+    /**
+     * Применить пресет заданий (скопировать библиотечные шаблоны группы себе).
+     */
+    @PostMapping("/library/preset/{group}/apply")
+    @PreAuthorize("hasRole('PARENT')")
+    @Operation(summary = "Применить пресет заданий",
+            description = "Копирует все библиотечные шаблоны из группы пресета в список шаблонов родителя")
+    public ResponseEntity<java.util.Map<String, Object>> applyTaskPreset(@PathVariable("group") String group) {
+        UUID parentId = SecurityUtils.getCurrentUserId();
+        log.info("Применение пресета заданий '{}' для родителя: {}", group, parentId);
+        List<TaskTemplateResponseDto> copied = templateService.applyTaskPreset(group, parentId);
+        return ResponseEntity.ok(java.util.Map.of("added", copied.size(), "templates", copied));
+    }
 }

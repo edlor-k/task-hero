@@ -155,6 +155,13 @@ public class TaskTemplate extends BaseEntity {
     private UUID sourceTemplateId;
 
     /**
+     * Группа пресета (STUDY, SPORTS, CLEAN, ROUTINE, HOBBY, GAMER).
+     * Используется для группировки библиотечных шаблонов при применении пресета.
+     */
+    @Column(name = "preset_group", length = 64)
+    private String presetGroup;
+
+    /**
      * Назначения заданий на основе этого шаблона.
      */
     @OneToMany(mappedBy = "template")

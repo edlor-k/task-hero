@@ -46,6 +46,7 @@ public interface TaskTemplateMapper {
     @Mapping(target = "libraryTemplate", constant = "false")
     @Mapping(target = "sourceTemplateId", ignore = true)
     @Mapping(target = "difficulty", defaultExpression = "java(ru.taskhero.common.model.enums.TaskDifficulty.NORMAL)")
+    @Mapping(target = "presetGroup", source = "presetGroup")
     TaskTemplate toEntity(TaskTemplateCreateRequest request);
 
     /**

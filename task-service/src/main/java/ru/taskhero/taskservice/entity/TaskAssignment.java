@@ -109,4 +109,11 @@ public class TaskAssignment extends BaseEntity {
     @Builder.Default
     @Column(name = "reassigned", nullable = false)
     private boolean reassigned = false;
+
+    /**
+     * Вводное задание — автоматически одобряется при отправке и разблокирует никнейм.
+     */
+    @Builder.Default
+    @Column(name = "intro_task", nullable = false)
+    private boolean introTask = false;
 }

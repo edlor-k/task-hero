@@ -22,6 +22,8 @@ import ru.taskhero.taskservice.repository.TaskAssignmentRepository;
 import ru.taskhero.taskservice.repository.TaskTemplateRepository;
 import ru.taskhero.taskservice.service.RewardService;
 import ru.taskhero.taskservice.service.TaskAssignmentService;
+import ru.taskhero.taskservice.service.TaskTemplateService;
+import ru.taskhero.taskservice.client.UserServiceClient;
 
 import java.time.Instant;
 import java.util.List;
@@ -39,6 +41,8 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
     private final TaskTemplateRepository templateRepository;
     private final TaskAssignmentMapper assignmentMapper;
     private final RewardService rewardService;
+    private final TaskTemplateService templateService;
+    private final UserServiceClient userServiceClient;
 
     @Override
     @Transactional
@@ -198,6 +202,27 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
         assignment.setStatus(TaskStatus.SUBMITTED);
         assignment.setChildComment(request.comment());
         assignment.setSubmittedAt(Instant.now());
+
+        // Вводное задание: авто-одобряем и разблокируем никнейм
+        if (assignment.isIntroTask()) {
+            TaskTemplate template = assignment.getTemplate();
+            int expToGrant = template.getExpReward();
+            int coinsToGrant = template.getCoinsReward();
+            assignment.setStatus(TaskStatus.APPROVED);
+            assignment.setReviewedAt(Instant.now());
+            assignment.setExpEarned(expToGrant);
+            assignment.setCoinsEarned(coinsToGrant);
+            assignment = assignmentRepository.save(assignment);
+            rewardService.grantReward(childId, expToGrant, coinsToGrant, false);
+            try {
+                userServiceClient.unlockNickname(childId);
+                log.info("Никнейм ребёнка {} разблокирован после вводного задания", childId);
+            } catch (Exception e) {
+                log.error("Ошибка разблокировки никнейма для ребёнка {}: {}", childId, e.getMessage());
+            }
+            log.info("Вводное задание {} авто-одобрено: {} EXP, {} коинов", assignmentId, expToGrant, coinsToGrant);
+            return assignmentMapper.toDto(assignment);
+        }
 
         assignment = assignmentRepository.save(assignment);
         log.info("Задание {} сдано на проверку", assignmentId);
@@ -371,5 +396,37 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
         return assignmentRepository.findAllByChildId(childId).stream()
                 .map(assignmentMapper::toDto)
                 .toList();
+    }
+
+    @Override
+    @Transactional
+    @LogMethod("assignment-create-intro")
+    public TaskAssignmentResponseDto createIntroTask(UUID childId) {
+        log.info("Создание вводного задания для ребёнка: {}", childId);
+
+        // Проверяем, нет ли уже вводного задания
+        boolean alreadyExists = assignmentRepository.findAllByChildId(childId).stream()
+                .anyMatch(TaskAssignment::isIntroTask);
+        if (alreadyExists) {
+            log.info("Вводное задание для ребёнка {} уже существует", childId);
+            return assignmentRepository.findAllByChildId(childId).stream()
+                    .filter(TaskAssignment::isIntroTask)
+                    .map(assignmentMapper::toDto)
+                    .findFirst()
+                    .orElseThrow();
+        }
+
+        TaskTemplate introTemplate = templateService.getOrCreateIntroTemplate();
+
+        TaskAssignment assignment = TaskAssignment.builder()
+                .template(introTemplate)
+                .childId(childId)
+                .status(TaskStatus.CREATED)
+                .introTask(true)
+                .build();
+
+        assignment = assignmentRepository.save(assignment);
+        log.info("Вводное задание {} создано для ребёнка {}", assignment.getId(), childId);
+        return assignmentMapper.toDto(assignment);
     }
 }

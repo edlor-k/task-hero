@@ -19,6 +19,7 @@ public record TaskAssignmentDto(
         Integer coinsEarned,
         Boolean important,
         Boolean reassigned,
+        Boolean introTask,
         TaskTemplateDto template,
         Instant createdAt,
         Instant updatedAt

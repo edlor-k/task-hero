@@ -443,6 +443,7 @@ public class AdminWebController {
             @RequestParam(required = false) Integer coinsReward,
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String difficulty,
+            @RequestParam(required = false) String presetGroup,
             RedirectAttributes redirectAttributes
     ) {
         try {
@@ -453,6 +454,7 @@ public class AdminWebController {
             if (coinsReward != null) req.put("coinsReward", coinsReward);
             if (category != null && !category.isBlank()) req.put("category", category);
             if (difficulty != null && !difficulty.isBlank()) req.put("difficulty", difficulty);
+            if (presetGroup != null && !presetGroup.isBlank()) req.put("presetGroup", presetGroup);
             taskServiceClient.createLibraryTemplate(req);
             redirectAttributes.addFlashAttribute("success", "Шаблон создан");
         } catch (Exception e) {
@@ -472,6 +474,7 @@ public class AdminWebController {
             @RequestParam(required = false) Integer coinsReward,
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String difficulty,
+            @RequestParam(required = false) String presetGroup,
             RedirectAttributes redirectAttributes
     ) {
         try {
@@ -482,6 +485,7 @@ public class AdminWebController {
             if (coinsReward != null) req.put("coinsReward", coinsReward);
             if (category != null && !category.isBlank()) req.put("category", category);
             if (difficulty != null && !difficulty.isBlank()) req.put("difficulty", difficulty);
+            if (presetGroup != null && !presetGroup.isBlank()) req.put("presetGroup", presetGroup);
             taskServiceClient.updateLibraryTemplate(id, req);
             redirectAttributes.addFlashAttribute("success", "Шаблон обновлён");
         } catch (Exception e) {

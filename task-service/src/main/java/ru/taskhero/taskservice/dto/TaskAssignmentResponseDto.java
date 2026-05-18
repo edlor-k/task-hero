@@ -48,6 +48,9 @@ public record TaskAssignmentResponseDto(
         @Schema(description = "Задание было переназначено после просрочки")
         Boolean reassigned,
 
+        @Schema(description = "Вводное задание (автоматически одобряется и разблокирует никнейм)")
+        Boolean introTask,
+
         @Schema(description = "Информация о шаблоне задания")
         TaskTemplateResponseDto template,
 

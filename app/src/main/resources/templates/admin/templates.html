@@ -165,6 +165,18 @@
                                     <input type="number" name="coinsReward" class="form-control" min="0" value="5"/>
                                 </div>
                             </div>
+                            <div class="mb-3">
+                                <label class="form-label">Группа пресета</label>
+                                <select name="presetGroup" class="form-select">
+                                    <option value="">— не входит в пресет —</option>
+                                    <option value="STUDY">📚 Учёба</option>
+                                    <option value="CLEAN">🧹 Уборка</option>
+                                    <option value="SPORTS">⚽ Спорт</option>
+                                    <option value="HOBBY">🎨 Хобби</option>
+                                    <option value="ROUTINE">🌙 Режим дня</option>
+                                    <option value="GAMER">🎮 Геймер</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
@@ -228,6 +240,18 @@
                                     <input type="number" name="coinsReward" class="form-control" min="0"
                                            th:value="${t['coinsReward']}"/>
                                 </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Группа пресета</label>
+                                <select name="presetGroup" class="form-select">
+                                    <option value="">— не входит в пресет —</option>
+                                    <option value="STUDY" th:selected="${t['presetGroup'] == 'STUDY'}">📚 Учёба</option>
+                                    <option value="CLEAN" th:selected="${t['presetGroup'] == 'CLEAN'}">🧹 Уборка</option>
+                                    <option value="SPORTS" th:selected="${t['presetGroup'] == 'SPORTS'}">⚽ Спорт</option>
+                                    <option value="HOBBY" th:selected="${t['presetGroup'] == 'HOBBY'}">🎨 Хобби</option>
+                                    <option value="ROUTINE" th:selected="${t['presetGroup'] == 'ROUTINE'}">🌙 Режим дня</option>
+                                    <option value="GAMER" th:selected="${t['presetGroup'] == 'GAMER'}">🎮 Геймер</option>
+                                </select>
                             </div>
                         </div>
                         <div class="modal-footer">

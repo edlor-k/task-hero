@@ -262,12 +262,19 @@ public class ParentController {
             int presetsApplied = 0;
             if (presetGroups != null && !presetGroups.isEmpty()) {
                 for (String presetGroup : presetGroups) {
+                    // Применяем пресет наград (shop items)
                     try {
                         Map<String, Object> result = userServiceClient.applyPreset(presetGroup, child.id());
                         Object added = result.get("added");
                         if (added instanceof Number n) presetsApplied += n.intValue();
                     } catch (Exception ex) {
-                        log.warn("Failed to apply preset {} for child {}: {}", presetGroup, child.id(), ex.getMessage());
+                        log.warn("Failed to apply reward preset {} for child {}: {}", presetGroup, child.id(), ex.getMessage());
+                    }
+                    // Применяем пресет заданий (task templates)
+                    try {
+                        taskServiceClient.applyTaskPreset(presetGroup);
+                    } catch (Exception ex) {
+                        log.warn("Failed to apply task preset {} for parent: {}", presetGroup, ex.getMessage());
                     }
                 }
             }

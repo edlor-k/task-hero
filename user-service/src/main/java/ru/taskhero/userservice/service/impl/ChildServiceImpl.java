@@ -453,4 +453,34 @@ public class ChildServiceImpl implements ChildService {
         return childRepository.searchByName(query, pageable)
                 .map(this::toChildResponseDto);
     }
+
+    @Override
+    @Transactional
+    @LogMethod("child-unlock-nickname")
+    public void unlockNickname(UUID childId) {
+        log.info("Разблокировка никнейма ребёнка: {}", childId);
+        Child child = childRepository.findById(childId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ребёнок с ID " + childId + " не найден"));
+        if (!child.isNicknameUnlocked()) {
+            child.setNicknameUnlocked(true);
+            childRepository.save(child);
+            log.info("Никнейм ребёнка {} разблокирован", childId);
+        }
+    }
+
+    @Override
+    @Transactional
+    @LogMethod("child-update-nickname")
+    public ChildResponseDto updateNickname(UUID childId, String nickname) {
+        log.info("Обновление никнейма ребёнка: {}", childId);
+        Child child = childRepository.findById(childId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ребёнок с ID " + childId + " не найден"));
+        if (!child.isNicknameUnlocked()) {
+            throw new ValidationException("Изменение никнейма ещё не разблокировано. Выполните первое задание!");
+        }
+        child.setNickname(nickname == null || nickname.isBlank() ? null : nickname.trim());
+        child = childRepository.save(child);
+        log.info("Никнейм ребёнка {} обновлён", childId);
+        return toChildResponseDto(child);
+    }
 }

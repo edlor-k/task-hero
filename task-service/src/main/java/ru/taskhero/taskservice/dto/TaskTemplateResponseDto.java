@@ -72,6 +72,9 @@ public record TaskTemplateResponseDto(
         @Schema(description = "Подпункты задания")
         List<TaskSubItemDto> subItems,
 
+        @Schema(description = "Группа пресета (STUDY, SPORTS, CLEAN, ROUTINE, HOBBY, GAMER)")
+        String presetGroup,
+
         @Schema(description = "Дата создания")
         Instant createdAt,
 

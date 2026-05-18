@@ -214,4 +214,16 @@ public interface TaskServiceClient {
     /** Получить назначения ребёнка (админ). */
     @GetMapping("/admin/templates/child/{childId}/assignments")
     List<TaskAssignmentDto> getChildAssignments(@PathVariable("childId") UUID childId);
+
+    /** Создать вводное задание для ребёнка. */
+    @PostMapping("/assignments/intro/{childId}")
+    TaskAssignmentDto createIntroTask(@PathVariable("childId") UUID childId);
+
+    /** Получить группы пресетов из библиотеки заданий. */
+    @GetMapping("/admin/templates/library/preset-groups")
+    List<String> getTaskPresetGroups();
+
+    /** Применить пресет заданий (для родителя, JWT из контекста). */
+    @PostMapping("/templates/library/preset/{group}/apply")
+    Map<String, Object> applyTaskPreset(@PathVariable("group") String group);
 }

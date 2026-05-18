@@ -86,4 +86,14 @@ public interface ChildService {
      * Поиск детей по имени или фамилии.
      */
     Page<ChildResponseDto> searchChildren(String query, Pageable pageable);
+
+    /**
+     * Разблокировать изменение никнейма ребёнка (вызывается после выполнения первого задания).
+     */
+    void unlockNickname(UUID childId);
+
+    /**
+     * Обновить никнейм ребёнка (доступно только после разблокировки).
+     */
+    ChildResponseDto updateNickname(UUID childId, String nickname);
 }

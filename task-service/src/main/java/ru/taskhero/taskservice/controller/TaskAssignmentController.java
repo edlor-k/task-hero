@@ -446,4 +446,16 @@ public class TaskAssignmentController {
         assignmentService.deleteAssignment(id, parentId);
         return ResponseEntity.noContent().build();
     }
+
+    /**
+     * Создать вводное задание для ребёнка (вызывается при первом входе после выбора персонажа).
+     */
+    @PostMapping("/intro/{childId}")
+    @PreAuthorize("hasAnyRole('CHILD', 'PARENT', 'ADMIN')")
+    @Operation(summary = "Создать вводное задание", description = "Создаёт первое задание для ребёнка при первом входе")
+    public ResponseEntity<TaskAssignmentResponseDto> createIntroTask(@PathVariable UUID childId) {
+        log.info("Запрос на создание вводного задания для ребёнка: {}", childId);
+        TaskAssignmentResponseDto response = assignmentService.createIntroTask(childId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
 }

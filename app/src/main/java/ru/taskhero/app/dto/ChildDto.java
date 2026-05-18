@@ -24,6 +24,7 @@ public record ChildDto(
         int nextLevelExp,
         Instant createdAt,
         Instant updatedAt,
-        String nickname
+        String nickname,
+        boolean nicknameUnlocked
 ) {
 }

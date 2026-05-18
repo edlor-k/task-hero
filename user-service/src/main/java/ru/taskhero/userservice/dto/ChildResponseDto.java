@@ -45,5 +45,8 @@ public record ChildResponseDto(
         ParentResponseDto parent,
 
         @Schema(description = "Никнейм ребёнка (отображается вместо имени в публичном UI)")
-        String nickname
+        String nickname,
+
+        @Schema(description = "Разблокировано ли изменение никнейма")
+        boolean nicknameUnlocked
 ) { }

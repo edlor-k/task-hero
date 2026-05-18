@@ -30,6 +30,7 @@ public interface ChildMapper {
     @Mapping(target = "firstName", source = "entity.firstName")
     @Mapping(target = "surname", source = "entity.surname")
     @Mapping(target = "nickname", source = "entity.nickname")
+    @Mapping(target = "nicknameUnlocked", source = "entity.nicknameUnlocked")
     @Mapping(target = "expToNextLevel", source = "expToNextLevel")
     @Mapping(target = "currentLevelExp", source = "currentLevelExp")
     @Mapping(target = "nextLevelExp", source = "nextLevelExp")

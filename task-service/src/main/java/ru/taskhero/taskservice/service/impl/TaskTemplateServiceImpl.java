@@ -353,4 +353,68 @@ public class TaskTemplateServiceImpl implements TaskTemplateService {
                 .map(templateMapper::toDto)
                 .toList();
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<String> getLibraryPresetGroups() {
+        log.debug("Получение групп пресетов из библиотеки");
+        return templateRepository.findAllByLibraryTemplateTrue().stream()
+                .map(TaskTemplate::getPresetGroup)
+                .filter(g -> g != null && !g.isBlank())
+                .distinct()
+                .sorted()
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    @LogMethod("library-preset-apply")
+    public List<TaskTemplateResponseDto> applyTaskPreset(String presetGroup, UUID parentId) {
+        log.info("Применение пресета заданий '{}' для родителя: {}", presetGroup, parentId);
+
+        List<TaskTemplate> presetTemplates = templateRepository.findAllByLibraryTemplateTrueAndPresetGroup(presetGroup);
+        if (presetTemplates.isEmpty()) {
+            log.warn("Нет библиотечных шаблонов для пресета: {}", presetGroup);
+            return List.of();
+        }
+
+        Set<UUID> alreadyCopied = getCopiedLibraryTemplateIds(parentId);
+
+        List<TaskTemplateResponseDto> result = new ArrayList<>();
+        for (TaskTemplate libTemplate : presetTemplates) {
+            if (alreadyCopied.contains(libTemplate.getId())) {
+                log.debug("Шаблон {} уже скопирован родителем {}", libTemplate.getId(), parentId);
+                continue;
+            }
+            TaskTemplateResponseDto copied = copyFromLibrary(libTemplate.getId(), parentId);
+            result.add(copied);
+        }
+
+        log.info("Скопировано {} шаблонов пресета '{}' для родителя {}", result.size(), presetGroup, parentId);
+        return result;
+    }
+
+    @Override
+    @Transactional
+    public TaskTemplate getOrCreateIntroTemplate() {
+        UUID systemParentId = UUID.fromString("00000000-0000-0000-0000-000000000001");
+        String introTitle = "Отправь своё первое задание";
+
+        return templateRepository.findByParentIdAndTitleAndLibraryTemplateFalse(systemParentId, introTitle)
+                .orElseGet(() -> {
+                    log.info("Создание системного шаблона вводного задания");
+                    TaskTemplate template = TaskTemplate.builder()
+                            .parentId(systemParentId)
+                            .title(introTitle)
+                            .description("Это твоё первое задание! Нажми «Сдать» — оно автоматически засчитается, и ты сможешь выбрать себе никнейм.")
+                            .expReward(10)
+                            .coinsReward(5)
+                            .repeatable(false)
+                            .libraryTemplate(false)
+                            .active(true)
+                            .autoSubmit(false)
+                            .build();
+                    return templateRepository.save(template);
+                });
+    }
 }

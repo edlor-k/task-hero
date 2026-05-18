@@ -73,4 +73,11 @@ public class Child extends BaseEntity {
      */
     @Column(name = "nickname", length = 64)
     private String nickname;
+
+    /**
+     * Разблокировано ли изменение никнейма (открывается после выполнения первого задания).
+     */
+    @Builder.Default
+    @Column(name = "nickname_unlocked", nullable = false)
+    private boolean nicknameUnlocked = false;
 }

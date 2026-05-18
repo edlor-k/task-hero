@@ -71,6 +71,10 @@ public record TaskTemplateCreateRequest(
         Boolean autoSubmit,
 
         @Schema(description = "Подпункты задания (для составных заданий)")
-        List<String> subItems
+        List<String> subItems,
+
+        @Schema(description = "Группа пресета (STUDY, SPORTS, CLEAN, ROUTINE, HOBBY, GAMER)")
+        @Size(max = 64, message = "Группа пресета не должна превышать 64 символа")
+        String presetGroup
 ) {
 }

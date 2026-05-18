@@ -19,4 +19,5 @@
     <include file="db/changelog/migrations/012-fix-admin-email.xml"/>
     <include file="db/changelog/migrations/013-add-preset-group-to-shop.xml"/>
     <include file="db/changelog/migrations/014-add-nickname-to-children.xml"/>
+    <include file="db/changelog/migrations/015-add-nickname-unlocked.xml"/>
 </databaseChangeLog>

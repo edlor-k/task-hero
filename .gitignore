@@ -42,3 +42,4 @@ build/
 
 ### Docker ###
 backup_*.sql
+/.claude

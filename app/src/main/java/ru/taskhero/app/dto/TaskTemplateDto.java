@@ -26,6 +26,7 @@ public record TaskTemplateDto(
         boolean libraryTemplate,
         UUID sourceTemplateId,
         List<TaskSubItemDto> subItems,
+        String presetGroup,
         Instant createdAt,
         Instant updatedAt
 ) {

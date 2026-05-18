@@ -3,6 +3,7 @@ package ru.taskhero.taskservice.client;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import ru.taskhero.taskservice.dto.ChildResponseDto;
@@ -54,4 +55,11 @@ public interface UserServiceClient {
             @PathVariable("childId") UUID childId,
             @PathVariable("parentId") UUID parentId
     );
+
+    /**
+     * Разблокировать изменение никнейма ребёнка.
+     * Вызывается при автоматическом одобрении вводного задания.
+     */
+    @PostMapping("/children/{childId}/unlock-nickname")
+    void unlockNickname(@PathVariable("childId") UUID childId);
 }

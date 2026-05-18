@@ -124,4 +124,23 @@ public interface TaskTemplateService {
      * Получить все шаблоны родителя (для админа).
      */
     List<TaskTemplateResponseDto> getAllByParent(UUID parentId);
+
+    /**
+     * Получить все доступные группы пресетов в библиотеке.
+     */
+    List<String> getLibraryPresetGroups();
+
+    /**
+     * Скопировать все библиотечные шаблоны из группы пресета родителю.
+     *
+     * @param presetGroup группа пресета
+     * @param parentId    ID родителя
+     * @return список скопированных шаблонов
+     */
+    List<TaskTemplateResponseDto> applyTaskPreset(String presetGroup, UUID parentId);
+
+    /**
+     * Получить или создать системный шаблон вводного задания.
+     */
+    TaskTemplate getOrCreateIntroTemplate();
 }

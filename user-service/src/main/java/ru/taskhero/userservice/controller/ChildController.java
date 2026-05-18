@@ -398,6 +398,33 @@ public class ChildController {
     }
 
     /**
+     * Разблокировать никнейм ребёнка.
+     * Вызывается из task-service при выполнении первого задания (JWT ребёнка).
+     */
+    @PostMapping("/{id}/unlock-nickname")
+    @PreAuthorize("hasAnyRole('CHILD', 'ADMIN')")
+    @Operation(summary = "Разблокировать изменение никнейма", description = "Разблокирует возможность менять никнейм после первого задания")
+    public ResponseEntity<Void> unlockNickname(@PathVariable UUID id) {
+        log.info("Разблокировка никнейма ребёнка: {}", id);
+        childService.unlockNickname(id);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Ребёнок меняет свой никнейм (только если разблокировано).
+     */
+    @PostMapping("/me/nickname")
+    @PreAuthorize("hasRole('CHILD')")
+    @Operation(summary = "Изменить никнейм ребёнка", description = "Ребёнок меняет свой никнейм после разблокировки")
+    public ResponseEntity<ChildResponseDto> updateNickname(@RequestBody java.util.Map<String, String> request) {
+        UUID childId = SecurityUtils.getCurrentUserId();
+        String nickname = request.get("nickname");
+        log.info("Ребёнок {} меняет никнейм", childId);
+        ChildResponseDto response = childService.updateNickname(childId, nickname);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
      * Проверить, принадлежит ли ребёнок родителю.
      * Используется task-service для проверки доступа.
      *

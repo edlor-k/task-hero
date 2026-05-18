@@ -141,4 +141,12 @@ public interface TaskAssignmentService {
      * Получить все назначения ребёнка (для админа).
      */
     List<TaskAssignmentResponseDto> getAllByChild(UUID childId);
+
+    /**
+     * Создать вводное задание для ребёнка (вызывается при первом входе после выбора персонажа).
+     *
+     * @param childId ID ребёнка
+     * @return созданное назначение
+     */
+    TaskAssignmentResponseDto createIntroTask(UUID childId);
 }

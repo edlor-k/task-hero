@@ -185,12 +185,41 @@ public class ChildController {
             RedirectAttributes redirectAttributes
     ) {
         try {
-            userServiceClient.selectCharacter(characterType);
+            ChildDto child = userServiceClient.selectCharacter(characterType);
+            // Создаём вводное задание для ребёнка
+            try {
+                taskServiceClient.createIntroTask(child.id());
+                log.info("Вводное задание создано для ребёнка {}", child.id());
+            } catch (Exception ex) {
+                log.warn("Не удалось создать вводное задание для ребёнка {}: {}", child.id(), ex.getMessage());
+            }
             redirectAttributes.addFlashAttribute("success", "Персонаж выбран!");
         } catch (Exception e) {
             log.error("Error selecting character: {}", e.getMessage());
             redirectAttributes.addFlashAttribute("error", "Ошибка выбора персонажа");
             return "redirect:/child/select-character";
+        }
+        return "redirect:/child/dashboard";
+    }
+
+    /**
+     * Ребёнок меняет свой никнейм.
+     */
+    @PostMapping("/profile/nickname")
+    public String updateNickname(
+            @RequestParam String nickname,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            userServiceClient.updateMyNickname(java.util.Map.of("nickname", nickname));
+            redirectAttributes.addFlashAttribute("success", "Никнейм обновлён!");
+        } catch (Exception e) {
+            log.error("Error updating nickname: {}", e.getMessage());
+            String msg = e.getMessage() != null && e.getMessage().contains("\"message\":\"")
+                    ? e.getMessage().substring(e.getMessage().indexOf("\"message\":\"") + 11,
+                        e.getMessage().indexOf("\"", e.getMessage().indexOf("\"message\":\"") + 11))
+                    : "Ошибка обновления никнейма";
+            redirectAttributes.addFlashAttribute("error", msg);
         }
         return "redirect:/child/dashboard";
     }

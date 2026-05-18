@@ -84,6 +84,30 @@ public class AdminTemplateController {
     }
 
     /**
+     * Получить все группы пресетов из библиотеки.
+     */
+    @GetMapping("/library/preset-groups")
+    @Operation(summary = "Получить группы пресетов")
+    public ResponseEntity<List<String>> getLibraryPresetGroups() {
+        log.info("Админ: запрос групп пресетов");
+        return ResponseEntity.ok(templateService.getLibraryPresetGroups());
+    }
+
+    /**
+     * Применить пресет заданий родителю (скопировать библиотечные шаблоны группы).
+     */
+    @PostMapping("/library/preset/{group}/apply")
+    @Operation(summary = "Применить пресет заданий родителю")
+    public ResponseEntity<java.util.Map<String, Object>> applyTaskPreset(
+            @PathVariable("group") String group,
+            @RequestParam UUID parentId
+    ) {
+        log.info("Применение пресета '{}' для родителя: {}", group, parentId);
+        List<TaskTemplateResponseDto> copied = templateService.applyTaskPreset(group, parentId);
+        return ResponseEntity.ok(java.util.Map.of("added", copied.size(), "templates", copied));
+    }
+
+    /**
      * Получить все шаблоны заданий конкретного родителя.
      */
     @GetMapping("/parent/{parentId}")
