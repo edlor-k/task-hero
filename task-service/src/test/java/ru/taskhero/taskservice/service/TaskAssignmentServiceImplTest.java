@@ -89,13 +89,13 @@ class TaskAssignmentServiceImplTest {
         TaskTemplateResponseDto templateDto = new TaskTemplateResponseDto(
                 templateId, parentId, "Убраться в комнате", null,
                 25, 10, false, null, null, null, null,
-                null, null, null, true, false, false, null, null, Instant.now(), null
+                null, null, null, true, false, false, null, null, null, Instant.now(), null
         );
 
         responseDto = new TaskAssignmentResponseDto(
                 assignmentId, childId, TaskStatus.CREATED, Instant.now().plus(Duration.ofDays(7)),
                 null, null, null, null, null, null,
-                null, null, templateDto, Instant.now(), null
+                null, null, null, templateDto, Instant.now(), null
         );
     }
 
@@ -165,7 +165,7 @@ class TaskAssignmentServiceImplTest {
                 new TaskAssignmentResponseDto(
                         assignmentId, childId, TaskStatus.SUBMITTED, null,
                         "Я все сделал!", null, Instant.now(), null, null, null,
-                        null, null, null, Instant.now(), null
+                        null, null, null, null, Instant.now(), null
                 )
         );
 
@@ -205,7 +205,7 @@ class TaskAssignmentServiceImplTest {
                 new TaskAssignmentResponseDto(
                         assignmentId, childId, TaskStatus.APPROVED, null,
                         null, "Молодец!", null, Instant.now(), 25, 10,
-                        null, null, null, Instant.now(), Instant.now()
+                        null, null, null, null, Instant.now(), Instant.now()
                 )
         );
         when(assignmentRepository.existsByChildIdAndImportantTrueAndStatusIn(any(), any()))
@@ -233,7 +233,7 @@ class TaskAssignmentServiceImplTest {
                 new TaskAssignmentResponseDto(
                         assignmentId, childId, TaskStatus.REJECTED, null,
                         null, "Нужно переделать", null, Instant.now(), null, null,
-                        null, null, null, Instant.now(), Instant.now()
+                        null, null, null, null, Instant.now(), Instant.now()
                 )
         );
 

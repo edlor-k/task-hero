@@ -6,6 +6,7 @@ import ru.taskhero.common.model.enums.TaskCategory;
 import ru.taskhero.taskservice.dto.TaskTemplateCreateRequest;
 import ru.taskhero.taskservice.dto.TaskTemplateResponseDto;
 import ru.taskhero.taskservice.dto.TaskTemplateUpdateRequest;
+import ru.taskhero.taskservice.entity.TaskTemplate;
 
 import java.util.List;
 import java.util.Set;

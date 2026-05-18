@@ -95,7 +95,7 @@ class ChildServiceImplTest {
                 childId, "Алиса", "Петрова",
                 0, 0, 1, null, "TOKEN-ABC",
                 DifficultyTrajectory.NORMAL, null, false, null,
-                50, 0, 50, null, null
+                50, 0, 50, null, null, false
         );
     }
 
@@ -182,7 +182,7 @@ class ChildServiceImplTest {
                 new ChildResponseDto(childId, "Алиса", "Петрова",
                         25, 10, 1, null, "TOKEN-ABC",
                         DifficultyTrajectory.NORMAL, null, false, null,
-                        25, 25, 50, null, null)
+                        25, 25, 50, null, null, false)
         );
 
         // When

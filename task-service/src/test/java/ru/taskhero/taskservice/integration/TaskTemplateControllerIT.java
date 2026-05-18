@@ -80,6 +80,7 @@ class TaskTemplateControllerIT extends AbstractIntegrationTest {
                 null,
                 null,
                 null,
+                null,
                 null
         );
 
@@ -105,6 +106,7 @@ class TaskTemplateControllerIT extends AbstractIntegrationTest {
                 10,
                 5,
                 false,
+                null,
                 null,
                 null,
                 null,
@@ -160,6 +162,7 @@ class TaskTemplateControllerIT extends AbstractIntegrationTest {
                 "Новое название",
                 null,
                 30,
+                null,
                 null,
                 null,
                 null,

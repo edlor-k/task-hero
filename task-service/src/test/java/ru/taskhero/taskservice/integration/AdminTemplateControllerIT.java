@@ -106,7 +106,7 @@ class AdminTemplateControllerIT extends AbstractIntegrationTest {
         TaskTemplate template = saveLibraryTemplate("Старый заголовок");
         TaskTemplateUpdateRequest update = new TaskTemplateUpdateRequest(
                 "Новый заголовок", null, 20, null, null, null,
-                null, null, null, null, null, null, null, null, null
+                null, null, null, null, null, null, null, null, null, null
         );
 
         // When & Then

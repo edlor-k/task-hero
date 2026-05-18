@@ -85,6 +85,7 @@ class TaskTemplateServiceImplTest {
                 false,
                 null,
                 null,
+                null,
                 Instant.now(),
                 null
         );
@@ -100,6 +101,7 @@ class TaskTemplateServiceImplTest {
                 25,
                 10,
                 false,
+                null,
                 null,
                 null,
                 null,
@@ -189,6 +191,7 @@ class TaskTemplateServiceImplTest {
                 null,
                 null,
                 null,
+                null,
                 null
         );
 
@@ -212,7 +215,7 @@ class TaskTemplateServiceImplTest {
         UUID otherParentId = UUID.randomUUID();
         TaskTemplateUpdateRequest request = new TaskTemplateUpdateRequest(
                 "Новое название", null, null, null, null, null, null,
-                null, null, null, null, null, null, null, null
+                null, null, null, null, null, null, null, null, null
         );
 
         when(templateRepository.findById(templateId)).thenReturn(Optional.of(template));
