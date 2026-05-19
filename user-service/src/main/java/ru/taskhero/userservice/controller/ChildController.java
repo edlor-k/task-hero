@@ -343,7 +343,7 @@ public class ChildController {
      * @return обновленные данные ребёнка
      */
     @PutMapping("/{childId}/reward")
-    @PreAuthorize("hasAnyRole('PARENT', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('PARENT', 'ADMIN', 'CHILD')")
     @Operation(
             summary = "Начислить награду ребёнку",
             description = "Начисляет EXP и коины ребёнку. Автоматически пересчитывает уровень."
