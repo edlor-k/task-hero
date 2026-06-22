@@ -7,4 +7,5 @@ public record SocialLoginRequestDto(
         @NotBlank @Email String email,
         String firstName,
         String surname
-) {}
+) {
+}
