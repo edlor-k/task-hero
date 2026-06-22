@@ -34,7 +34,11 @@ public interface ChildMapper {
     @Mapping(target = "expToNextLevel", source = "expToNextLevel")
     @Mapping(target = "currentLevelExp", source = "currentLevelExp")
     @Mapping(target = "nextLevelExp", source = "nextLevelExp")
-    @Mapping(target = "characterImagePath", source = "entity", qualifiedByName = "characterImagePath")
+    @Mapping(target = "avatarUrl", source = "entity", qualifiedByName = "avatarUrl")
+    @Mapping(target = "avatarOptionId", source = "entity", qualifiedByName = "avatarOptionId")
+    @Mapping(target = "backgroundUrl", source = "entity", qualifiedByName = "backgroundUrl")
+    @Mapping(target = "backgroundOptionId", source = "entity", qualifiedByName = "backgroundOptionId")
+    @Mapping(target = "accentColor", source = "entity.accentColor")
     @Mapping(target = "parent", source = "parent")
     ChildResponseDto toDto(Child entity, int expToNextLevel, int currentLevelExp, int nextLevelExp, ParentResponseDto parent);
 
@@ -46,13 +50,29 @@ public interface ChildMapper {
     }
 
     /**
-     * Вычислить путь к изображению персонажа.
+     * URL аватара ребёнка — берётся из выбранной опции галереи, {@code null},
+     * если аватар ещё не выбран.
      */
-    @Named("characterImagePath")
-    default String characterImagePath(Child entity) {
-        if (entity.getCharacterType() == null) {
-            return null;
-        }
-        return entity.getCharacterType().getImagePath(entity.getLevel());
+    @Named("avatarUrl")
+    default String avatarUrl(Child entity) {
+        return entity.getAvatarOption() != null ? entity.getAvatarOption().getImageUrl() : null;
+    }
+
+    /**
+     * ID выбранной опции аватара ({@code null}, если ещё не выбран).
+     */
+    @Named("avatarOptionId")
+    default java.util.UUID avatarOptionId(Child entity) {
+        return entity.getAvatarOption() != null ? entity.getAvatarOption().getId() : null;
+    }
+
+    @Named("backgroundUrl")
+    default String backgroundUrl(Child entity) {
+        return entity.getBackgroundOption() != null ? entity.getBackgroundOption().getImageUrl() : null;
+    }
+
+    @Named("backgroundOptionId")
+    default java.util.UUID backgroundOptionId(Child entity) {
+        return entity.getBackgroundOption() != null ? entity.getBackgroundOption().getId() : null;
     }
 }

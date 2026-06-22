@@ -9,6 +9,29 @@ spring:
     mode: HTML
     encoding: UTF-8
 
+  servlet:
+    multipart:
+      max-file-size: 3MB
+      max-request-size: 4MB
+
+  security:
+    oauth2:
+      client:
+        registration:
+          yandex:
+            client-id: ${YANDEX_CLIENT_ID:}
+            client-secret: ${YANDEX_CLIENT_SECRET:}
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/yandex"
+            scope: login:email,login:info
+            client-name: Яндекс
+        provider:
+          yandex:
+            authorization-uri: https://oauth.yandex.ru/authorize
+            token-uri: https://oauth.yandex.ru/token
+            user-info-uri: https://login.yandex.ru/info?format=json
+            user-name-attribute: id
+
   # Отключаем datasource - app только вызывает API
   autoconfigure:
     exclude:

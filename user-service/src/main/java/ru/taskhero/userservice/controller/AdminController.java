@@ -15,9 +15,11 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import ru.taskhero.common.exception.ExceptionBody;
 import ru.taskhero.common.exception.ValidationException;
 import ru.taskhero.common.model.enums.Role;
@@ -25,12 +27,15 @@ import ru.taskhero.userservice.dto.*;
 import ru.taskhero.userservice.entity.AuditAction;
 import ru.taskhero.userservice.service.AdminService;
 import ru.taskhero.userservice.service.AuditService;
+import ru.taskhero.userservice.service.AvatarOptionService;
+import ru.taskhero.userservice.service.BackgroundOptionService;
 import ru.taskhero.userservice.service.ChildService;
 import ru.taskhero.userservice.service.ParentService;
 import ru.taskhero.userservice.service.ShopService;
 import ru.taskhero.userservice.service.UserService;
 import ru.taskhero.userservice.util.SecurityUtils;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -53,6 +58,8 @@ public class AdminController {
     private final AdminService adminService;
     private final AuditService auditService;
     private final ShopService shopService;
+    private final AvatarOptionService avatarOptionService;
+    private final BackgroundOptionService backgroundOptionService;
 
     /**
      * Получить список всех пользователей с пагинацией и фильтрами.
@@ -526,5 +533,151 @@ public class AdminController {
     public ResponseEntity<java.util.List<ShopPurchaseResponseDto>> getParentPurchases(@PathVariable UUID id) {
         log.info("Админ: запрос покупок родителя: {}", id);
         return ResponseEntity.ok(shopService.getAllPurchasesByParent(id));
+    }
+
+    // ==================== Avatar Gallery Management ====================
+
+    /**
+     * Получить все опции аватара (вкл. неактивные).
+     */
+    @GetMapping("/avatar-options")
+    @Operation(summary = "Получить галерею аватаров", description = "Список всех опций аватара, включая неактивные")
+    public ResponseEntity<List<AvatarOptionResponseDto>> getAvatarOptions() {
+        log.info("Админ: запрос галереи аватаров");
+        return ResponseEntity.ok(avatarOptionService.listAll());
+    }
+
+    /**
+     * Загрузить новую картинку в галерею аватаров.
+     */
+    @PostMapping("/avatar-options")
+    @Operation(summary = "Загрузить аватар", description = "Загружает картинку (PNG/WebP, квадратная, 256-1024px) в галерею")
+    public ResponseEntity<AvatarOptionResponseDto> createAvatarOption(
+            @RequestParam MultipartFile file,
+            @RequestParam(required = false) String label
+    ) {
+        UUID currentAdminId = SecurityUtils.getCurrentUserId();
+        log.info("Админ: загрузка новой опции аватара");
+        AvatarOptionResponseDto option = avatarOptionService.create(file, label);
+        UserResponseDto admin = userService.getById(currentAdminId);
+        auditService.log(currentAdminId, admin.email(), AuditAction.AVATAR_OPTION_CREATED,
+                "AVATAR_OPTION", option.id(), null);
+        return ResponseEntity.status(HttpStatus.CREATED).body(option);
+    }
+
+    /**
+     * Включить/выключить видимость опции аватара в пикере ребёнка.
+     */
+    @PatchMapping("/avatar-options/{id}")
+    @Operation(summary = "Переключить активность аватара", description = "Скрыть/показать опцию в пикере ребёнка")
+    public ResponseEntity<AvatarOptionResponseDto> toggleAvatarOption(
+            @PathVariable UUID id,
+            @RequestParam boolean active
+    ) {
+        UUID currentAdminId = SecurityUtils.getCurrentUserId();
+        log.info("Админ: переключение активности опции аватара {}: active={}", id, active);
+        AvatarOptionResponseDto option = avatarOptionService.setActive(id, active);
+        UserResponseDto admin = userService.getById(currentAdminId);
+        auditService.log(currentAdminId, admin.email(), AuditAction.AVATAR_OPTION_UPDATED,
+                "AVATAR_OPTION", id, "active=" + active);
+        return ResponseEntity.ok(option);
+    }
+
+    /**
+     * Удалить опцию аватара из галереи.
+     */
+    @DeleteMapping("/avatar-options/{id}")
+    @Operation(summary = "Удалить аватар", description = "Удаляет опцию и файл из хранилища (если её никто не выбрал)")
+    public ResponseEntity<Void> deleteAvatarOption(@PathVariable UUID id) {
+        UUID currentAdminId = SecurityUtils.getCurrentUserId();
+        log.info("Админ: удаление опции аватара: {}", id);
+        avatarOptionService.delete(id);
+        UserResponseDto admin = userService.getById(currentAdminId);
+        auditService.log(currentAdminId, admin.email(), AuditAction.AVATAR_OPTION_DELETED,
+                "AVATAR_OPTION", id, null);
+        return ResponseEntity.noContent().build();
+    }
+
+    // ==================== Background Gallery Management ====================
+
+    @GetMapping("/background-options")
+    @Operation(summary = "Получить галерею фонов", description = "Список всех фонов, включая неактивные")
+    public ResponseEntity<List<BackgroundOptionResponseDto>> getBackgroundOptions() {
+        log.info("Админ: запрос галереи фонов");
+        return ResponseEntity.ok(backgroundOptionService.listAll());
+    }
+
+    @PostMapping("/background-options")
+    @Operation(summary = "Загрузить фон", description = "Загружает картинку (PNG/WebP/JPEG) в галерею фонов")
+    public ResponseEntity<BackgroundOptionResponseDto> createBackgroundOption(
+            @RequestParam MultipartFile file,
+            @RequestParam(required = false) String label
+    ) {
+        UUID currentAdminId = SecurityUtils.getCurrentUserId();
+        log.info("Админ: загрузка нового фона");
+        BackgroundOptionResponseDto option = backgroundOptionService.create(file, label);
+        UserResponseDto admin = userService.getById(currentAdminId);
+        auditService.log(currentAdminId, admin.email(), AuditAction.BACKGROUND_OPTION_CREATED,
+                "BACKGROUND_OPTION", option.id(), null);
+        return ResponseEntity.status(HttpStatus.CREATED).body(option);
+    }
+
+    @PatchMapping("/background-options/{id}")
+    @Operation(summary = "Переключить активность фона")
+    public ResponseEntity<BackgroundOptionResponseDto> toggleBackgroundOption(
+            @PathVariable UUID id,
+            @RequestParam boolean active
+    ) {
+        UUID currentAdminId = SecurityUtils.getCurrentUserId();
+        log.info("Админ: переключение активности фона {}: active={}", id, active);
+        BackgroundOptionResponseDto option = backgroundOptionService.setActive(id, active);
+        UserResponseDto admin = userService.getById(currentAdminId);
+        auditService.log(currentAdminId, admin.email(), AuditAction.BACKGROUND_OPTION_UPDATED,
+                "BACKGROUND_OPTION", id, "active=" + active);
+        return ResponseEntity.ok(option);
+    }
+
+    @DeleteMapping("/background-options/{id}")
+    @Operation(summary = "Удалить фон", description = "Удаляет фон и файл из хранилища (если его никто не выбрал)")
+    public ResponseEntity<Void> deleteBackgroundOption(@PathVariable UUID id) {
+        UUID currentAdminId = SecurityUtils.getCurrentUserId();
+        log.info("Админ: удаление фона: {}", id);
+        backgroundOptionService.delete(id);
+        UserResponseDto admin = userService.getById(currentAdminId);
+        auditService.log(currentAdminId, admin.email(), AuditAction.BACKGROUND_OPTION_DELETED,
+                "BACKGROUND_OPTION", id, null);
+        return ResponseEntity.noContent().build();
+    }
+
+    // ==================== Admin force-change avatar / background ====================
+
+    @PostMapping("/children/{id}/force-avatar")
+    @Operation(summary = "Принудительно установить аватар ребёнку", description = "Без проверки уровня")
+    public ResponseEntity<ChildResponseDto> forceSetAvatar(
+            @PathVariable UUID id,
+            @RequestParam UUID avatarOptionId
+    ) {
+        UUID currentAdminId = SecurityUtils.getCurrentUserId();
+        log.info("Админ: принудительная смена аватара ребёнка {}", id);
+        ChildResponseDto child = childService.adminForceSetAvatar(id, avatarOptionId);
+        UserResponseDto admin = userService.getById(currentAdminId);
+        auditService.log(currentAdminId, admin.email(), AuditAction.CHILD_AVATAR_FORCED,
+                "CHILD", id, "avatarOptionId=" + avatarOptionId);
+        return ResponseEntity.ok(child);
+    }
+
+    @PostMapping("/children/{id}/force-background")
+    @Operation(summary = "Принудительно установить фон ребёнку", description = "Без проверки уровня")
+    public ResponseEntity<ChildResponseDto> forceSetBackground(
+            @PathVariable UUID id,
+            @RequestParam UUID backgroundOptionId
+    ) {
+        UUID currentAdminId = SecurityUtils.getCurrentUserId();
+        log.info("Админ: принудительная смена фона ребёнка {}", id);
+        ChildResponseDto child = childService.adminForceSetBackground(id, backgroundOptionId);
+        UserResponseDto admin = userService.getById(currentAdminId);
+        auditService.log(currentAdminId, admin.email(), AuditAction.CHILD_BACKGROUND_FORCED,
+                "CHILD", id, "backgroundOptionId=" + backgroundOptionId);
+        return ResponseEntity.ok(child);
     }
 }

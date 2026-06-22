@@ -5,112 +5,133 @@
 <div class="th-layout">
     <nav th:replace="~{fragments/layout :: sidebar-parent}"></nav>
     <div class="th-content">
-        <header th:replace="~{fragments/layout :: header}"></header>
+        <header th:replace="~{fragments/layout :: topbar}"></header>
         <main class="th-main">
 
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4 class="fw-bold mb-0"><i class="bi bi-shop me-2"></i>Магазин наград</h4>
+            <div class="lm-page-header">
+                <div>
+                    <h1 class="lm-page-title">Магазин наград</h1>
+                    <p class="lm-page-sub">Управляйте товарами и запросами на покупку</p>
+                </div>
                 <div class="d-flex gap-2">
-                    <a th:if="${onboarding}" th:href="@{/parent/onboarding}" class="btn btn-outline-secondary">
-                        <i class="bi bi-arrow-left me-1"></i>Назад к настройке
+                    <a th:if="${onboarding}" th:href="@{/parent/onboarding}" class="lm-btn lm-btn-ghost lm-btn-sm">
+                        <i class="bi bi-arrow-left me-1"></i>Назад
                     </a>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addItemModal">
+                    <button class="lm-btn lm-btn-primary" data-bs-toggle="modal" data-bs-target="#addItemModal">
                         <i class="bi bi-plus-lg me-1"></i>Добавить товар
                     </button>
                 </div>
             </div>
 
-            <!-- Messages -->
-            <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
-                <i class="bi bi-check-circle me-2"></i><span th:text="${success}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div th:if="${success}" class="lm-banner ok mb-4">
+                <i class="bi bi-check-circle-fill fs-5"></i><span th:text="${success}">Успех</span>
             </div>
-            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
-                <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div th:if="${error}" class="lm-banner err mb-4">
+                <i class="bi bi-exclamation-triangle-fill fs-5"></i><span th:text="${error}">Ошибка</span>
             </div>
 
             <!-- Pending purchases -->
-            <div th:if="${pendingPurchases != null and !pendingPurchases.isEmpty()}" class="card mb-4 border-warning">
-                <div class="card-header bg-warning bg-opacity-10">
-                    <h5 class="fw-bold mb-0"><i class="bi bi-clock-history me-2"></i>Ожидают подтверждения</h5>
+            <div th:if="${pendingPurchases != null and !pendingPurchases.isEmpty()}"
+                 class="lm-review mb-4" style="padding:0;overflow:hidden;border-left:3px solid var(--brand-warning);">
+                <div style="padding:var(--s-3) var(--s-5);border-bottom:1px solid var(--border-subtle);
+                            display:flex;align-items:center;gap:var(--s-2);">
+                    <i class="bi bi-clock-history" style="color:var(--brand-warning);"></i>
+                    <span class="fw-semibold">Запросы на выкуп</span>
+                    <span class="lm-chip warning ms-auto" th:text="${#lists.size(pendingPurchases)}">0</span>
                 </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light">
-                            <tr>
-                                <th>Ребёнок</th>
-                                <th>Товар</th>
-                                <th>Цена</th>
-                                <th>Дата</th>
-                                <th class="text-end">Действия</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr th:each="p : ${pendingPurchases}">
-                                <td th:text="${p.childFirstName}">Имя</td>
-                                <td>
-                                    <span th:if="${p.shopItem?.iconName}" th:text="${p.shopItem.iconName}" class="me-1"></span>
-                                    <span th:text="${p.shopItem?.title}">Товар</span>
-                                </td>
-                                <td><span class="badge bg-warning text-dark" th:text="${p.shopItem?.priceCoins} + ' коинов'">10</span></td>
-                                <td><small class="text-muted" th:attr="data-utc-datetime=${p.createdAt}" th:text="${p.createdAt}">2025-01-01T09:00:00Z</small></td>
-                                <td class="text-end">
-                                    <form th:action="@{/parent/shop/purchases/{id}/approve(id=${p.id})}" method="post" class="d-inline">
-                                        <button class="btn btn-sm btn-success"><i class="bi bi-check-lg"></i></button>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                        <tr>
+                            <th>Ребёнок</th>
+                            <th>Товар</th>
+                            <th>Цена</th>
+                            <th>Дата</th>
+                            <th class="text-end">Действия</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="p : ${pendingPurchases}">
+                            <td style="font-weight:600;font-size:var(--fs-sm);" th:text="${p.childFirstName}">Имя</td>
+                            <td>
+                                <span th:if="${p.shopItem?.iconName}" th:text="${p.shopItem.iconName}" class="me-1"></span>
+                                <span style="font-size:var(--fs-sm);" th:text="${p.shopItem?.title}">Товар</span>
+                            </td>
+                            <td><span class="lm-chip accent" th:text="'🪙 ' + ${p.shopItem?.priceCoins}">🪙 10</span></td>
+                            <td><span style="font-size:var(--fs-xs);color:var(--ink-500);font-family:var(--font-mono);"
+                                      th:attr="data-utc-datetime=${p.createdAt}" th:text="${p.createdAt}">—</span></td>
+                            <td class="text-end">
+                                <div class="d-flex gap-1 justify-content-end">
+                                    <form th:action="@{/parent/shop/purchases/{id}/approve(id=${p.id})}" method="post">
+                                        <button class="lm-btn lm-btn-sm" title="Одобрить"
+                                                style="background:var(--brand-success);color:#fff;">
+                                            <i class="bi bi-check-lg"></i>
+                                        </button>
                                     </form>
-                                    <form th:action="@{/parent/shop/purchases/{id}/reject(id=${p.id})}" method="post" class="d-inline ms-1">
-                                        <button class="btn btn-sm btn-danger"><i class="bi bi-x-lg"></i></button>
+                                    <form th:action="@{/parent/shop/purchases/{id}/reject(id=${p.id})}" method="post">
+                                        <button class="lm-btn lm-btn-ghost lm-btn-sm" title="Отклонить"
+                                                style="color:var(--brand-danger);">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
                                     </form>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
             <!-- Shop items -->
-            <h5 class="fw-semibold mb-3">Товары</h5>
-            <div th:if="${#lists.isEmpty(items)}" class="text-center py-5">
-                <i class="bi bi-bag-plus display-1 text-muted"></i>
-                <h4 class="mt-3 text-muted">Нет товаров</h4>
-                <p class="text-muted">Добавьте товары, которые дети смогут покупать за коины</p>
-                <a th:href="@{/parent/shop/marketplace}" class="btn btn-outline-primary mt-2">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h2 class="lm-section-title">Товары</h2>
+                <a th:href="@{/parent/shop/marketplace}" class="lm-btn lm-btn-ghost lm-btn-sm">
+                    <i class="bi bi-shop-window me-1"></i>Маркетплейс
+                </a>
+            </div>
+
+            <div th:if="${#lists.isEmpty(items)}" class="lm-empty-state">
+                <div class="lm-empty-icon">🛍️</div>
+                <div class="lm-empty-title">Нет товаров</div>
+                <div class="lm-empty-sub">Добавьте товары, которые дети смогут покупать за монеты</div>
+                <a th:href="@{/parent/shop/marketplace}" class="lm-btn lm-btn-primary mt-2">
                     <i class="bi bi-shop-window me-1"></i>Выбрать из маркетплейса
                 </a>
             </div>
 
             <div th:unless="${#lists.isEmpty(items)}" class="row g-4">
-                <div th:each="item : ${items}" class="col-md-6 col-lg-4">
-                    <div class="card h-100" th:classappend="${!item.active} ? 'opacity-50 border-secondary' : ''">
-                        <div class="card-body text-center">
-                            <div class="display-4 mb-2" th:if="${item.iconName}" th:text="${item.iconName}">🎁</div>
-                            <div class="display-4 mb-2" th:unless="${item.iconName}">🎁</div>
-                            <h5 class="fw-bold" th:text="${item.title}">Товар</h5>
-                            <p class="text-muted small" th:text="${item.description}" th:if="${item.description}">Описание</p>
-                            <div class="mb-3">
-                                <span class="badge bg-warning text-dark fs-6" th:text="${item.priceCoins} + ' коинов'">10 коинов</span>
-                                <span th:if="${!item.active}" class="badge bg-secondary ms-1">Архивный</span>
-                            </div>
+                <div th:each="item : ${items}" class="col-md-6 col-lg-4"
+                     th:classappend="${!item.active} ? 'opacity-50' : ''">
+                    <div class="lm-reward-card h-100">
+                        <!-- Icon -->
+                        <div class="lm-reward-img" style="height:80px;font-size:36px;">
+                            <span th:if="${item.iconName}" th:text="${item.iconName}">🎁</span>
+                            <span th:unless="${item.iconName}">🎁</span>
                         </div>
-                        <div class="card-footer bg-transparent border-0 pb-3 px-3" th:if="${item.active}">
-                            <div class="d-flex gap-2">
-                                <button type="button" class="btn btn-outline-primary btn-sm flex-fill"
-                                        onclick="openEditItemModal(this)"
-                                        th:attr="data-id=${item.id}, data-title=${item.title}, data-description=${item.description},
-                                                 data-priceCoins=${item.priceCoins}, data-iconName=${item.iconName},
-                                                 data-child-ids=${item.childIds != null ? #strings.listJoin(item.childIds, ',') : ''}">
-                                    <i class="bi bi-pencil me-1"></i>Изменить
+                        <div class="lm-reward-ttl" th:text="${item.title}">Товар</div>
+                        <p th:if="${item.description}"
+                           style="font-size:var(--fs-xs);color:var(--ink-500);margin:0;"
+                           th:text="${item.description}">Описание</p>
+                        <div class="lm-reward-price">
+                            🪙 <span th:text="${item.priceCoins}">10</span>
+                            <span th:if="${!item.active}" class="lm-chip ms-2" style="font-size:10px;">Архивный</span>
+                        </div>
+                        <!-- Actions -->
+                        <div th:if="${item.active}" class="d-flex gap-2 mt-auto">
+                            <button type="button" class="lm-btn lm-btn-secondary lm-btn-sm flex-fill justify-content-center"
+                                    onclick="openEditItemModal(this)"
+                                    th:attr="data-id=${item.id}, data-title=${item.title}, data-description=${item.description},
+                                             data-priceCoins=${item.priceCoins}, data-iconName=${item.iconName},
+                                             data-child-ids=${item.childIds != null ? #strings.listJoin(item.childIds, ',') : ''}">
+                                <i class="bi bi-pencil me-1"></i>Изменить
+                            </button>
+                            <form th:action="@{/parent/shop/{id}/delete(id=${item.id})}" method="post">
+                                <button type="submit" class="lm-btn lm-btn-ghost lm-btn-sm lm-btn-icon"
+                                        style="color:var(--brand-danger);"
+                                        onclick="return confirm('Удалить товар?')" title="Удалить">
+                                    <i class="bi bi-trash"></i>
                                 </button>
-                                <form th:action="@{/parent/shop/{id}/delete(id=${item.id})}" method="post" class="flex-fill">
-                                    <button type="submit" class="btn btn-outline-danger btn-sm w-100"
-                                            onclick="return confirm('Удалить товар?')">
-                                        <i class="bi bi-trash me-1"></i>Удалить
-                                    </button>
-                                </form>
-                            </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -118,50 +139,50 @@
 
             <!-- Purchase history -->
             <div class="mt-5" th:if="${allPurchases != null and !allPurchases.isEmpty()}">
-                <h5 class="fw-semibold mb-3"><i class="bi bi-clock-history me-2"></i>История операций</h5>
-                <div class="card">
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
-                                <thead class="table-light">
-                                <tr>
-                                    <th>Ребёнок</th>
-                                    <th>Товар</th>
-                                    <th>Цена</th>
-                                    <th>Статус</th>
-                                    <th>Дата запроса</th>
-                                    <th>Дата решения</th>
-                                    <th>Комментарий</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr th:each="p : ${allPurchases}">
-                                    <td th:text="${p.childFirstName}">Имя</td>
-                                    <td>
-                                        <span th:if="${p.shopItem?.iconName}" th:text="${p.shopItem.iconName}" class="me-1"></span>
-                                        <span th:text="${p.shopItem?.title}">Товар</span>
-                                    </td>
-                                    <td><span class="badge bg-warning text-dark" th:text="${p.shopItem?.priceCoins} + ' коинов'">10</span></td>
-                                    <td>
-                                        <span class="badge"
-                                              th:classappend="${p.status == 'PENDING' ? 'bg-warning text-dark' :
-                                                               p.status == 'APPROVED' ? 'bg-success' : 'bg-danger'}"
-                                              th:text="${p.status == 'PENDING' ? 'Ожидает' :
-                                                         p.status == 'APPROVED' ? 'Одобрено' : 'Отклонено'}">Статус</span>
-                                    </td>
-                                    <td><small class="text-muted" th:attr="data-utc-datetime=${p.createdAt}" th:text="${p.createdAt}">2025-01-01T09:00:00Z</small></td>
-                                    <td>
-                                        <small class="text-muted"
-                                               th:if="${p.reviewedAt}"
-                                               th:attr="data-utc-datetime=${p.reviewedAt}"
-                                               th:text="${p.reviewedAt}">2025-01-01T09:00:00Z</small>
-                                        <small class="text-muted" th:unless="${p.reviewedAt}">—</small>
-                                    </td>
-                                    <td><small class="text-muted" th:text="${p.parentComment ?: '—'}">—</small></td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                <h2 class="lm-section-title mb-3">
+                    <i class="bi bi-clock-history me-2" style="color:var(--brand-primary);"></i>История операций
+                </h2>
+                <div class="lm-review" style="padding:0;overflow:hidden;">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                            <tr>
+                                <th>Ребёнок</th>
+                                <th>Товар</th>
+                                <th>Цена</th>
+                                <th>Статус</th>
+                                <th>Запрос</th>
+                                <th>Решение</th>
+                                <th>Комментарий</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="p : ${allPurchases}">
+                                <td style="font-size:var(--fs-sm);font-weight:600;" th:text="${p.childFirstName}">Имя</td>
+                                <td>
+                                    <span th:if="${p.shopItem?.iconName}" th:text="${p.shopItem.iconName}" class="me-1"></span>
+                                    <span style="font-size:var(--fs-sm);" th:text="${p.shopItem?.title}">Товар</span>
+                                </td>
+                                <td><span class="lm-chip accent" th:text="'🪙 ' + ${p.shopItem?.priceCoins}">🪙 10</span></td>
+                                <td>
+                                    <span class="lm-chip"
+                                          th:classappend="${p.status == 'PENDING' ? ' warning' :
+                                                           p.status == 'APPROVED' ? ' success' : ' danger'}"
+                                          th:text="${p.status == 'PENDING' ? 'Ожидает' :
+                                                     p.status == 'APPROVED' ? 'Одобрено' : 'Отклонено'}">Статус</span>
+                                </td>
+                                <td><span style="font-size:var(--fs-xs);color:var(--ink-500);font-family:var(--font-mono);"
+                                          th:attr="data-utc-datetime=${p.createdAt}" th:text="${p.createdAt}">—</span></td>
+                                <td>
+                                    <span style="font-size:var(--fs-xs);color:var(--ink-500);font-family:var(--font-mono);"
+                                          th:if="${p.reviewedAt}"
+                                          th:attr="data-utc-datetime=${p.reviewedAt}" th:text="${p.reviewedAt}">—</span>
+                                    <span th:unless="${p.reviewedAt}" style="color:var(--ink-300);">—</span>
+                                </td>
+                                <td style="font-size:var(--fs-xs);color:var(--ink-500);" th:text="${p.parentComment ?: '—'}">—</td>
+                            </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -217,8 +238,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                    <button type="submit" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Добавить</button>
+                    <button type="button" class="lm-btn lm-btn-ghost" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="lm-btn lm-btn-primary"><i class="bi bi-plus-lg me-1"></i>Добавить</button>
                 </div>
             </form>
         </div>
@@ -271,8 +292,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                    <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>Сохранить</button>
+                    <button type="button" class="lm-btn lm-btn-ghost" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="lm-btn lm-btn-primary"><i class="bi bi-check-lg me-1"></i>Сохранить</button>
                 </div>
             </form>
         </div>

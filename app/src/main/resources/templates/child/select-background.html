@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Выбери фон')}"></head>
+<body style="background:linear-gradient(160deg, oklch(0.96 0.04 290), oklch(0.97 0.03 240) 60%, oklch(0.96 0.04 200)); min-height:100vh;">
+<div class="container py-5" style="max-width:900px;">
+
+    <div class="text-center mb-5">
+        <div style="font-size:48px;margin-bottom:12px;">🖼️</div>
+        <h2 class="fw-bold" style="font-size:var(--fs-3xl);letter-spacing:-0.02em;color:var(--ink-900);">
+            <span th:if="${childProfile != null and !childProfile.backgroundSelected()}">Выбери фон для своего мира!</span>
+            <span th:unless="${childProfile != null and !childProfile.backgroundSelected()}">Смени фон</span>
+        </h2>
+        <p style="color:var(--ink-500);font-size:var(--fs-base);margin-top:8px;">
+            <span th:if="${childProfile != null and !childProfile.backgroundSelected()}">Выбери картинку — она будет видна только тебе</span>
+            <span th:unless="${childProfile != null and !childProfile.backgroundSelected()}">Фон твоего игрового мира</span>
+        </p>
+    </div>
+
+    <div th:if="${error}" class="lm-banner err mb-4">
+        <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+        <span th:text="${error}">Ошибка</span>
+    </div>
+
+    <!-- Locked: background change requires level 3 -->
+    <div th:if="${!canChange}" class="text-center py-5">
+        <div style="font-size:56px;margin-bottom:16px;">🔒</div>
+        <h3 class="fw-bold mb-2" style="color:var(--ink-900);">Смена фона откроется на уровне 3</h3>
+        <p style="color:var(--ink-500);font-size:var(--fs-base);">
+            Ты на уровне <strong th:text="${childProfile?.level()}">1</strong>.
+            Продолжай выполнять задания — скоро откроется!
+        </p>
+        <a th:href="@{/child/dashboard}" class="lm-btn lm-btn-primary lm-btn-lg mt-4">
+            <i class="bi bi-house me-2"></i>Вернуться на главную
+        </a>
+    </div>
+
+    <!-- Empty state -->
+    <div th:if="${canChange and (backgroundOptions == null or #lists.isEmpty(backgroundOptions))}" class="lm-empty-state">
+        <div class="lm-empty-icon">🖼️</div>
+        <div class="lm-empty-title">Фоны пока не добавлены</div>
+        <div class="lm-empty-sub">Попроси родителя обратиться к администратору — галерея фонов скоро появится</div>
+        <a th:href="@{/child/dashboard}" class="lm-btn lm-btn-secondary lm-btn-lg mt-4">
+            <i class="bi bi-house me-2"></i>Перейти на главную
+        </a>
+    </div>
+
+    <!-- Background grid -->
+    <div th:if="${canChange and backgroundOptions != null and !#lists.isEmpty(backgroundOptions)}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:var(--s-4);" class="mb-4">
+            <form th:each="option : ${backgroundOptions}" th:action="@{/child/select-background}" method="post">
+                <input type="hidden" name="backgroundOptionId" th:value="${option.id}">
+                <button type="submit" class="border-0 p-0 bg-transparent w-100"
+                        style="border-radius:var(--r-lg);overflow:hidden;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;"
+                        th:classappend="${childProfile != null and childProfile.backgroundOptionId == option.id} ? 'th-bg-tile selected' : 'th-bg-tile'">
+                    <div style="position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:var(--r-lg);">
+                        <img th:src="${option.imageUrl}" th:alt="${option.label}"
+                             style="width:100%;height:100%;object-fit:cover;display:block;">
+                        <div th:if="${childProfile != null and childProfile.backgroundOptionId == option.id}"
+                             style="position:absolute;top:8px;right:8px;background:var(--brand-success);color:white;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;">
+                            <i class="bi bi-check-lg"></i>
+                        </div>
+                    </div>
+                    <div th:if="${option.label}" class="text-center py-2"
+                         style="font-size:var(--fs-sm);font-weight:600;color:var(--ink-700);"
+                         th:text="${option.label}">Название</div>
+                </button>
+            </form>
+        </div>
+
+        <!-- Skip button for onboarding -->
+        <div th:if="${childProfile != null and !childProfile.backgroundSelected()}" class="text-center mt-3">
+            <a th:href="@{/child/dashboard}" class="lm-btn lm-btn-secondary lm-btn-lg">
+                <i class="bi bi-skip-forward me-2"></i>Пропустить
+            </a>
+        </div>
+    </div>
+
+    <!-- Back link for re-selection -->
+    <div th:if="${childProfile != null and childProfile.backgroundSelected() and canChange}" class="text-center mt-3">
+        <a th:href="@{/child/dashboard}" style="color:var(--ink-400);font-size:var(--fs-sm);">
+            ← Вернуться без изменений
+        </a>
+    </div>
+</div>
+
+<style>
+.th-bg-tile:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.18); }
+.th-bg-tile.selected { box-shadow: 0 0 0 3px var(--brand-primary); }
+</style>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

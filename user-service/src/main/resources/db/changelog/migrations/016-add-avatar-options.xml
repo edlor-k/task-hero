@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Галерея аватаров: картинки, которые загружает админ в S3-совместимое
+         хранилище. Ребёнок выбирает себе один аватар из активных опций. -->
+    <changeSet id="016-create-avatar-options-table" author="task-hero">
+        <createTable tableName="avatar_options">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="image_url" type="varchar(512)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="image_key" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="label" type="varchar(64)"/>
+            <column name="sort_order" type="int" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="active" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="updated_at" type="timestamp"/>
+        </createTable>
+
+        <createIndex tableName="avatar_options" indexName="idx_avatar_options_active_sort">
+            <column name="active"/>
+            <column name="sort_order"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Заменяем CharacterType-систему (эмодзи-персонаж + эволюция по уровням,
+         которая никогда не дошла до реальных картинок) на выбор аватара
+         из галереи. -->
+    <changeSet id="016-replace-character-with-avatar-on-children" author="task-hero">
+        <addColumn tableName="children">
+            <column name="avatar_option_id" type="uuid">
+                <constraints nullable="true"
+                             foreignKeyName="fk_child_avatar_option"
+                             references="avatar_options(id)"/>
+            </column>
+        </addColumn>
+
+        <dropColumn tableName="children" columnName="character_type"/>
+        <dropColumn tableName="children" columnName="character_selected"/>
+        <!-- avatar_url существовала с момента создания таблицы, но никогда не
+             записывалась приложением — реальный URL теперь приходит через
+             join на avatar_options. -->
+        <dropColumn tableName="children" columnName="avatar_url"/>
+    </changeSet>
+
+</databaseChangeLog>

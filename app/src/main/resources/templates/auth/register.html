@@ -1,24 +1,47 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Регистрация')}"></head>
-<body class="auth-wrapper d-flex align-items-center justify-content-center">
+<body class="auth-wrapper d-flex align-items-center justify-content-center min-vh-100 py-4">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-6 col-lg-5">
-                <div class="card shadow border-0">
-                    <div class="card-body p-4 p-md-5">
-                        <div class="text-center mb-4">
-                            <a th:href="@{/}" class="text-decoration-none">
-                                <i class="bi bi-trophy-fill text-primary fs-1"></i>
-                                <h4 class="fw-bold text-dark mt-2">TaskGamer</h4>
-                            </a>
-                            <p class="text-muted">Создайте аккаунт родителя</p>
-                        </div>
+                <div class="auth-card" style="max-width:480px;">
+                    <div class="auth-logo">
+                        <span class="auth-logo-chip"><i class="bi bi-trophy-fill"></i></span>
+                        <span class="auth-logo-text">TaskGamer</span>
+                    </div>
+                    <p style="color:var(--ink-500);font-size:var(--fs-sm);margin-bottom:var(--s-6);">Создайте аккаунт родителя</p>
 
-                        <div th:if="${error}" class="alert alert-danger py-2">
-                            <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}">Ошибка</span>
-                        </div>
+                    <div th:if="${error}" class="alert alert-danger py-2 mb-3">
+                        <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}">Ошибка</span>
+                    </div>
 
+                    <!-- Yandex SSO (primary) -->
+                    <a th:href="@{/oauth2/authorization/yandex}"
+                       class="lm-btn lm-btn-primary lm-btn-lg w-100 justify-content-center mb-3"
+                       style="background:var(--brand-primary);border-color:var(--brand-primary);text-decoration:none;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                             fill="currentColor" class="me-2" style="flex-shrink:0;">
+                            <path d="M13.515 2H10.5C6.91 2 4 4.91 4 8.5c0 2.604 1.38 4.536 3.585 5.573L4.19 22h3.12l3.19-7.58H12v7.58h2.985V2h-1.47zm0 9.737h-1.158c-1.905 0-3.072-1.107-3.072-3.237 0-2.085 1.167-3.237 3.072-3.237h1.158v6.474z"/>
+                        </svg>
+                        Зарегистрироваться через Яндекс
+                    </a>
+
+                    <div class="d-flex align-items-center mb-3" style="gap:0.75rem;">
+                        <hr style="flex:1;border-color:var(--border-subtle);margin:0;">
+                        <span style="color:var(--ink-400);font-size:var(--fs-xs);white-space:nowrap;">или</span>
+                        <hr style="flex:1;border-color:var(--border-subtle);margin:0;">
+                    </div>
+
+                    <!-- Toggle manual form -->
+                    <button type="button" id="toggleManual"
+                            class="lm-btn lm-btn-secondary lm-btn-lg w-100 justify-content-center mb-3"
+                            onclick="toggleManualForm()">
+                        <i class="bi bi-pencil-square me-2"></i>Ручная регистрация
+                    </button>
+
+                    <!-- Manual form (hidden by default) -->
+                    <div id="manualForm" style="display:none;">
                         <form th:action="@{/register}" method="post" th:object="${registerRequest}">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
@@ -47,17 +70,37 @@
                                 <input type="password" class="form-control" id="confirmPassword"
                                        th:field="*{confirmPassword}" placeholder="Повторите пароль" required>
                             </div>
-                            <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">Зарегистрироваться</button>
-                            <div class="text-center">
-                                <span class="text-muted">Уже есть аккаунт?</span>
-                                <a th:href="@{/login}" class="fw-semibold text-decoration-none">Войти</a>
-                            </div>
+                            <button type="submit" class="lm-btn lm-btn-primary lm-btn-lg w-100 justify-content-center mb-3">Создать аккаунт</button>
                         </form>
+                    </div>
+
+                    <div class="text-center" style="font-size:var(--fs-sm);">
+                        <span style="color:var(--ink-500);">Уже есть аккаунт?</span>
+                        <a th:href="@{/login}" class="fw-semibold text-decoration-none ms-1"
+                           style="color:var(--brand-primary);">Войти</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+<script>
+function toggleManualForm() {
+    var form = document.getElementById('manualForm');
+    var btn = document.getElementById('toggleManual');
+    if (form.style.display === 'none') {
+        form.style.display = 'block';
+        btn.innerHTML = '<i class="bi bi-x-lg me-2"></i>Скрыть форму';
+    } else {
+        form.style.display = 'none';
+        btn.innerHTML = '<i class="bi bi-pencil-square me-2"></i>Ручная регистрация';
+    }
+}
+// Если была ошибка валидации — показать форму сразу
+(function() {
+    var errorAlert = document.querySelector('.alert-danger');
+    if (errorAlert) { toggleManualForm(); }
+})();
+</script>
 </body>
 </html>

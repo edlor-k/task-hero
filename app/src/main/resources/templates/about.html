@@ -1,125 +1,117 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('О проекте')}"></head>
-<body>
-<nav class="navbar navbar-expand-lg navbar-dark" style="background: #1e293b;">
-    <div class="container">
-        <a class="navbar-brand fw-bold" th:href="@{/}">
-            <i class="bi bi-trophy me-2"></i>TaskGamer
+<body style="background:var(--surface-page);">
+<nav style="background:var(--surface-card);border-bottom:1px solid var(--border-subtle);" class="sticky-top">
+    <div class="container d-flex justify-content-between align-items-center" style="height:60px;">
+        <a th:href="@{/}" class="text-decoration-none d-flex align-items-center gap-2">
+            <span style="width:32px;height:32px;border-radius:var(--r-xs);
+                         background:linear-gradient(135deg,var(--brand-primary),oklch(0.45 0.16 280));
+                         display:flex;align-items:center;justify-content:center;">
+                <i class="bi bi-trophy-fill text-white" style="font-size:15px;"></i>
+            </span>
+            <span class="fw-bold" style="color:var(--ink-900);">TaskGamer</span>
         </a>
-        <div class="ms-auto">
-            <a th:href="@{/}" class="btn btn-outline-light btn-sm">На главную</a>
-        </div>
+        <a th:href="@{/}" class="lm-btn lm-btn-secondary lm-btn-sm">На главную</a>
     </div>
 </nav>
 
-<div class="container py-5">
+<div class="container py-5" style="max-width:960px;">
+
     <!-- Header -->
     <div class="text-center mb-5">
-        <h1 class="display-4 fw-bold">О проекте TaskGamer</h1>
-        <p class="lead text-muted">Gamification-платформа для управления детскими заданиями</p>
+        <h1 style="font-size:var(--fs-4xl);font-weight:800;letter-spacing:-0.025em;color:var(--ink-900);">О проекте TaskGamer</h1>
+        <p style="font-size:var(--fs-lg);color:var(--ink-500);margin-top:var(--s-3);">Gamification-платформа для управления детскими заданиями</p>
     </div>
 
     <!-- Description -->
     <div class="row justify-content-center mb-5">
         <div class="col-lg-8">
-            <div class="card">
-                <div class="card-body p-4">
-                    <p class="mb-3">
-                        <strong>TaskGamer</strong> — это платформа, которая превращает повседневные задания в увлекательное
-                        приключение для детей. Родители создают задания, а дети выполняют их, получая опыт, коины и
-                        прокачивая своего персонажа.
-                    </p>
-                    <p class="mb-0">
-                        Система геймификации мотивирует детей развивать полезные привычки через игровые механики:
-                        уровни, классы персонажей, магазин наград и систему достижений.
-                    </p>
-                </div>
+            <div class="lm-review" style="padding:var(--s-6);">
+                <p style="color:var(--ink-700);font-size:var(--fs-base);line-height:1.65;margin:0 0 var(--s-4);">
+                    <strong>TaskGamer</strong> — это платформа, которая превращает повседневные задания в увлекательное
+                    приключение для детей. Родители создают задания, а дети выполняют их, получая опыт, монеты и
+                    прокачивая своего персонажа.
+                </p>
+                <p style="color:var(--ink-700);font-size:var(--fs-base);line-height:1.65;margin:0;">
+                    Система геймификации мотивирует детей развивать полезные привычки через игровые механики:
+                    уровни, классы персонажей, магазин наград и систему достижений.
+                </p>
             </div>
         </div>
     </div>
 
     <!-- Features -->
-    <h3 class="fw-bold text-center mb-4">Возможности</h3>
+    <h3 class="fw-bold text-center mb-4" style="font-size:var(--fs-xl);color:var(--ink-900);">Возможности</h3>
     <div class="row g-4 mb-5">
         <div class="col-md-4">
-            <div class="card h-100 text-center">
-                <div class="card-body">
-                    <div class="stat-icon bg-primary bg-opacity-10 text-primary mx-auto mb-3">
-                        <i class="bi bi-people"></i>
-                    </div>
-                    <h5 class="fw-bold">Для родителей</h5>
-                    <p class="text-muted small mb-0">Создание заданий, шаблоны, библиотека, проверка выполнения, магазин наград</p>
-                </div>
+            <div class="lm-feature-card h-100 text-center">
+                <div class="lm-feature-icon mx-auto"><i class="bi bi-people-fill"></i></div>
+                <div class="lm-feature-title">Для родителей</div>
+                <div class="lm-feature-desc">Создание заданий, шаблоны, библиотека, проверка выполнения, магазин наград</div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card h-100 text-center">
-                <div class="card-body">
-                    <div class="stat-icon bg-success bg-opacity-10 text-success mx-auto mb-3">
-                        <i class="bi bi-controller"></i>
-                    </div>
-                    <h5 class="fw-bold">Для детей</h5>
-                    <p class="text-muted small mb-0">Выбор персонажа, выполнение заданий, прокачка уровня, покупки в магазине</p>
+            <div class="lm-feature-card h-100 text-center">
+                <div class="lm-feature-icon mx-auto" style="background:oklch(0.97 0.04 150);color:oklch(0.35 0.12 150);">
+                    <i class="bi bi-controller"></i>
                 </div>
+                <div class="lm-feature-title">Для детей</div>
+                <div class="lm-feature-desc">Выбор персонажа, выполнение заданий, прокачка уровня, покупки в магазине</div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card h-100 text-center">
-                <div class="card-body">
-                    <div class="stat-icon bg-warning bg-opacity-10 text-warning mx-auto mb-3">
-                        <i class="bi bi-trophy"></i>
-                    </div>
-                    <h5 class="fw-bold">Геймификация</h5>
-                    <p class="text-muted small mb-0">Опыт, уровни, классы героев, коины, магазин, повторяющиеся задания</p>
+            <div class="lm-feature-card h-100 text-center">
+                <div class="lm-feature-icon mx-auto" style="background:var(--brand-accent-soft);color:oklch(0.40 0.13 75);">
+                    <i class="bi bi-trophy-fill"></i>
                 </div>
+                <div class="lm-feature-title">Геймификация</div>
+                <div class="lm-feature-desc">Опыт, уровни, классы героев, монеты, магазин, повторяющиеся задания</div>
             </div>
         </div>
     </div>
 
     <!-- Tech stack -->
-    <h3 class="fw-bold text-center mb-4">Технологии</h3>
+    <h3 class="fw-bold text-center mb-4" style="font-size:var(--fs-xl);color:var(--ink-900);">Технологии</h3>
     <div class="row justify-content-center mb-5">
         <div class="col-lg-8">
             <div class="d-flex flex-wrap justify-content-center gap-2">
-                <span class="badge bg-primary fs-6 px-3 py-2">Java 17</span>
-                <span class="badge bg-success fs-6 px-3 py-2">Spring Boot 3</span>
-                <span class="badge bg-info fs-6 px-3 py-2">Thymeleaf</span>
-                <span class="badge bg-secondary fs-6 px-3 py-2">PostgreSQL</span>
-                <span class="badge bg-warning text-dark fs-6 px-3 py-2">Liquibase</span>
-                <span class="badge bg-danger fs-6 px-3 py-2">Docker</span>
-                <span class="badge bg-dark fs-6 px-3 py-2">Bootstrap 5</span>
+                <span class="lm-chip primary" style="padding:7px 14px;font-size:var(--fs-sm);">Java 17</span>
+                <span class="lm-chip success" style="padding:7px 14px;font-size:var(--fs-sm);">Spring Boot 3</span>
+                <span class="lm-chip" style="padding:7px 14px;font-size:var(--fs-sm);">Thymeleaf</span>
+                <span class="lm-chip" style="padding:7px 14px;font-size:var(--fs-sm);">PostgreSQL</span>
+                <span class="lm-chip warning" style="padding:7px 14px;font-size:var(--fs-sm);">Liquibase</span>
+                <span class="lm-chip danger" style="padding:7px 14px;font-size:var(--fs-sm);">Docker</span>
+                <span class="lm-chip" style="padding:7px 14px;font-size:var(--fs-sm);">Bootstrap 5</span>
             </div>
         </div>
     </div>
 
     <!-- Architecture -->
-    <h3 class="fw-bold text-center mb-4">Архитектура</h3>
+    <h3 class="fw-bold text-center mb-4" style="font-size:var(--fs-xl);color:var(--ink-900);">Архитектура</h3>
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <div class="card">
-                <div class="card-body">
-                    <div class="row g-3 text-center">
-                        <div class="col-md-4">
-                            <div class="bg-primary bg-opacity-10 rounded-3 p-3">
-                                <i class="bi bi-window-stack display-6 text-primary"></i>
-                                <h6 class="fw-bold mt-2 mb-0">App (BFF)</h6>
-                                <small class="text-muted">Порт 8080</small>
-                            </div>
+            <div class="lm-review" style="padding:var(--s-5);">
+                <div class="row g-3 text-center">
+                    <div class="col-md-4">
+                        <div style="background:var(--brand-primary-soft);border-radius:var(--r-md);padding:var(--s-4);">
+                            <i class="bi bi-window-stack" style="font-size:2rem;color:var(--brand-primary);"></i>
+                            <div class="fw-bold mt-2" style="font-size:var(--fs-sm);">App (BFF)</div>
+                            <div style="font-size:var(--fs-xs);color:var(--ink-500);font-family:var(--font-mono);">:8080</div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="bg-success bg-opacity-10 rounded-3 p-3">
-                                <i class="bi bi-person-badge display-6 text-success"></i>
-                                <h6 class="fw-bold mt-2 mb-0">User Service</h6>
-                                <small class="text-muted">Порт 8081</small>
-                            </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div style="background:oklch(0.97 0.04 150);border-radius:var(--r-md);padding:var(--s-4);">
+                            <i class="bi bi-person-badge" style="font-size:2rem;color:var(--brand-success);"></i>
+                            <div class="fw-bold mt-2" style="font-size:var(--fs-sm);">User Service</div>
+                            <div style="font-size:var(--fs-xs);color:var(--ink-500);font-family:var(--font-mono);">:8081</div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="bg-warning bg-opacity-10 rounded-3 p-3">
-                                <i class="bi bi-list-check display-6 text-warning"></i>
-                                <h6 class="fw-bold mt-2 mb-0">Task Service</h6>
-                                <small class="text-muted">Порт 8082</small>
-                            </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div style="background:oklch(0.97 0.05 70);border-radius:var(--r-md);padding:var(--s-4);">
+                            <i class="bi bi-list-check" style="font-size:2rem;color:var(--brand-warning);"></i>
+                            <div class="fw-bold mt-2" style="font-size:var(--fs-sm);">Task Service</div>
+                            <div style="font-size:var(--fs-xs);color:var(--ink-500);font-family:var(--font-mono);">:8082</div>
                         </div>
                     </div>
                 </div>
@@ -128,9 +120,9 @@
     </div>
 </div>
 
-<footer class="bg-dark text-white text-center py-3 mt-5">
-    <small>&copy; 2025 TaskGamer. Все права защищены.</small>
-</footer>
+<div class="text-center py-4 mt-4" style="color:var(--ink-400);font-size:var(--fs-sm);border-top:1px solid var(--border-subtle);">
+    TaskGamer &copy; 2026
+</div>
 
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 </body>

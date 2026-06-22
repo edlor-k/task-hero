@@ -7,8 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.taskhero.common.aop.LogMethod;
 import ru.taskhero.common.exception.AuthenticationException;
+import ru.taskhero.common.model.enums.Role;
 import ru.taskhero.userservice.dto.ChildLoginRequestDto;
 import ru.taskhero.userservice.dto.LoginResponseDto;
+import ru.taskhero.userservice.dto.SocialLoginRequestDto;
 import ru.taskhero.userservice.dto.UserLoginRequestDto;
 import ru.taskhero.userservice.entity.Child;
 import ru.taskhero.userservice.entity.User;
@@ -16,6 +18,9 @@ import ru.taskhero.userservice.repository.ChildRepository;
 import ru.taskhero.userservice.repository.UserRepository;
 import ru.taskhero.userservice.security.JwtTokenProvider;
 import ru.taskhero.userservice.service.AuthService;
+import ru.taskhero.userservice.service.ParentService;
+
+import java.util.UUID;
 
 /**
  * Имплементация AuthService для аутентификации пользователей.
@@ -29,6 +34,7 @@ public class AuthServiceImpl implements AuthService {
     private final ChildRepository childRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final ParentService parentService;
 
     /**
      * Авторизация родителя или администратора.
@@ -108,5 +114,36 @@ public class AuthServiceImpl implements AuthService {
                 displayName,
                 "CHILD"
         );
+    }
+
+    @Override
+    @Transactional
+    @LogMethod(value = "auth-social-login")
+    public LoginResponseDto socialLogin(SocialLoginRequestDto request) {
+        User user = userRepository.findByEmail(request.email()).orElse(null);
+
+        if (user == null) {
+            String firstName = request.firstName() != null && !request.firstName().isBlank()
+                    ? request.firstName() : "Пользователь";
+            String surname = request.surname() != null ? request.surname() : "";
+
+            user = User.builder()
+                    .email(request.email())
+                    .password(passwordEncoder.encode(UUID.randomUUID().toString()))
+                    .role(Role.PARENT)
+                    .build();
+            user = userRepository.save(user);
+            parentService.createForUser(user.getId(), firstName, surname);
+            log.info("Создан новый пользователь через Yandex SSO: {}", user.getEmail());
+        } else if (!user.isActive()) {
+            log.warn("Попытка SSO-входа заблокированного пользователя: {}", request.email());
+            throw new AuthenticationException("Учётная запись заблокирована");
+        }
+
+        String token = jwtTokenProvider.generateToken(
+                user.getId(), user.getEmail(), user.getRole().name());
+
+        log.info("Успешный SSO-вход: {}", user.getEmail());
+        return new LoginResponseDto(token, user.getEmail(), user.getRole().name());
     }
 }

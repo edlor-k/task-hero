@@ -20,4 +20,7 @@
     <include file="db/changelog/migrations/013-add-preset-group-to-shop.xml"/>
     <include file="db/changelog/migrations/014-add-nickname-to-children.xml"/>
     <include file="db/changelog/migrations/015-add-nickname-unlocked.xml"/>
+    <include file="db/changelog/migrations/016-add-avatar-options.xml"/>
+    <include file="db/changelog/migrations/017-add-background-options.xml"/>
+    <include file="db/changelog/migrations/018-add-accent-color.xml"/>
 </databaseChangeLog>

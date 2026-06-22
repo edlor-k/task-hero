@@ -116,6 +116,12 @@ services:
       JWT_SECRET: mySecretKeyForJWTTokenGenerationThatIsLongEnough256bits
       JWT_EXPIRATION_MS: 86400000
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
+      S3_ENDPOINT: ${S3_ENDPOINT:-}
+      S3_REGION: ${S3_REGION:-ru-central1}
+      S3_BUCKET: ${S3_BUCKET:-}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-}
+      S3_PUBLIC_BASE_URL: ${S3_PUBLIC_BASE_URL:-}
       LOGGING_LEVEL_ROOT: INFO
       JAVA_TOOL_OPTIONS: "-Xss512k -XX:MaxMetaspaceSize=128m -XX:ReservedCodeCacheSize=48m"
     healthcheck:
@@ -199,6 +205,8 @@ services:
     environment:
       USER_SERVICE_URL: http://user-service:8081/users
       TASK_SERVICE_URL: http://task-service:8082/tasks
+      YANDEX_CLIENT_ID: ${YANDEX_CLIENT_ID:-}
+      YANDEX_CLIENT_SECRET: ${YANDEX_CLIENT_SECRET:-}
       LOGGING_LEVEL_ROOT: INFO
       JAVA_TOOL_OPTIONS: "-Xss512k -XX:MaxMetaspaceSize=110m -XX:ReservedCodeCacheSize=40m"
     healthcheck:

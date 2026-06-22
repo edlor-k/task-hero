@@ -27,6 +27,7 @@
         <!-- Feign / HTTP -->
         <spring.cloud.starter.openfeign.version>4.3.0</spring.cloud.starter.openfeign.version>
         <feign-okhttp.version>13.5</feign-okhttp.version>
+        <feign-form.version>3.8.0</feign-form.version>
 
         <!-- DB / Migration -->
         <postgresql.version>42.7.5</postgresql.version>
@@ -48,6 +49,9 @@
         <!-- Monitoring -->
         <micrometer.version>1.13.3</micrometer.version>
         <zipkin.version>2.16.3</zipkin.version>
+
+        <!-- Object storage (S3-совместимое: Yandex Object Storage / Selectel / R2 / MinIO) -->
+        <aws-sdk.version>2.29.52</aws-sdk.version>
     </properties>
 
     <dependencyManagement>
@@ -67,6 +71,16 @@
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
                 <version>${spring.cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- AWS SDK v2 platform (используем только модуль s3, но он работает
+                 с любым S3-совместимым хранилищем через endpointOverride) -->
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>bom</artifactId>
+                <version>${aws-sdk.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -99,6 +113,18 @@
                 <groupId>io.github.openfeign</groupId>
                 <artifactId>feign-okhttp</artifactId>
                 <version>${feign-okhttp.version}</version>
+            </dependency>
+
+            <!-- Multipart-форма для одного Feign-клиента (загрузка аватара админом) -->
+            <dependency>
+                <groupId>io.github.openfeign.form</groupId>
+                <artifactId>feign-form</artifactId>
+                <version>${feign-form.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.openfeign.form</groupId>
+                <artifactId>feign-form-spring</artifactId>
+                <version>${feign-form.version}</version>
             </dependency>
 
             <dependency>

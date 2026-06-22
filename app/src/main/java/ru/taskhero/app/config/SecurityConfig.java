@@ -10,6 +10,7 @@ import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import ru.taskhero.app.security.ActiveUserSessionFilter;
+import ru.taskhero.app.security.YandexOAuth2SuccessHandler;
 
 /**
  * Конфигурация безопасности для веб-приложения.
@@ -21,6 +22,7 @@ import ru.taskhero.app.security.ActiveUserSessionFilter;
 public class SecurityConfig {
 
     private final ActiveUserSessionFilter activeUserSessionFilter;
+    private final YandexOAuth2SuccessHandler yandexOAuth2SuccessHandler;
 
     /**
      * Настройка цепочки фильтров безопасности.
@@ -32,6 +34,7 @@ public class SecurityConfig {
                         // Публичные страницы
                         .requestMatchers("/", "/home", "/about").permitAll()
                         .requestMatchers("/login", "/register", "/login/child").permitAll()
+                        .requestMatchers("/login/oauth2/**", "/oauth2/**").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/error").permitAll()
@@ -61,6 +64,11 @@ public class SecurityConfig {
                         .invalidateHttpSession(true)
                         .deleteCookies("TASKHERO_SESSION")
                         .permitAll()
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/login")
+                        .successHandler(yandexOAuth2SuccessHandler)
+                        .failureUrl("/login?error=true")
                 )
                 .exceptionHandling(ex -> ex
                         .accessDeniedPage("/access-denied")

@@ -260,6 +260,7 @@ public class ParentController {
             ChildDto child = userServiceClient.createChild(request);
 
             int presetsApplied = 0;
+            int tasksApplied = 0;
             if (presetGroups != null && !presetGroups.isEmpty()) {
                 for (String presetGroup : presetGroups) {
                     // Применяем пресет наград (shop items)
@@ -270,18 +271,24 @@ public class ParentController {
                     } catch (Exception ex) {
                         log.warn("Failed to apply reward preset {} for child {}: {}", presetGroup, child.id(), ex.getMessage());
                     }
-                    // Применяем пресет заданий (task templates)
-                    try {
-                        taskServiceClient.applyTaskPreset(presetGroup);
-                    } catch (Exception ex) {
-                        log.warn("Failed to apply task preset {} for parent: {}", presetGroup, ex.getMessage());
+                    // Применяем пресет заданий — создаём шаблоны в библиотеке родителя
+                    List<Map<String, Object>> presetTasks = buildPresetTasks(normalizePresetGroup(presetGroup));
+                    if (presetTasks != null) {
+                        for (Map<String, Object> task : presetTasks) {
+                            try {
+                                taskServiceClient.createTemplate(task);
+                                tasksApplied++;
+                            } catch (Exception ex) {
+                                log.warn("Failed to create preset task '{}': {}", task.get("title"), ex.getMessage());
+                            }
+                        }
                     }
                 }
             }
 
             String msg = "Ребёнок добавлен! Токен для входа: " + child.loginToken();
-            if (presetsApplied > 0) {
-                msg += ". Добавлено " + presetsApplied + " наград из пресетов.";
+            if (presetsApplied > 0 || tasksApplied > 0) {
+                msg += ". Из пресетов добавлено: " + presetsApplied + " наград, " + tasksApplied + " шаблонов заданий.";
             }
             redirectAttributes.addFlashAttribute("success", msg);
 
@@ -565,6 +572,18 @@ public class ParentController {
         return "redirect:/parent/library" + (onboarding ? "?onboarding=true" : "");
     }
 
+    /**
+     * Нормализует название пресета из формы (STUDY, SPORTS, CLEAN, ROUTINE, HOBBY, GAMER)
+     * в ключ, используемый {@link #buildPresetTasks}.
+     */
+    private static String normalizePresetGroup(String presetGroup) {
+        if (presetGroup == null) return null;
+        return switch (presetGroup.toUpperCase()) {
+            case "CLEAN" -> "household";
+            default -> presetGroup.toLowerCase();
+        };
+    }
+
     private List<Map<String, Object>> buildPresetTasks(String presetName) {
         return switch (presetName) {
             case "study" -> List.of(
@@ -598,6 +617,12 @@ public class ParentController {
                 presetTask("Практика / репетиция", "Целенаправленно потренироваться", "FREQ=WEEKLY;BYDAY=MO,WE,FR", 20, 20, "CREATIVITY"),
                 presetTask("Закончить маленький проект", "Доделать рисунок, поделку, мелодию, модель", "FREQ=WEEKLY", 25, 25, "CREATIVITY"),
                 presetTask("Попробовать что-то новое", "Новый материал, техника, формат", "FREQ=WEEKLY", 25, 25, "CREATIVITY")
+            );
+            case "gamer" -> List.of(
+                presetTask("Выполнить дневное задание в игре", "Любая игра: квест, ежедневная миссия, достижение", "FREQ=DAILY;BYDAY=MO,TU,WE,TH,FR", 10, 10, "CREATIVITY"),
+                presetTask("Пройти новый уровень / глава", "Продвинуться по сюжету или кампании", "FREQ=WEEKLY;BYDAY=SA,SU", 20, 20, "CREATIVITY"),
+                presetTask("Поиграть с другом или семьёй", "Совместная онлайн или локальная игра", "FREQ=WEEKLY;BYDAY=SA,SU", 15, 15, "CREATIVITY"),
+                presetTask("Сделать перерыв после часа игры", "Встать, размяться, попить воды", "FREQ=DAILY;BYDAY=MO,TU,WE,TH,FR,SA,SU", 5, 5, "HYGIENE")
             );
             default -> null;
         };
@@ -722,6 +747,12 @@ public class ParentController {
         try {
             List<TaskAssignmentDto> pendingReview = taskServiceClient.getPendingReview();
             model.addAttribute("assignments", pendingReview);
+
+            // TaskAssignmentDto хранит только childId — подтягиваем детей родителя,
+            // чтобы шаблон мог показать имя/аватар ребёнка по каждому заданию.
+            Map<UUID, ChildDto> childrenById = userServiceClient.getChildren().stream()
+                    .collect(Collectors.toMap(ChildDto::id, c -> c));
+            model.addAttribute("childrenById", childrenById);
         } catch (Exception e) {
             log.error("Error loading review page: {}", e.getMessage());
             model.addAttribute("error", "Ошибка загрузки заданий");

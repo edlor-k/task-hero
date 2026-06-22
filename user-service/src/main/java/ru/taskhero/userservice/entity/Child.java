@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import ru.taskhero.common.model.entity.BaseEntity;
-import ru.taskhero.common.model.enums.CharacterType;
 import ru.taskhero.common.model.enums.DifficultyTrajectory;
 
 
@@ -43,9 +42,6 @@ public class Child extends BaseEntity {
     @Column(name = "level", nullable = false)
     private int level = 1;
 
-    @Column(name = "avatar_url", length = 256)
-    private String avatarUrl;
-
     @Column(name = "login_token", unique = true, length = 64)
     private String loginToken;
 
@@ -55,18 +51,26 @@ public class Child extends BaseEntity {
     private DifficultyTrajectory difficultyTrajectory = DifficultyTrajectory.NORMAL;
 
     /**
-     * Тип персонажа (выбирается ребёнком при первом входе).
+     * Аватар ребёнка, выбранный из галереи (картинки в объектном хранилище).
+     * {@code null}, пока ребёнок не выбрал аватар при первом входе.
      */
-    @Enumerated(EnumType.STRING)
-    @Column(name = "character_type", length = 16)
-    private CharacterType characterType;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "avatar_option_id")
+    private AvatarOption avatarOption;
 
     /**
-     * Флаг, выбран ли персонаж (при первом входе).
+     * Фон ребёнка, выбранный из галереи. {@code null}, пока ребёнок не выбрал фон.
      */
-    @Builder.Default
-    @Column(name = "character_selected", nullable = false)
-    private boolean characterSelected = false;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "background_option_id")
+    private BackgroundOption backgroundOption;
+
+    /**
+     * Акцентный цвет UI ребёнка (ключ палитры: primary, success, accent, danger, pink, cyan, orange, indigo).
+     * {@code null} соответствует дефолту — primary (фиолетовый).
+     */
+    @Column(name = "accent_color", length = 20)
+    private String accentColor;
 
     /**
      * Никнейм ребёнка (отображается вместо имени в публичном UI).

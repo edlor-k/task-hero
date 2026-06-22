@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.8.xsd">
+
+    <changeSet id="017-create-background-options-table" author="taskhero">
+        <createTable tableName="background_options">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="image_url" type="varchar(512)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="image_key" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="label" type="varchar(64)"/>
+            <column name="sort_order" type="integer" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="active" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone"/>
+            <column name="updated_at" type="timestamp with time zone"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="017-add-background-option-to-children" author="taskhero">
+        <addColumn tableName="children">
+            <column name="background_option_id" type="uuid"/>
+        </addColumn>
+        <addForeignKeyConstraint
+                baseTableName="children"
+                baseColumnNames="background_option_id"
+                constraintName="fk_children_background_option"
+                referencedTableName="background_options"
+                referencedColumnNames="id"
+                onDelete="SET NULL"/>
+    </changeSet>
+
+</databaseChangeLog>

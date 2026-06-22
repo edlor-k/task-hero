@@ -1,7 +1,6 @@
 package ru.taskhero.userservice.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import ru.taskhero.common.model.enums.CharacterType;
 import ru.taskhero.common.model.enums.DifficultyTrajectory;
 
 import java.time.Instant;
@@ -37,8 +36,8 @@ public record ChildDetailDto(
         @Schema(description = "Траектория сложности")
         DifficultyTrajectory difficultyTrajectory,
 
-        @Schema(description = "Тип персонажа")
-        CharacterType characterType,
+        @Schema(description = "URL аватара")
+        String avatarUrl,
 
         @Schema(description = "Информация о родителе")
         ParentSummaryDto parent,
@@ -50,5 +49,17 @@ public record ChildDetailDto(
         Instant updatedAt,
 
         @Schema(description = "Никнейм ребёнка")
-        String nickname
+        String nickname,
+
+        @Schema(description = "ID выбранного аватара из галереи")
+        UUID avatarOptionId,
+
+        @Schema(description = "URL фона")
+        String backgroundUrl,
+
+        @Schema(description = "ID выбранного фона из галереи")
+        UUID backgroundOptionId,
+
+        @Schema(description = "Акцентный цвет UI")
+        String accentColor
 ) { }

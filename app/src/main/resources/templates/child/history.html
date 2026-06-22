@@ -1,58 +1,67 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('История заданий')}"></head>
-<body>
+<body class="lm-has-bottom-tab">
 <div class="th-layout">
     <nav th:replace="~{fragments/layout :: sidebar-child}"></nav>
+    <nav th:replace="~{fragments/layout :: bottom-tab-child}"></nav>
     <div class="th-content">
-        <header th:replace="~{fragments/layout :: header}"></header>
+        <header th:replace="~{fragments/layout :: topbar-child(coins=${topbarCoins}, avatarUrl=${topbarAvatarUrl})}"></header>
         <main class="th-main">
 
-            <h4 class="fw-bold mb-4"><i class="bi bi-clock-history me-2"></i>История заданий</h4>
-
-            <!-- Empty state -->
-            <div th:if="${#lists.isEmpty(assignments)}" class="text-center py-5">
-                <i class="bi bi-clock-history display-1 text-muted"></i>
-                <h4 class="mt-3 text-muted">История пуста</h4>
-                <p class="text-muted">Выполненные задания появятся здесь</p>
+            <div class="lm-page-header">
+                <div>
+                    <h1 class="lm-page-title">История заданий</h1>
+                    <p class="lm-page-sub">Все выполненные задания</p>
+                </div>
             </div>
 
-            <!-- History list -->
-            <div th:unless="${#lists.isEmpty(assignments)}" class="list-group">
-                <div th:each="a : ${assignments}" class="list-group-item">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div class="me-3">
-                            <div class="d-flex align-items-center gap-2 mb-1">
-                                <h6 class="fw-semibold mb-0" th:text="${a.template?.title}">Задание</h6>
-                                <span class="badge"
-                                      th:classappend="${a.status == 'APPROVED' ? 'bg-success' :
-                                                        a.status == 'REJECTED' ? 'bg-danger' : 'bg-secondary'}"
-                                      th:text="${a.status == 'APPROVED' ? 'Одобрено' :
-                                                 a.status == 'REJECTED' ? 'Отклонено' : a.status}">Статус</span>
-                            </div>
-                            <p class="text-muted small mb-1" th:text="${a.template?.description}" th:if="${a.template?.description}">Описание</p>
+            <!-- Empty state -->
+            <div th:if="${#lists.isEmpty(assignments)}" class="lm-empty-state">
+                <div class="lm-empty-icon">📖</div>
+                <div class="lm-empty-title">История пуста</div>
+                <div class="lm-empty-sub">Выполненные задания появятся здесь</div>
+            </div>
 
-                            <!-- Rewards -->
-                            <div class="d-flex gap-2" th:if="${a.status == 'APPROVED'}">
-                                <span class="badge bg-success-subtle text-success" th:if="${a.expEarned}">
-                                    <i class="bi bi-star-fill me-1"></i>+<span th:text="${a.expEarned}">10</span> EXP
-                                </span>
-                                <span class="badge bg-warning-subtle text-warning" th:if="${a.coinsEarned}">
-                                    <i class="bi bi-coin me-1"></i>+<span th:text="${a.coinsEarned}">5</span> коинов
-                                </span>
-                            </div>
+            <!-- History feed -->
+            <div th:unless="${#lists.isEmpty(assignments)}" class="d-flex flex-column gap-2">
+                <div th:each="a : ${assignments}"
+                     class="lm-history-item"
+                     th:classappend="${a.status == 'APPROVED' ? 'approved' :
+                                      a.status == 'REJECTED' ? 'rejected' : 'pending'}">
 
-                            <!-- Parent comment -->
-                            <div th:if="${a.parentComment}" class="mt-1">
-                                <small class="text-muted"><i class="bi bi-chat-left-text me-1"></i><span th:text="${a.parentComment}">Комментарий</span></small>
-                            </div>
-                        </div>
-                        <div class="text-end">
-                            <small class="text-muted d-block" th:if="${a.reviewedAt}"
-                                   th:attr="data-utc-datetime=${a.reviewedAt}"
-                                   th:text="${a.reviewedAt}">2025-01-01T09:00:00Z</small>
+                    <div class="lm-hi-icon">
+                        <span th:if="${a.status == 'APPROVED'}">✅</span>
+                        <span th:if="${a.status == 'REJECTED'}">❌</span>
+                        <span th:unless="${a.status == 'APPROVED' or a.status == 'REJECTED'}">⏳</span>
+                    </div>
+
+                    <div class="lm-hi-body">
+                        <div class="lm-hi-title" th:text="${a.template?.title}">Задание</div>
+                        <div class="lm-hi-date">
+                            <span th:if="${a.reviewedAt}"
+                                  th:attr="data-utc-datetime=${a.reviewedAt}"
+                                  th:text="${a.reviewedAt}">дата</span>
+                            <span th:if="${a.parentComment}"
+                                  style="color:var(--ink-400);">
+                                · <span th:text="${a.parentComment}">Комментарий</span>
+                            </span>
                         </div>
                     </div>
+
+                    <!-- Earned rewards -->
+                    <div th:if="${a.status == 'APPROVED'}" class="text-end flex-shrink-0">
+                        <div class="lm-hi-reward" th:if="${a.coinsEarned}">
+                            🪙 +<span th:text="${a.coinsEarned}">5</span>
+                        </div>
+                        <div style="font-size:var(--fs-xs);color:oklch(0.35 0.12 150);font-weight:600;" th:if="${a.expEarned}">
+                            ⭐ +<span th:text="${a.expEarned}">10</span> EXP
+                        </div>
+                    </div>
+                    <span th:unless="${a.status == 'APPROVED'}"
+                          class="lm-chip ms-auto"
+                          th:classappend="${a.status == 'REJECTED' ? ' danger' : ' warning'}"
+                          th:text="${a.status == 'REJECTED' ? 'Отклонено' : 'На проверке'}">Статус</span>
                 </div>
             </div>
 
@@ -60,7 +69,6 @@
         <footer th:replace="~{fragments/layout :: footer}"></footer>
     </div>
 </div>
-
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 </body>
 </html>

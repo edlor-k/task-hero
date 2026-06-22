@@ -1,0 +1,1372 @@
+/* ============================================================
+   TaskGamer · Lumi Design System integration
+   Lumi tokens + Bootstrap 5 bridge + component overrides
+   Loaded AFTER bootstrap.min.css and taskhero.css
+   ============================================================ */
+
+/* ── 1. Design Tokens ───────────────────────────────────────── */
+:root {
+  /* Brand: Purple */
+  --brand-primary:        oklch(0.56 0.19 288);
+  --brand-primary-hover:  oklch(0.50 0.20 288);
+  --brand-primary-soft:   oklch(0.96 0.03 288);
+  --brand-primary-ink:    oklch(0.32 0.16 288);
+  --brand-accent:         oklch(0.78 0.16 75);
+  --brand-accent-soft:    oklch(0.96 0.06 75);
+  --brand-success:        oklch(0.66 0.16 150);
+  --brand-warning:        oklch(0.78 0.15 70);
+  --brand-danger:         oklch(0.62 0.20 25);
+  --brand-info:           oklch(0.62 0.13 230);
+
+  /* Neutrals */
+  --ink-900: oklch(0.20 0.02 285);
+  --ink-700: oklch(0.36 0.02 285);
+  --ink-500: oklch(0.52 0.02 285);
+  --ink-400: oklch(0.64 0.02 285);
+  --ink-300: oklch(0.78 0.01 285);
+  --ink-200: oklch(0.90 0.005 285);
+  --ink-100: oklch(0.96 0.003 285);
+  --ink-050: oklch(0.985 0.002 285);
+  --ink-000: #ffffff;
+
+  /* Surfaces */
+  --surface-page:    var(--ink-050);
+  --surface-card:    #ffffff;
+  --surface-sunken:  var(--ink-100);
+  --surface-overlay: rgba(20, 14, 38, 0.55);
+
+  /* Borders */
+  --border-subtle:   oklch(0.93 0.008 285);
+  --border-default:  oklch(0.88 0.012 285);
+  --border-strong:   oklch(0.78 0.02 285);
+
+  /* Typography */
+  --font-sans:    "Onest", "Inter", system-ui, sans-serif;
+  --font-display: "Onest", "Inter", system-ui, sans-serif;
+  --font-mono:    "JetBrains Mono", ui-monospace, monospace;
+
+  /* Font scale */
+  --fs-2xs: 11px;
+  --fs-xs:  12px;
+  --fs-sm:  13px;
+  --fs-md:  14px;
+  --fs-base:15px;
+  --fs-lg:  17px;
+  --fs-xl:  20px;
+  --fs-2xl: 24px;
+  --fs-3xl: 32px;
+  --fs-4xl: 44px;
+
+  /* Spacing */
+  --s-1:  4px;  --s-2:  8px;  --s-3:  12px; --s-4:  16px; --s-5:  20px;
+  --s-6:  24px; --s-8:  32px; --s-10: 40px; --s-12: 48px; --s-16: 64px;
+
+  /* Radius */
+  --r-xs:  6px; --r-sm: 10px; --r-md: 14px; --r-lg: 20px; --r-xl: 28px;
+  --r-pill: 999px;
+
+  /* Shadows */
+  --sh-xs: 0 1px 2px rgba(18,12,38,0.06);
+  --sh-sm: 0 2px 6px rgba(18,12,38,0.06), 0 1px 2px rgba(18,12,38,0.04);
+  --sh-md: 0 8px 24px -8px rgba(18,12,38,0.10), 0 2px 6px rgba(18,12,38,0.04);
+  --sh-lg: 0 20px 48px -16px rgba(18,12,38,0.18), 0 4px 12px rgba(18,12,38,0.06);
+  --sh-glow: 0 0 0 4px color-mix(in oklch, var(--brand-primary) 18%, transparent);
+
+  /* Motion */
+  --ease-out:    cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-1: 120ms; --dur-2: 200ms; --dur-3: 320ms; --dur-4: 480ms;
+}
+
+/* Brand variant overrides */
+[data-brand="forest"] {
+  --brand-primary:       oklch(0.55 0.13 168);
+  --brand-primary-hover: oklch(0.48 0.14 168);
+  --brand-primary-soft:  oklch(0.96 0.03 168);
+  --brand-primary-ink:   oklch(0.30 0.10 168);
+  --brand-accent:        oklch(0.74 0.16 50);
+  --brand-accent-soft:   oklch(0.96 0.05 50);
+}
+[data-brand="sunset"] {
+  --brand-primary:       oklch(0.62 0.17 25);
+  --brand-primary-hover: oklch(0.55 0.18 25);
+  --brand-primary-soft:  oklch(0.97 0.03 25);
+  --brand-primary-ink:   oklch(0.32 0.14 25);
+  --brand-accent:        oklch(0.66 0.15 290);
+  --brand-accent-soft:   oklch(0.96 0.04 290);
+}
+[data-density="compact"] {
+  --s-3: 8px; --s-4: 12px; --s-5: 16px; --s-6: 18px; --s-8: 24px; --s-10: 32px;
+}
+[data-radius="sharp"] { --r-sm: 4px;  --r-md: 6px;  --r-lg: 8px;  --r-xl: 10px; }
+[data-radius="pill"]  { --r-sm: 14px; --r-md: 20px; --r-lg: 28px; --r-xl: 36px; }
+
+
+/* ── 2. Base resets ─────────────────────────────────────────── */
+body {
+  font-family: var(--font-sans) !important;
+  background: var(--surface-page) !important;
+  color: var(--ink-900) !important;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+::selection { background: var(--brand-primary-soft); color: var(--brand-primary-ink); }
+
+
+/* ── 3. Bootstrap Bridge ────────────────────────────────────── */
+/* Map Bootstrap variables to Lumi tokens so BS components auto-recolor */
+:root {
+  /* oklch(0.56 0.19 288) ≈ rgb(96, 68, 194) */
+  --bs-primary-rgb:       96, 68, 194;
+  --bs-success-rgb:       80, 177, 122;   /* oklch(0.66 0.16 150) */
+  --bs-warning-rgb:       220, 182, 40;   /* oklch(0.78 0.15 70)  */
+  --bs-danger-rgb:        205, 79, 58;    /* oklch(0.62 0.20 25)  */
+  --bs-info-rgb:          64, 148, 204;   /* oklch(0.62 0.13 230) */
+  --bs-body-bg:           var(--surface-page);
+  --bs-body-color:        var(--ink-900);
+  --bs-border-color:      var(--border-default);
+  --bs-border-radius:     var(--r-md);
+  --bs-border-radius-sm:  var(--r-sm);
+  --bs-border-radius-lg:  var(--r-lg);
+  --bs-font-sans-serif:   var(--font-sans);
+  --bs-link-color:        var(--brand-primary);
+  --bs-link-color-rgb:    96, 68, 194;
+  --bs-link-hover-color:  var(--brand-primary-hover);
+}
+
+/* Primary button */
+.btn-primary {
+  --bs-btn-color: #fff;
+  --bs-btn-bg:               var(--brand-primary);
+  --bs-btn-border-color:     var(--brand-primary);
+  --bs-btn-hover-bg:         var(--brand-primary-hover);
+  --bs-btn-hover-border-color: var(--brand-primary-hover);
+  --bs-btn-active-bg:        var(--brand-primary-hover);
+  --bs-btn-active-border-color: var(--brand-primary-hover);
+  --bs-btn-disabled-bg:      var(--brand-primary);
+  --bs-btn-disabled-border-color: var(--brand-primary);
+  --bs-btn-focus-shadow-rgb: 96, 68, 194;
+}
+.btn-outline-primary {
+  --bs-btn-color:              var(--brand-primary);
+  --bs-btn-border-color:       var(--brand-primary);
+  --bs-btn-hover-color:        #fff;
+  --bs-btn-hover-bg:           var(--brand-primary);
+  --bs-btn-hover-border-color: var(--brand-primary);
+  --bs-btn-active-bg:          var(--brand-primary-hover);
+  --bs-btn-active-border-color: var(--brand-primary-hover);
+  --bs-btn-focus-shadow-rgb:   96, 68, 194;
+}
+
+/* Success */
+.btn-success {
+  --bs-btn-bg:               var(--brand-success);
+  --bs-btn-border-color:     var(--brand-success);
+  --bs-btn-hover-bg:         oklch(0.60 0.17 150);
+  --bs-btn-hover-border-color: oklch(0.60 0.17 150);
+  --bs-btn-focus-shadow-rgb: 80, 177, 122;
+}
+.btn-outline-success {
+  --bs-btn-color:            var(--brand-success);
+  --bs-btn-border-color:     var(--brand-success);
+  --bs-btn-hover-bg:         var(--brand-success);
+  --bs-btn-hover-border-color: var(--brand-success);
+}
+
+/* Danger */
+.btn-danger {
+  --bs-btn-bg:               var(--brand-danger);
+  --bs-btn-border-color:     var(--brand-danger);
+  --bs-btn-hover-bg:         oklch(0.56 0.21 25);
+  --bs-btn-hover-border-color: oklch(0.56 0.21 25);
+  --bs-btn-focus-shadow-rgb: 205, 79, 58;
+}
+.btn-outline-danger {
+  --bs-btn-color:            var(--brand-danger);
+  --bs-btn-border-color:     var(--brand-danger);
+  --bs-btn-hover-bg:         var(--brand-danger);
+  --bs-btn-hover-border-color: var(--brand-danger);
+}
+
+/* Warning */
+.btn-warning {
+  --bs-btn-bg:               var(--brand-warning);
+  --bs-btn-border-color:     var(--brand-warning);
+  --bs-btn-hover-bg:         oklch(0.72 0.16 70);
+  --bs-btn-hover-border-color: oklch(0.72 0.16 70);
+}
+.btn-outline-warning {
+  --bs-btn-color:            oklch(0.50 0.15 70);
+  --bs-btn-border-color:     var(--brand-warning);
+  --bs-btn-hover-bg:         var(--brand-warning);
+  --bs-btn-hover-border-color: var(--brand-warning);
+}
+
+/* Info */
+.btn-info {
+  --bs-btn-bg:               var(--brand-info);
+  --bs-btn-border-color:     var(--brand-info);
+  --bs-btn-hover-bg:         oklch(0.56 0.14 230);
+  --bs-btn-hover-border-color: oklch(0.56 0.14 230);
+}
+
+/* Text / bg / border utilities */
+.text-primary   { color: var(--brand-primary) !important; }
+.bg-primary     { background-color: var(--brand-primary) !important; }
+.border-primary { border-color: var(--brand-primary) !important; }
+.text-success   { color: var(--brand-success) !important; }
+.bg-success     { background-color: var(--brand-success) !important; }
+.text-danger    { color: var(--brand-danger) !important; }
+.bg-danger      { background-color: var(--brand-danger) !important; }
+.text-warning   { color: oklch(0.50 0.15 70) !important; }
+.bg-warning     { background-color: var(--brand-warning) !important; }
+.text-info      { color: var(--brand-info) !important; }
+.bg-info        { background-color: var(--brand-info) !important; }
+
+/* Badges */
+.badge.bg-primary { background-color: var(--brand-primary) !important; }
+.badge.bg-success { background-color: var(--brand-success) !important; }
+.badge.bg-danger  { background-color: var(--brand-danger) !important; }
+.badge.bg-warning { background-color: var(--brand-warning) !important; color: #fff !important; }
+.badge.bg-info    { background-color: var(--brand-info) !important; }
+
+/* Alerts */
+.alert-primary {
+  --bs-alert-color:      var(--brand-primary-ink);
+  --bs-alert-bg:         var(--brand-primary-soft);
+  --bs-alert-border-color: color-mix(in oklch, var(--brand-primary) 25%, transparent);
+}
+.alert-success {
+  --bs-alert-color:      oklch(0.28 0.12 150);
+  --bs-alert-bg:         oklch(0.97 0.04 150);
+  --bs-alert-border-color: oklch(0.80 0.10 150);
+}
+.alert-danger {
+  --bs-alert-color:      oklch(0.30 0.14 25);
+  --bs-alert-bg:         oklch(0.97 0.04 25);
+  --bs-alert-border-color: oklch(0.82 0.10 25);
+}
+.alert-warning {
+  --bs-alert-color:      oklch(0.34 0.13 70);
+  --bs-alert-bg:         oklch(0.97 0.05 70);
+  --bs-alert-border-color: oklch(0.86 0.10 70);
+}
+.alert-info {
+  --bs-alert-color:      oklch(0.30 0.10 230);
+  --bs-alert-bg:         oklch(0.97 0.03 230);
+  --bs-alert-border-color: oklch(0.82 0.08 230);
+}
+
+/* Form controls focus */
+.form-control:focus, .form-select:focus {
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--brand-primary) 15%, transparent);
+}
+
+/* Pagination */
+.page-link { color: var(--brand-primary); }
+.page-item.active .page-link {
+  background-color: var(--brand-primary);
+  border-color: var(--brand-primary);
+}
+
+/* Tabs */
+.nav-tabs .nav-link.active {
+  color: var(--brand-primary);
+  border-bottom-color: var(--brand-primary);
+}
+.nav-pills .nav-link.active {
+  background-color: var(--brand-primary);
+}
+
+/* Cards */
+.card {
+  border-color: var(--border-subtle);
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-xs);
+}
+.card:hover { box-shadow: var(--sh-sm); }
+.card-header {
+  background: var(--surface-sunken);
+  border-bottom-color: var(--border-subtle);
+}
+
+/* Dropdowns */
+.dropdown-menu {
+  border-color: var(--border-subtle);
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-md);
+}
+.dropdown-item:hover { background: var(--ink-100); }
+.dropdown-item:active { background: var(--brand-primary); }
+
+/* Progress */
+.progress { background: var(--ink-100); border-radius: var(--r-pill); }
+.progress-bar { background: var(--brand-primary); }
+
+/* Buttons global radius */
+.btn { border-radius: var(--r-sm); font-family: var(--font-sans); }
+
+
+/* ── 4. Sidebar Override ─────────────────────────────────────── */
+/* Purple dark sidebar */
+.th-sidebar {
+  background: linear-gradient(180deg, oklch(0.28 0.20 290), oklch(0.22 0.17 284)) !important;
+  border-right: 1px solid oklch(0.19 0.14 284);
+  box-shadow: var(--sh-md);
+}
+
+.th-sidebar::-webkit-scrollbar-thumb {
+  background: oklch(0.40 0.14 288);
+}
+
+/* Logo chip: bright accent on dark bg */
+.sidebar-logo-icon {
+  background: linear-gradient(135deg, oklch(0.65 0.20 288), oklch(0.78 0.16 75)) !important;
+}
+
+/* Brand name: white on dark bg */
+.sidebar-header .fw-bold.text-white,
+.sidebar-header .fw-bold {
+  color: #fff !important;
+}
+
+/* Section labels */
+.sidebar-section-label {
+  font-family: var(--font-mono);
+  color: oklch(0.68 0.10 288) !important;
+  letter-spacing: 0.1em;
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  padding: 1rem 1rem 0.3rem;
+}
+
+/* Nav links */
+.sidebar-link {
+  color: oklch(0.88 0.05 288) !important;
+  border-radius: var(--r-sm) !important;
+  font-size: var(--fs-sm) !important;
+}
+.sidebar-link:hover {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.10) !important;
+}
+.sidebar-link.active {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.18) !important;
+  font-weight: 600;
+}
+.sidebar-link i {
+  color: inherit;
+}
+
+/* Badges */
+.sidebar-badge {
+  animation: none !important;
+  box-shadow: none !important;
+  font-size: var(--fs-2xs) !important;
+  height: 18px !important;
+  min-width: 18px !important;
+  padding: 0 5px !important;
+  border-radius: var(--r-pill) !important;
+  font-weight: 700 !important;
+  line-height: 18px !important;
+}
+.sidebar-badge-warning { background: var(--brand-warning); color: #fff !important; }
+.sidebar-badge-info    { background: var(--brand-info);    color: #fff !important; }
+.sidebar-badge-danger  { background: var(--brand-danger);  color: #fff !important; }
+.sidebar-badge-star    { background: var(--brand-accent);  color: #fff !important; }
+
+/* Footer */
+.sidebar-footer {
+  border-top-color: oklch(0.35 0.14 288) !important;
+}
+.sidebar-footer .btn-outline-light {
+  color: oklch(0.82 0.06 288) !important;
+  border-color: oklch(0.44 0.13 288) !important;
+  background: transparent;
+}
+.sidebar-footer .btn-outline-light:hover {
+  background: rgba(255, 255, 255, 0.10) !important;
+  color: #fff !important;
+}
+
+
+/* ── 5. Topbar Override ──────────────────────────────────────── */
+.th-topbar {
+  background: var(--surface-card) !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+  box-shadow: var(--sh-xs) !important;
+}
+.th-topbar .text-primary { color: var(--brand-primary) !important; }
+.th-topbar .btn-light { background: var(--ink-100); border-color: transparent; }
+.th-topbar .bi-person-fill { color: var(--brand-primary) !important; }
+
+
+/* ── 6. Content area ─────────────────────────────────────────── */
+.th-content { background: var(--surface-page) !important; }
+
+
+/* ── 7. Auth pages ───────────────────────────────────────────── */
+.auth-wrapper {
+  background: linear-gradient(120deg,
+    oklch(0.97 0.04 290) 0%,
+    oklch(0.96 0.03 320) 60%,
+    oklch(0.97 0.04 25) 100%) !important;
+}
+.auth-card {
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-xl);
+  box-shadow: var(--sh-lg);
+  padding: var(--s-8) var(--s-8);
+  width: 100%;
+  max-width: 420px;
+}
+.auth-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-3);
+  margin-bottom: var(--s-6);
+}
+.auth-logo-chip {
+  width: 40px; height: 40px;
+  border-radius: var(--r-sm);
+  background: linear-gradient(135deg, var(--brand-primary), oklch(0.45 0.16 280));
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 20px;
+}
+.auth-logo-text {
+  font-weight: 700;
+  font-size: var(--fs-xl);
+  color: var(--ink-900);
+  letter-spacing: -0.01em;
+}
+
+
+/* ── 8. Lumi Buttons ────────────────────────────────────────── */
+.lm-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 11px 18px; border-radius: var(--r-md);
+  font-weight: 600; font-size: var(--fs-sm); font-family: var(--font-sans);
+  border: 1px solid transparent; cursor: pointer;
+  transition: transform var(--dur-1) var(--ease-out),
+              background var(--dur-2) var(--ease-out),
+              box-shadow var(--dur-2) var(--ease-out);
+  text-decoration: none; line-height: 1.4;
+}
+.lm-btn-primary {
+  background: var(--brand-primary); color: #fff;
+}
+.lm-btn-primary:hover { background: var(--brand-primary-hover); color: #fff; }
+.lm-btn-primary:active { transform: scale(0.97); }
+.lm-btn-secondary {
+  background: var(--surface-card); color: var(--brand-primary-ink);
+  border-color: var(--border-default);
+}
+.lm-btn-secondary:hover {
+  border-color: var(--brand-primary); background: var(--brand-primary-soft);
+  color: var(--brand-primary-ink);
+}
+.lm-btn-ghost { background: transparent; color: var(--ink-700); }
+.lm-btn-ghost:hover { background: var(--ink-100); color: var(--ink-900); }
+.lm-btn-lg { padding: 14px 24px; font-size: var(--fs-base); }
+.lm-btn-xl { padding: 18px 28px; font-size: var(--fs-lg); border-radius: var(--r-lg); }
+.lm-btn-icon { width: 38px; height: 38px; padding: 0; justify-content: center; }
+.lm-btn-sm { padding: 7px 12px; font-size: var(--fs-xs); }
+
+
+/* ── 9. Task card ────────────────────────────────────────────── */
+.lm-task {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px;
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-md);
+  width: 100%; transition: box-shadow var(--dur-2) var(--ease-out);
+}
+.lm-task:hover { box-shadow: var(--sh-sm); }
+.lm-task .lm-task-ic {
+  width: 40px; height: 40px; border-radius: var(--r-sm);
+  background: var(--brand-primary-soft); color: var(--brand-primary-ink);
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+  flex-shrink: 0;
+}
+.lm-task .lm-task-body { flex: 1; min-width: 0; }
+.lm-task .lm-task-title { font-weight: 600; font-size: var(--fs-sm); color: var(--ink-900); }
+.lm-task .lm-task-meta {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 3px; font-size: var(--fs-xs); color: var(--ink-500);
+}
+.lm-task .lm-task-reward {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-weight: 600; color: var(--brand-accent); white-space: nowrap;
+}
+
+/* Task status variants */
+.lm-task.lm-task-approved {
+  border-left: 3px solid var(--brand-success);
+  background: color-mix(in oklch, var(--brand-success) 7%, var(--surface-card));
+}
+.lm-task.lm-task-rejected {
+  border-left: 3px solid var(--brand-danger);
+  background: color-mix(in oklch, var(--brand-danger) 6%, var(--surface-card));
+}
+.lm-task.lm-task-submitted {
+  border-left: 3px solid var(--brand-warning);
+  background: color-mix(in oklch, var(--brand-warning) 7%, var(--surface-card));
+}
+.lm-task.lm-task-pending {
+  border-left: 3px solid var(--ink-300);
+}
+.lm-task.lm-task-approved  .lm-task-ic { background: color-mix(in oklch, var(--brand-success) 18%, var(--surface-card)); color: var(--brand-success); }
+.lm-task.lm-task-rejected  .lm-task-ic { background: color-mix(in oklch, var(--brand-danger) 18%, var(--surface-card)); color: var(--brand-danger); }
+.lm-task.lm-task-submitted .lm-task-ic { background: color-mix(in oklch, var(--brand-warning) 22%, var(--surface-card)); color: var(--brand-warning); }
+
+
+/* ── 10. Reward card ─────────────────────────────────────────── */
+.lm-reward {
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-lg);
+  padding: 14px;
+  display: flex; flex-direction: column; gap: 10px;
+  transition: box-shadow var(--dur-2) var(--ease-out),
+              transform var(--dur-2) var(--ease-out);
+}
+.lm-reward:hover { box-shadow: var(--sh-sm); transform: translateY(-2px); }
+.lm-reward .lm-reward-img {
+  height: 120px; border-radius: var(--r-md);
+  background: repeating-linear-gradient(135deg, var(--ink-100) 0 12px, var(--ink-050) 12px 24px);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ink-400); font-size: 2rem;
+  overflow: hidden;
+}
+.lm-reward .lm-reward-img img { width: 100%; height: 100%; object-fit: cover; }
+.lm-reward .lm-reward-ttl { font-weight: 600; font-size: var(--fs-sm); color: var(--ink-900); }
+.lm-reward .lm-reward-price {
+  color: var(--brand-accent); font-weight: 700; font-size: var(--fs-lg);
+  display: flex; align-items: center; gap: 5px;
+}
+.lm-reward .lm-reward-bar {
+  height: 6px; border-radius: 3px; background: var(--ink-100); overflow: hidden; position: relative;
+}
+.lm-reward .lm-reward-bar-fill {
+  position: absolute; left: 0; top: 0; bottom: 0; background: var(--brand-primary);
+  border-radius: 3px; transition: width var(--dur-3) var(--ease-out);
+}
+
+
+/* ── 11. Coin ticker ─────────────────────────────────────────── */
+.lm-coin {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 10px; border-radius: var(--r-pill);
+  background: var(--brand-accent-soft);
+  color: oklch(0.40 0.13 75); font-weight: 700; font-size: var(--fs-sm);
+}
+
+
+/* ── 12. Banners / toasts ────────────────────────────────────── */
+.lm-banner {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 14px 18px; border-radius: var(--r-md);
+  background: var(--brand-primary-soft); color: var(--brand-primary-ink);
+  border-left: 3px solid var(--brand-primary);
+}
+.lm-banner.warn { background: oklch(0.97 0.04 70); color: oklch(0.36 0.14 70); border-left-color: var(--brand-warning); }
+.lm-banner.ok   { background: oklch(0.97 0.04 150); color: oklch(0.30 0.12 150); border-left-color: var(--brand-success); }
+.lm-banner.err  { background: oklch(0.97 0.04 25); color: oklch(0.30 0.14 25); border-left-color: var(--brand-danger); }
+
+.lm-toast {
+  display: flex; gap: 12px; align-items: center;
+  padding: 12px 16px; border-radius: var(--r-md);
+  background: var(--ink-900); color: #fff; font-size: var(--fs-sm);
+  min-width: 280px; max-width: 420px; box-shadow: var(--sh-md);
+}
+.lm-toast.success { background: oklch(0.36 0.10 150); }
+.lm-toast.warn    { background: oklch(0.40 0.12 70); }
+.lm-toast.error   { background: oklch(0.38 0.14 25); }
+
+
+/* ── 13. Review card ─────────────────────────────────────────── */
+.lm-review {
+  background: var(--surface-card); border: 1px solid var(--border-subtle);
+  border-radius: var(--r-lg); padding: 16px;
+  display: flex; flex-direction: column; gap: 12px;
+  transition: box-shadow var(--dur-2) var(--ease-out);
+}
+.lm-review:hover { box-shadow: var(--sh-sm); }
+.lm-review .lm-review-hdr { display: flex; gap: 10px; align-items: center; }
+.lm-review .lm-review-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--brand-primary-soft);
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+  flex-shrink: 0;
+}
+.lm-review .lm-review-child { font-weight: 600; font-size: var(--fs-sm); }
+.lm-review .lm-review-when  { font-size: var(--fs-xs); color: var(--ink-500); }
+.lm-review .lm-review-task  { font-size: var(--fs-sm); color: var(--ink-700); font-weight: 500; }
+.lm-review .lm-review-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+
+/* ── 14. KPI / stat tiles ────────────────────────────────────── */
+.lm-stat-tile {
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-md);
+  padding: var(--s-5) var(--s-6);
+  display: flex; align-items: flex-start; gap: var(--s-4);
+}
+.lm-stat-tile .lm-tile-icon {
+  width: 44px; height: 44px; border-radius: var(--r-sm);
+  background: var(--brand-primary-soft); color: var(--brand-primary-ink);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+}
+.lm-stat-tile .lm-tile-body { flex: 1; min-width: 0; }
+.lm-stat-tile .lm-tile-label {
+  font-size: var(--fs-xs); color: var(--ink-500); font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;
+}
+.lm-stat-tile .lm-tile-value {
+  font-size: var(--fs-2xl); font-weight: 700; color: var(--ink-900);
+  line-height: 1.1; letter-spacing: -0.01em;
+}
+.lm-stat-tile .lm-tile-sub {
+  font-size: var(--fs-xs); color: var(--ink-500); margin-top: 3px;
+}
+
+/* Color variants for stat tiles */
+.lm-stat-tile.accent  .lm-tile-icon { background: var(--brand-accent-soft);   color: oklch(0.40 0.13 75); }
+.lm-stat-tile.success .lm-tile-icon { background: oklch(0.96 0.04 150); color: oklch(0.35 0.12 150); }
+.lm-stat-tile.danger  .lm-tile-icon { background: oklch(0.97 0.04 25);  color: oklch(0.35 0.14 25); }
+.lm-stat-tile.warning .lm-tile-icon { background: oklch(0.97 0.05 70);  color: oklch(0.40 0.13 70); }
+.lm-stat-tile.info    .lm-tile-icon { background: oklch(0.96 0.03 230); color: oklch(0.35 0.10 230); }
+
+
+/* ── 15. Page / section titles ───────────────────────────────── */
+.lm-page-title {
+  font-size: var(--fs-2xl); font-weight: 700; color: var(--ink-900);
+  letter-spacing: -0.015em; margin: 0 0 var(--s-1);
+}
+.lm-page-sub {
+  font-size: var(--fs-sm); color: var(--ink-500);
+}
+.lm-section-title {
+  font-size: var(--fs-lg); font-weight: 700; color: var(--ink-900);
+  letter-spacing: -0.01em; margin: 0;
+}
+.lm-section-label {
+  font-family: var(--font-mono); font-size: var(--fs-2xs);
+  color: var(--ink-400); text-transform: uppercase; letter-spacing: 0.1em;
+}
+
+/* Page header block */
+.lm-page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: var(--s-3);
+  margin-bottom: var(--s-6);
+}
+
+
+/* ── 16. Empty state ─────────────────────────────────────────── */
+.lm-empty-state {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--s-3); padding: var(--s-16) var(--s-6);
+  text-align: center; color: var(--ink-500);
+}
+.lm-empty-state .lm-empty-icon {
+  font-size: 3rem; opacity: 0.5; margin-bottom: var(--s-2);
+}
+.lm-empty-state .lm-empty-title { font-size: var(--fs-lg); font-weight: 600; color: var(--ink-700); }
+.lm-empty-state .lm-empty-sub   { font-size: var(--fs-sm); max-width: 320px; }
+
+
+/* ── 17. Hero block (child dashboard) ───────────────────────── */
+.lm-hero {
+  background: linear-gradient(180deg, oklch(0.96 0.04 240) 0%, oklch(0.97 0.03 200) 100%);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-xl);
+  padding: var(--s-8) var(--s-6);
+  margin-bottom: var(--s-6);
+}
+.lm-hero .lm-hero-avatar {
+  width: 72px; height: 72px; border-radius: var(--r-lg);
+  background: var(--surface-card); box-shadow: var(--sh-sm);
+  display: flex; align-items: center; justify-content: center; font-size: 36px;
+  margin-bottom: var(--s-3);
+}
+.lm-hero .lm-hero-name {
+  font-size: var(--fs-xl); font-weight: 700; color: var(--ink-900);
+  letter-spacing: -0.01em; margin-bottom: var(--s-1);
+}
+.lm-hero .lm-hero-greeting { font-size: var(--fs-sm); color: var(--ink-500); }
+
+/* XP bar */
+.lm-xp-bar { margin-top: var(--s-4); }
+.lm-xp-bar .lm-xp-label {
+  display: flex; justify-content: space-between;
+  font-size: var(--fs-xs); color: var(--ink-500); margin-bottom: var(--s-1);
+}
+.lm-xp-track {
+  height: 8px; border-radius: var(--r-pill);
+  background: var(--surface-card); overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(18,12,38,0.06);
+}
+.lm-xp-fill {
+  height: 100%; border-radius: var(--r-pill);
+  background: linear-gradient(90deg, var(--lm-accent, var(--brand-primary)), var(--lm-accent-end, oklch(0.62 0.18 310)));
+  transition: width var(--dur-4) var(--ease-out);
+}
+
+
+/* ── 18. Sheet / panel ───────────────────────────────────────── */
+.lm-sheet {
+  background: var(--surface-card); border: 1px solid var(--border-subtle);
+  border-radius: var(--r-lg); box-shadow: var(--sh-lg); padding: var(--s-5);
+  display: flex; flex-direction: column; gap: var(--s-4);
+}
+
+
+/* ── 19. Character card (select-character) ───────────────────── */
+.character-card {
+  border-color: var(--border-subtle) !important;
+  border-radius: var(--r-md) !important;
+}
+.character-card:hover {
+  border-color: var(--brand-primary) !important;
+  box-shadow: 0 8px 25px color-mix(in oklch, var(--brand-primary) 15%, transparent) !important;
+}
+
+
+/* ── 20. Landing / home page ─────────────────────────────────── */
+.lm-landing-hero {
+  background: linear-gradient(135deg,
+    oklch(0.97 0.04 290) 0%,
+    oklch(0.96 0.03 320) 50%,
+    oklch(0.97 0.04 25) 100%);
+  border-radius: var(--r-xl);
+  padding: var(--s-16) var(--s-8);
+  text-align: center;
+}
+.lm-landing-hero .lm-hero-headline {
+  font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800;
+  color: var(--ink-900); letter-spacing: -0.025em; line-height: 1.1;
+  margin-bottom: var(--s-4);
+}
+.lm-landing-hero .lm-hero-sub {
+  font-size: var(--fs-lg); color: var(--ink-500);
+  max-width: 560px; margin: 0 auto var(--s-8); line-height: 1.55;
+}
+
+.lm-feature-card {
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-lg);
+  padding: var(--s-6);
+}
+.lm-feature-card .lm-feature-icon {
+  width: 48px; height: 48px; border-radius: var(--r-sm);
+  background: var(--brand-primary-soft); color: var(--brand-primary-ink);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; margin-bottom: var(--s-3);
+}
+.lm-feature-card .lm-feature-title { font-size: var(--fs-base); font-weight: 700; color: var(--ink-900); margin-bottom: var(--s-1); }
+.lm-feature-card .lm-feature-desc  { font-size: var(--fs-sm); color: var(--ink-500); line-height: 1.5; }
+
+
+/* ── 21. Miscellaneous helpers ───────────────────────────────── */
+.lm-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: var(--r-pill);
+  font-size: var(--fs-xs); font-weight: 600; line-height: 1.5;
+  background: var(--ink-100); color: var(--ink-700);
+}
+.lm-chip.primary { background: var(--brand-primary-soft); color: var(--brand-primary-ink); }
+.lm-chip.success { background: oklch(0.97 0.04 150); color: oklch(0.30 0.12 150); }
+.lm-chip.warning { background: oklch(0.97 0.05 70);  color: oklch(0.36 0.14 70); }
+.lm-chip.danger  { background: oklch(0.97 0.04 25);  color: oklch(0.30 0.14 25); }
+.lm-chip.accent  { background: var(--brand-accent-soft); color: oklch(0.40 0.13 75); }
+.lm-chip.pink    { background: oklch(0.96 0.04 340); color: oklch(0.34 0.16 340); }
+.lm-chip.cyan    { background: oklch(0.95 0.04 195); color: oklch(0.30 0.12 195); }
+.lm-chip.orange  { background: oklch(0.97 0.05 55);  color: oklch(0.36 0.14 55);  }
+.lm-chip.indigo  { background: oklch(0.96 0.03 265); color: oklch(0.30 0.13 265); }
+
+.lm-divider {
+  border: none; border-top: 1px solid var(--border-subtle); margin: var(--s-4) 0;
+}
+
+/* Hero gradient for older templates (override to Lumi) */
+.hero-gradient {
+  background: linear-gradient(135deg,
+    var(--brand-primary) 0%,
+    oklch(0.48 0.18 300) 50%,
+    oklch(0.52 0.17 320) 100%) !important;
+}
+
+
+/* ── 22. Proof input ─────────────────────────────────────────── */
+.lm-proof {
+  padding: var(--s-5); background: var(--surface-card);
+  border: 1px solid var(--border-subtle); border-radius: var(--r-lg);
+  display: flex; flex-direction: column; gap: var(--s-4);
+}
+.lm-proof .lm-proof-types { display: flex; gap: 6px; flex-wrap: wrap; }
+.lm-proof .lm-proof-type {
+  font-size: var(--fs-xs); padding: 5px 10px; border-radius: var(--r-pill);
+  background: var(--ink-100); color: var(--ink-700); cursor: pointer;
+  font-weight: 500; border: 1px solid transparent;
+  transition: background var(--dur-1) var(--ease-out);
+}
+.lm-proof .lm-proof-type.active { background: var(--brand-primary); color: #fff; }
+.lm-proof .lm-proof-drop {
+  height: 140px; border: 1.5px dashed var(--border-default);
+  border-radius: var(--r-md);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 6px; color: var(--ink-500); font-size: var(--fs-sm);
+  transition: border-color var(--dur-1) var(--ease-out), background var(--dur-1) var(--ease-out);
+}
+.lm-proof .lm-proof-drop:hover { border-color: var(--brand-primary); background: var(--brand-primary-soft); }
+
+
+/* ── 23. Pairing code view ───────────────────────────────────── */
+.lm-pair {
+  display: flex; flex-direction: column; align-items: center; gap: var(--s-4);
+  padding: var(--s-6); background: var(--surface-card);
+  border: 1px solid var(--border-subtle); border-radius: var(--r-lg);
+}
+.lm-pair .lm-pair-qr {
+  width: 160px; height: 160px; border: 1px solid var(--border-default);
+  border-radius: var(--r-sm); background: var(--ink-050);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ink-400); font-size: var(--fs-2xl);
+}
+.lm-pair .lm-pair-code {
+  font-family: var(--font-mono); font-size: 32px; font-weight: 700;
+  letter-spacing: 0.12em; color: var(--brand-primary-ink);
+}
+.lm-pair .lm-pair-expires { font-size: var(--fs-xs); color: var(--ink-500); }
+
+
+/* ── 24. Charts ──────────────────────────────────────────────── */
+.lm-chart {
+  background: var(--surface-card); border: 1px solid var(--border-subtle);
+  border-radius: var(--r-md); padding: var(--s-4);
+  overflow: hidden;
+}
+.lm-chart .lm-chart-label {
+  font-size: var(--fs-xs); color: var(--ink-500); margin-bottom: var(--s-2);
+  font-family: var(--font-mono);
+}
+
+
+/* ── 25. Child UI — hero zone ────────────────────────────────── */
+.lm-child-hero {
+  background: linear-gradient(180deg,
+    oklch(0.96 0.04 240) 0%,
+    oklch(0.97 0.03 200) 60%,
+    oklch(0.95 0.05 140) 100%);
+  border-radius: var(--r-xl);
+  padding: var(--s-6);
+  margin-bottom: var(--s-4);
+  position: relative; overflow: hidden;
+}
+/* Decorative "sky" blobs — sun + clouds, purely cosmetic, behind content */
+.lm-child-hero::before,
+.lm-child-hero::after {
+  content: ""; position: absolute; border-radius: 50%;
+  pointer-events: none; z-index: 0;
+}
+.lm-child-hero::before {
+  width: 140px; height: 140px; top: -50px; right: -30px;
+  background: radial-gradient(circle, oklch(0.92 0.08 90 / 55%), transparent 70%);
+  filter: blur(2px);
+}
+.lm-child-hero::after {
+  width: 220px; height: 90px; bottom: -40px; left: -50px;
+  background: radial-gradient(ellipse, oklch(0.99 0.01 140 / 70%), transparent 75%);
+  filter: blur(4px);
+}
+.lm-child-hero > * { position: relative; z-index: 1; }
+.lm-child-hero-avatar {
+  width: 96px; height: 96px; border-radius: var(--r-lg);
+  background: var(--surface-card);
+  box-shadow: var(--sh-sm), 0 0 0 4px color-mix(in oklch, var(--ink-000) 60%, transparent);
+  border: 2px solid color-mix(in oklch, var(--brand-primary) 18%, transparent);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 52px; flex-shrink: 0;
+}
+.lm-child-hero-name {
+  font-size: var(--fs-2xl); font-weight: 800; color: var(--ink-900);
+  letter-spacing: -0.02em; line-height: 1.1;
+}
+.lm-child-hero-sub { font-size: var(--fs-sm); color: var(--ink-500); margin-top: 2px; }
+
+
+/* ── 26. Child stat mini cards ───────────────────────────────── */
+.lm-stat-mini {
+  background: var(--surface-card); border-radius: var(--r-md);
+  padding: var(--s-3) var(--s-3);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  text-align: center;
+}
+.lm-stat-mini .lm-stat-mini-icon { font-size: 18px; margin-bottom: 2px; }
+.lm-stat-mini .lm-stat-mini-val {
+  font-size: var(--fs-2xl); font-weight: 800; color: var(--ink-900);
+  letter-spacing: -0.02em; line-height: 1.1;
+}
+.lm-stat-mini .lm-stat-mini-lbl { font-size: var(--fs-xs); color: var(--ink-500); margin-top: 2px; }
+
+
+/* ── 27. Weekly goal bar ─────────────────────────────────────── */
+.lm-weekly-goal {
+  background: var(--surface-card); border-radius: var(--r-md);
+  padding: var(--s-4); box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  margin-bottom: var(--s-3);
+}
+.lm-weekly-goal .lm-wg-title { font-size: var(--fs-sm); font-weight: 700; margin-bottom: var(--s-2); }
+.lm-weekly-goal .lm-wg-bar {
+  height: 9px; background: var(--ink-100); border-radius: var(--r-pill); overflow: hidden;
+}
+.lm-weekly-goal .lm-wg-fill {
+  height: 100%; background: linear-gradient(90deg, var(--brand-primary), oklch(0.62 0.18 280));
+  border-radius: var(--r-pill); transition: width var(--dur-4) var(--ease-out);
+}
+.lm-weekly-goal .lm-wg-count {
+  font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-700);
+  font-weight: 600;
+}
+
+
+/* ── 28. Child task section ──────────────────────────────────── */
+.lm-child-tasks {
+  background: var(--surface-card); border-radius: var(--r-lg);
+  padding: var(--s-4); box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.lm-child-tasks .lm-ct-title {
+  font-size: var(--fs-md); font-weight: 700; margin-bottom: var(--s-3);
+}
+/* Child task item (larger hit targets) */
+.lm-child-task {
+  display: flex; align-items: center; gap: var(--s-3);
+  padding: var(--s-3) var(--s-3); border-radius: var(--r-md);
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-card);
+  transition: box-shadow var(--dur-2) var(--ease-out);
+  margin-bottom: var(--s-2);
+}
+.lm-child-task:last-child { margin-bottom: 0; }
+.lm-child-task .lm-ct-icon {
+  width: 44px; height: 44px; border-radius: var(--r-sm);
+  background: var(--brand-primary-soft); color: var(--brand-primary-ink);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+}
+.lm-child-task .lm-ct-body { flex: 1; min-width: 0; }
+.lm-child-task .lm-ct-title-text { font-weight: 600; font-size: var(--fs-sm); color: var(--ink-900); }
+.lm-child-task .lm-ct-meta { font-size: var(--fs-xs); color: var(--ink-500); margin-top: 2px; }
+.lm-child-task .lm-ct-btn {
+  min-width: 90px; height: 44px; border-radius: var(--r-md);
+  background: var(--lm-accent, var(--brand-primary)); color: #fff; font-weight: 700;
+  font-size: var(--fs-sm); border: none; cursor: pointer;
+  transition: background var(--dur-1) var(--ease-out), transform var(--dur-1) var(--ease-out);
+  flex-shrink: 0;
+}
+.lm-child-task .lm-ct-btn:hover { background: var(--lm-accent-hover, var(--brand-primary-hover)); }
+.lm-child-task .lm-ct-btn:active { transform: scale(0.96); }
+/* Status coloring */
+.lm-child-task.submitted {
+  border-left: 3px solid var(--brand-warning);
+  background: color-mix(in oklch, var(--brand-warning) 7%, var(--surface-card));
+}
+.lm-child-task.approved {
+  border-left: 3px solid var(--brand-success);
+  background: color-mix(in oklch, var(--brand-success) 7%, var(--surface-card));
+}
+.lm-child-task.rejected {
+  border-left: 3px solid var(--brand-danger);
+  background: color-mix(in oklch, var(--brand-danger) 6%, var(--surface-card));
+}
+.lm-child-task.submitted .lm-ct-icon { background: color-mix(in oklch, var(--brand-warning) 22%, var(--surface-card)); color: var(--brand-warning); }
+.lm-child-task.approved  .lm-ct-icon { background: color-mix(in oklch, var(--brand-success) 18%, var(--surface-card)); color: var(--brand-success); }
+.lm-child-task.rejected  .lm-ct-icon { background: color-mix(in oklch, var(--brand-danger) 18%, var(--surface-card)); color: var(--brand-danger); }
+
+
+/* ── 29. Reward card (child shop) ────────────────────────────── */
+.lm-reward-card {
+  background: var(--surface-card); border: 1px solid var(--border-subtle);
+  border-radius: var(--r-lg); padding: var(--s-4);
+  display: flex; flex-direction: column; gap: var(--s-2);
+  transition: box-shadow var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out);
+}
+.lm-reward-card:hover { box-shadow: var(--sh-sm); transform: translateY(-2px); }
+.lm-reward-card .lm-rc-icon {
+  height: 80px; border-radius: var(--r-md);
+  background: var(--brand-primary-soft);
+  display: flex; align-items: center; justify-content: center; font-size: 36px;
+}
+.lm-reward-card .lm-rc-name { font-weight: 700; font-size: var(--fs-sm); color: var(--ink-900); }
+.lm-reward-card .lm-rc-price {
+  display: flex; align-items: center; gap: 4px;
+  font-weight: 700; color: oklch(0.40 0.13 75); font-size: var(--fs-lg);
+}
+.lm-reward-card .lm-rc-bar {
+  height: 6px; background: var(--ink-100); border-radius: 3px; overflow: hidden;
+}
+.lm-reward-card .lm-rc-fill {
+  height: 100%; background: var(--brand-primary); border-radius: 3px;
+  transition: width var(--dur-3) var(--ease-out);
+}
+.lm-reward-card .lm-rc-sub { font-size: var(--fs-xs); color: var(--ink-500); }
+
+
+/* ── 30. History feed ────────────────────────────────────────── */
+.lm-history-item {
+  display: flex; align-items: center; gap: var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-md);
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-card);
+  margin-bottom: var(--s-2);
+}
+.lm-history-item:last-child { margin-bottom: 0; }
+.lm-history-item .lm-hi-icon {
+  width: 40px; height: 40px; border-radius: var(--r-sm);
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+  flex-shrink: 0;
+}
+.lm-history-item.approved .lm-hi-icon { background: oklch(0.97 0.04 150); }
+.lm-history-item.rejected .lm-hi-icon { background: oklch(0.97 0.04 25); }
+.lm-history-item.pending  .lm-hi-icon { background: oklch(0.97 0.04 70); }
+.lm-history-item .lm-hi-body { flex: 1; min-width: 0; }
+.lm-history-item .lm-hi-title { font-weight: 600; font-size: var(--fs-sm); color: var(--ink-900); }
+.lm-history-item .lm-hi-date  { font-size: var(--fs-xs); color: var(--ink-500); margin-top: 2px; }
+.lm-history-item .lm-hi-reward {
+  font-weight: 700; font-size: var(--fs-sm); white-space: nowrap;
+  color: oklch(0.40 0.13 75);
+}
+
+
+/* ── 31. Child page wrapper ──────────────────────────────────── */
+.lm-child-page {
+  background: linear-gradient(180deg,
+    oklch(0.96 0.04 240) 0%,
+    var(--surface-page) 40%);
+  min-height: 100%;
+}
+
+
+/* ── 32. Landing: trust bar ──────────────────────────────────── */
+.lm-trust-bar {
+  background: var(--brand-primary-soft); border-radius: var(--r-lg);
+  padding: var(--s-5) var(--s-6);
+  display: flex; flex-wrap: wrap; gap: var(--s-5); align-items: center;
+}
+.lm-trust-stat .lm-ts-val {
+  font-size: var(--fs-2xl); font-weight: 800; color: var(--brand-primary-ink);
+  line-height: 1;
+}
+.lm-trust-stat .lm-ts-lbl { font-size: var(--fs-xs); color: var(--ink-500); }
+.lm-trust-item {
+  display: flex; align-items: center; gap: var(--s-2);
+  font-size: var(--fs-sm); color: var(--ink-700);
+}
+
+
+/* ── 33. Topbar coin/avatar extras ──────────────────────────── */
+.lm-topbar-coin {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 10px; border-radius: var(--r-pill);
+  background: var(--brand-accent-soft); color: oklch(0.40 0.13 75);
+  font-weight: 700; font-size: var(--fs-xs); text-decoration: none;
+}
+.lm-topbar-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--brand-primary-soft); color: var(--brand-primary-ink);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: var(--fs-sm); cursor: pointer;
+  border: 2px solid var(--border-subtle);
+  transition: border-color var(--dur-1) var(--ease-out);
+}
+.lm-topbar-avatar:hover { border-color: var(--brand-primary); }
+
+
+/* ── 34. Modal polish ────────────────────────────────────────── */
+.modal-content {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-lg);
+}
+.modal-header { border-bottom-color: var(--border-subtle); }
+.modal-footer { border-top-color: var(--border-subtle); }
+
+
+/* ── 35. Table polish ────────────────────────────────────────── */
+.table { color: var(--ink-900); }
+.table th {
+  font-family: var(--font-mono); font-size: var(--fs-xs);
+  color: var(--ink-500); text-transform: uppercase;
+  letter-spacing: 0.06em; font-weight: 600;
+  border-bottom-color: var(--border-default);
+}
+.table td { border-bottom-color: var(--border-subtle); font-size: var(--fs-sm); }
+.table-hover tbody tr:hover td { background: var(--ink-050); }
+
+
+/* ── 36. Progress ring (SVG wrapper) ─────────────────────────── */
+.lm-progress-ring {
+  display: flex; flex-direction: column; align-items: center; gap: var(--s-2);
+}
+.lm-progress-ring svg { overflow: visible; }
+.lm-progress-ring .lm-pr-track {
+  fill: none; stroke: var(--ink-100); stroke-width: 10;
+}
+.lm-progress-ring .lm-pr-fill {
+  fill: none;
+  stroke: var(--lm-accent, var(--brand-primary));
+  stroke-width: 10;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+  transition: stroke-dashoffset var(--dur-4) var(--ease-out);
+}
+.lm-progress-ring .lm-pr-label { font-size: var(--fs-xs); color: var(--ink-500); }
+
+
+/* ── 37. Streak dots ─────────────────────────────────────────── */
+.lm-streak-dots {
+  display: flex; gap: 6px; align-items: center; flex-wrap: wrap;
+}
+.lm-streak-dot {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; flex-shrink: 0;
+}
+.lm-streak-dot.done  { background: var(--brand-success); color: #fff; }
+.lm-streak-dot.today { background: var(--lm-accent, var(--brand-primary)); color: #fff; box-shadow: 0 0 0 3px var(--lm-accent-soft, var(--brand-primary-soft)); }
+.lm-streak-dot.empty { background: var(--ink-100); color: var(--ink-400); }
+
+
+/* ── 38. Onboarding step card ────────────────────────────────── */
+.lm-step-card {
+  background: var(--surface-card); border: 2px solid var(--border-subtle);
+  border-radius: var(--r-lg); padding: var(--s-6);
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  gap: var(--s-3); position: relative;
+  transition: border-color var(--dur-2) var(--ease-out),
+              box-shadow var(--dur-2) var(--ease-out);
+}
+.lm-step-card.done  { border-color: var(--brand-success); background: oklch(0.99 0.01 150); }
+.lm-step-card.active { border-color: var(--brand-primary); box-shadow: 0 0 0 3px var(--brand-primary-soft); }
+.lm-step-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: var(--fs-xs); font-weight: 700;
+  background: var(--ink-100); color: var(--ink-500);
+}
+.lm-step-card.done  .lm-step-num { background: var(--brand-success); color: #fff; }
+.lm-step-card.active .lm-step-num { background: var(--brand-primary); color: #fff; }
+.lm-step-emoji { font-size: 44px; line-height: 1; }
+.lm-step-title { font-size: var(--fs-base); font-weight: 700; color: var(--ink-900); }
+.lm-step-desc  { font-size: var(--fs-xs); color: var(--ink-500); line-height: 1.55; }
+
+
+/* ── 39. Setup progress bar ──────────────────────────────────── */
+.lm-setup-progress {
+  background: var(--surface-card); border: 1px solid var(--border-subtle);
+  border-radius: var(--r-lg); padding: var(--s-5) var(--s-6);
+}
+.lm-setup-progress .lm-sp-track {
+  height: 10px; background: var(--ink-100); border-radius: var(--r-pill);
+  overflow: hidden; margin: var(--s-3) 0 var(--s-2);
+}
+.lm-setup-progress .lm-sp-fill {
+  height: 100%; background: linear-gradient(90deg, var(--brand-success), oklch(0.62 0.18 150));
+  border-radius: var(--r-pill); transition: width var(--dur-3) var(--ease-out);
+}
+
+
+/* ── 36. Character selector ──────────────────────────────────── */
+.lm-char-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: var(--s-3);
+}
+.lm-char-tile {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--s-2); padding: var(--s-4) var(--s-3);
+  border: 2px solid var(--border-subtle); border-radius: var(--r-lg);
+  cursor: pointer; background: var(--surface-card);
+  transition: border-color var(--dur-2) var(--ease-out),
+              box-shadow var(--dur-2) var(--ease-out),
+              transform var(--dur-2) var(--ease-out);
+  min-height: 100px;
+}
+.lm-char-tile:hover {
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px var(--brand-primary-soft);
+  transform: translateY(-2px);
+}
+.lm-char-tile.selected {
+  border-color: var(--brand-primary);
+  background: var(--brand-primary-soft);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--brand-primary) 15%, transparent);
+}
+.lm-char-tile .lm-char-emoji { font-size: 42px; line-height: 1; }
+.lm-char-tile .lm-char-name { font-size: var(--fs-xs); font-weight: 600; color: var(--ink-700); }
+
+/* Picture avatar inside any square/round soft-bg avatar container
+   (lm-child-hero-avatar, lm-review-avatar, table avatars, etc.) — drop
+   this <img> inside the existing container, no need to touch the container. */
+.lm-avatar-img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+
+/* ── 37. Child UI — bottom tab bar (mobile only) ─────────────── */
+/* Replaces the off-canvas sidebar as primary nav for the child app
+   on small screens — closer to a native mobile feel for kids. */
+.lm-bottom-tab {
+  display: none;
+  position: fixed; left: 50%; bottom: var(--s-3);
+  transform: translateX(-50%);
+  width: calc(100% - var(--s-6)); max-width: 420px;
+  background: color-mix(in oklch, var(--surface-card) 88%, transparent);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-xl);
+  box-shadow: var(--sh-md);
+  padding: var(--s-2);
+  z-index: 1030;
+}
+.lm-bottom-tab .lm-bt-row {
+  display: flex; align-items: stretch; justify-content: space-between; gap: var(--s-1);
+}
+.lm-bottom-tab .lm-bt-link {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: var(--s-2) var(--s-1);
+  border-radius: var(--r-lg);
+  color: var(--ink-500); text-decoration: none;
+  font-size: var(--fs-2xs); font-weight: 600;
+  transition: background var(--dur-2) var(--ease-out), color var(--dur-2) var(--ease-out);
+  position: relative;
+}
+.lm-bottom-tab .lm-bt-link i { font-size: 19px; line-height: 1; }
+.lm-bottom-tab .lm-bt-link:hover { color: var(--brand-primary); }
+.lm-bottom-tab .lm-bt-link.active {
+  color: var(--brand-primary-ink);
+  background: var(--brand-primary-soft);
+}
+.lm-bottom-tab .lm-bt-badge {
+  position: absolute; top: 2px; right: 14%;
+  min-width: 16px; height: 16px; padding: 0 4px;
+  border-radius: var(--r-pill);
+  background: var(--brand-danger); color: #fff;
+  font-size: 9px; font-weight: 700; line-height: 16px; text-align: center;
+}
+@media (max-width: 991.98px) {
+  .lm-bottom-tab { display: block; }
+  /* keep content clear of the floating bar */
+  body.lm-has-bottom-tab .th-main { padding-bottom: calc(var(--s-10) + 64px); }
+}
+
+/* ── 38. Child area background — color fallback; image set via inline style from backend ── */
+body.lm-has-bottom-tab .th-content {
+  background-color: oklch(0.22 0.17 284);
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+}
+/* Cards and content stay readable on top of the bg */
+body.lm-has-bottom-tab .lm-card,
+body.lm-has-bottom-tab .card {
+  background: color-mix(in oklch, var(--surface-card) 92%, transparent) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+
+/* ── Accent color theming ────────────────────────────────────── */
+/* Each [data-accent] sets --lm-accent / --lm-accent-end / --lm-accent-hover / --lm-accent-soft.
+   Elements that should follow the accent use these vars.
+   Default (no attribute or data-accent="primary") falls back to --brand-primary via var() fallback. */
+
+[data-accent="success"] {
+  --lm-accent:       oklch(0.66 0.16 150);
+  --lm-accent-end:   oklch(0.56 0.18 165);
+  --lm-accent-hover: oklch(0.58 0.17 150);
+  --lm-accent-soft:  oklch(0.95 0.05 150);
+}
+[data-accent="accent"] {
+  --lm-accent:       oklch(0.78 0.16 75);
+  --lm-accent-end:   oklch(0.68 0.18 60);
+  --lm-accent-hover: oklch(0.70 0.17 75);
+  --lm-accent-soft:  oklch(0.96 0.06 75);
+}
+[data-accent="danger"] {
+  --lm-accent:       oklch(0.62 0.20 25);
+  --lm-accent-end:   oklch(0.52 0.22 15);
+  --lm-accent-hover: oklch(0.54 0.21 25);
+  --lm-accent-soft:  oklch(0.97 0.04 25);
+}
+[data-accent="pink"] {
+  --lm-accent:       oklch(0.68 0.20 340);
+  --lm-accent-end:   oklch(0.58 0.22 330);
+  --lm-accent-hover: oklch(0.60 0.21 340);
+  --lm-accent-soft:  oklch(0.96 0.04 340);
+}
+[data-accent="cyan"] {
+  --lm-accent:       oklch(0.60 0.13 195);
+  --lm-accent-end:   oklch(0.50 0.15 205);
+  --lm-accent-hover: oklch(0.52 0.14 195);
+  --lm-accent-soft:  oklch(0.95 0.04 195);
+}
+[data-accent="orange"] {
+  --lm-accent:       oklch(0.72 0.16 55);
+  --lm-accent-end:   oklch(0.62 0.18 45);
+  --lm-accent-hover: oklch(0.64 0.17 55);
+  --lm-accent-soft:  oklch(0.97 0.05 55);
+}
+[data-accent="indigo"] {
+  --lm-accent:       oklch(0.50 0.18 265);
+  --lm-accent-end:   oklch(0.42 0.20 275);
+  --lm-accent-hover: oklch(0.44 0.19 265);
+  --lm-accent-soft:  oklch(0.96 0.03 265);
+}
+
+
+/* ── Accent color picker palette ────────────────────────────── */
+.lm-accent-palette {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--s-3);
+  max-width: 400px;
+  margin: 0 auto;
+}
+.lm-accent-swatch {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  cursor: pointer; padding: 10px 6px; border-radius: var(--r-md);
+  border: 2px solid transparent;
+  transition: border-color var(--dur-1) var(--ease-out), background var(--dur-1) var(--ease-out);
+  user-select: none;
+}
+.lm-accent-swatch:has(input:checked),
+.lm-accent-swatch.selected {
+  border-color: var(--brand-primary);
+  background: var(--brand-primary-soft);
+}
+.lm-accent-swatch input[type="radio"] { display: none; }
+.lm-accent-dot {
+  width: 44px; height: 44px; border-radius: 50%;
+  box-shadow: var(--sh-sm);
+  transition: transform var(--dur-1) var(--ease-out);
+}
+.lm-accent-swatch:has(input:checked) .lm-accent-dot,
+.lm-accent-swatch.selected .lm-accent-dot {
+  transform: scale(1.15);
+  box-shadow: var(--sh-md);
+}
+.lm-accent-label {
+  font-size: var(--fs-xs); font-weight: 600; color: var(--ink-600);
+  text-align: center; line-height: 1.2;
+}

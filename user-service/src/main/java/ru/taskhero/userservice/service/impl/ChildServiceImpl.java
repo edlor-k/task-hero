@@ -9,17 +9,20 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.taskhero.common.aop.LogMethod;
 import ru.taskhero.common.exception.ResourceNotFoundException;
 import ru.taskhero.common.exception.ValidationException;
-import ru.taskhero.common.model.enums.CharacterType;
 import ru.taskhero.common.model.enums.DifficultyTrajectory;
 import ru.taskhero.userservice.dto.ChildCreateRequestDto;
 import ru.taskhero.userservice.dto.ChildDetailDto;
 import ru.taskhero.userservice.dto.ChildResponseDto;
 import ru.taskhero.userservice.dto.UpdateChildRequest;
+import ru.taskhero.userservice.entity.AvatarOption;
+import ru.taskhero.userservice.entity.BackgroundOption;
 import ru.taskhero.userservice.entity.Child;
 import ru.taskhero.userservice.entity.Parent;
 import ru.taskhero.userservice.entity.AuditAction;
 import ru.taskhero.userservice.mapper.ChildMapper;
 import ru.taskhero.userservice.mapper.ParentMapper;
+import ru.taskhero.userservice.repository.AvatarOptionRepository;
+import ru.taskhero.userservice.repository.BackgroundOptionRepository;
 import ru.taskhero.userservice.repository.ChildRepository;
 import ru.taskhero.userservice.repository.ParentRepository;
 import ru.taskhero.userservice.service.AuditService;
@@ -40,6 +43,8 @@ public class ChildServiceImpl implements ChildService {
 
     private final ChildRepository childRepository;
     private final ParentRepository parentRepository;
+    private final AvatarOptionRepository avatarOptionRepository;
+    private final BackgroundOptionRepository backgroundOptionRepository;
     private final ChildMapper childMapper;
     private final ParentMapper parentMapper;
     private final LevelRewardService levelRewardService;
@@ -174,11 +179,15 @@ public class ChildServiceImpl implements ChildService {
                 child.getCoins(),
                 child.getLevel(),
                 child.getDifficultyTrajectory(),
-                child.getCharacterType(),
+                child.getAvatarOption() != null ? child.getAvatarOption().getImageUrl() : null,
                 child.getParent() != null ? parentMapper.toSummary(child.getParent()) : null,
                 child.getCreatedAt(),
                 child.getUpdatedAt(),
-                child.getNickname()
+                child.getNickname(),
+                child.getAvatarOption() != null ? child.getAvatarOption().getId() : null,
+                child.getBackgroundOption() != null ? child.getBackgroundOption().getImageUrl() : null,
+                child.getBackgroundOption() != null ? child.getBackgroundOption().getId() : null,
+                child.getAccentColor()
         );
     }
 
@@ -333,30 +342,38 @@ public class ChildServiceImpl implements ChildService {
     }
 
     /**
-     * Выбрать персонажа для ребёнка (при первом входе).
+     * Выбрать аватар из галереи для ребёнка (при первом входе или позже —
+     * ребёнок может в любой момент сменить аватар).
      *
-     * @param childId       ID ребёнка
-     * @param characterType тип персонажа
+     * @param childId        ID ребёнка
+     * @param avatarOptionId ID опции аватара из галереи
      * @return обновленные данные ребёнка
      */
     @Override
     @Transactional
-    @LogMethod("child-select-character")
-    public ChildResponseDto selectCharacter(UUID childId, CharacterType characterType) {
-        log.info("Выбор персонажа {} для ребёнка {}", characterType, childId);
+    @LogMethod("child-select-avatar")
+    public ChildResponseDto selectAvatar(UUID childId, UUID avatarOptionId) {
+        log.info("Выбор аватара {} ребёнком {}", avatarOptionId, childId);
 
         Child child = childRepository.findById(childId)
                 .orElseThrow(() -> new ResourceNotFoundException("Ребёнок с ID " + childId + " не найден"));
 
-        if (child.isCharacterSelected()) {
-            throw new ValidationException("Персонаж уже выбран");
+        AvatarOption avatarOption = avatarOptionRepository.findById(avatarOptionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Опция аватара с ID " + avatarOptionId + " не найдена"));
+
+        if (!avatarOption.isActive()) {
+            throw new ValidationException("Эта опция аватара больше не доступна");
         }
 
-        child.setCharacterType(characterType);
-        child.setCharacterSelected(true);
+        // Смена аватара доступна с уровня 2 (первый выбор — без ограничений)
+        if (child.getAvatarOption() != null && child.getLevel() < 2) {
+            throw new ValidationException("Смена аватара откроется на уровне 2. Сейчас ты на уровне " + child.getLevel());
+        }
+
+        child.setAvatarOption(avatarOption);
         child = childRepository.save(child);
 
-        log.info("Ребёнок {} выбрал персонажа {}", childId, characterType);
+        log.info("Ребёнок {} выбрал аватар {}", childId, avatarOptionId);
         return toChildResponseDto(child);
     }
 
@@ -444,6 +461,92 @@ public class ChildServiceImpl implements ChildService {
 
         log.debug("Сгенерирован уникальный loginToken за {} попыток", attempts);
         return token;
+    }
+
+    @Override
+    @Transactional
+    @LogMethod("child-select-background")
+    public ChildResponseDto selectBackground(UUID childId, UUID backgroundOptionId) {
+        log.info("Выбор фона {} ребёнком {}", backgroundOptionId, childId);
+
+        Child child = childRepository.findById(childId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ребёнок с ID " + childId + " не найден"));
+
+        // Смена фона доступна с уровня 3 (первый выбор — без ограничений)
+        if (child.getBackgroundOption() != null && child.getLevel() < 3) {
+            throw new ValidationException("Смена фона откроется на уровне 3. Сейчас ты на уровне " + child.getLevel());
+        }
+
+        BackgroundOption backgroundOption = backgroundOptionRepository.findById(backgroundOptionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Опция фона с ID " + backgroundOptionId + " не найдена"));
+
+        if (!backgroundOption.isActive()) {
+            throw new ValidationException("Этот фон больше не доступен");
+        }
+
+        child.setBackgroundOption(backgroundOption);
+        child = childRepository.save(child);
+
+        log.info("Ребёнок {} выбрал фон {}", childId, backgroundOptionId);
+        return toChildResponseDto(child);
+    }
+
+    private static final java.util.Set<String> ALLOWED_ACCENT_COLORS = java.util.Set.of(
+            "primary", "success", "accent", "danger", "pink", "cyan", "orange", "indigo"
+    );
+
+    @Override
+    @Transactional
+    @LogMethod("child-select-accent-color")
+    public ChildResponseDto selectAccentColor(UUID childId, String accentColor) {
+        log.info("Выбор акцентного цвета '{}' ребёнком {}", accentColor, childId);
+
+        if (accentColor == null || !ALLOWED_ACCENT_COLORS.contains(accentColor)) {
+            throw new ValidationException("Недопустимый цвет: " + accentColor);
+        }
+
+        Child child = childRepository.findById(childId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ребёнок с ID " + childId + " не найден"));
+
+        child.setAccentColor(accentColor);
+        child = childRepository.save(child);
+
+        log.info("Ребёнок {} выбрал акцентный цвет {}", childId, accentColor);
+        return toChildResponseDto(child);
+    }
+
+    @Override
+    @Transactional
+    @LogMethod("admin-force-avatar")
+    public ChildResponseDto adminForceSetAvatar(UUID childId, UUID avatarOptionId) {
+        log.info("Администратор принудительно устанавливает аватар {} ребёнку {}", avatarOptionId, childId);
+
+        Child child = childRepository.findById(childId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ребёнок с ID " + childId + " не найден"));
+
+        AvatarOption avatarOption = avatarOptionRepository.findById(avatarOptionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Опция аватара с ID " + avatarOptionId + " не найдена"));
+
+        child.setAvatarOption(avatarOption);
+        child = childRepository.save(child);
+        return toChildResponseDto(child);
+    }
+
+    @Override
+    @Transactional
+    @LogMethod("admin-force-background")
+    public ChildResponseDto adminForceSetBackground(UUID childId, UUID backgroundOptionId) {
+        log.info("Администратор принудительно устанавливает фон {} ребёнку {}", backgroundOptionId, childId);
+
+        Child child = childRepository.findById(childId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ребёнок с ID " + childId + " не найден"));
+
+        BackgroundOption backgroundOption = backgroundOptionRepository.findById(backgroundOptionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Опция фона с ID " + backgroundOptionId + " не найдена"));
+
+        child.setBackgroundOption(backgroundOption);
+        child = childRepository.save(child);
+        return toChildResponseDto(child);
     }
 
     @Override

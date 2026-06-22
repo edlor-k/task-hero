@@ -5,68 +5,68 @@
 <div class="th-layout">
     <nav th:replace="~{fragments/layout :: sidebar-parent}"></nav>
     <div class="th-content">
-        <header th:replace="~{fragments/layout :: header}"></header>
+        <header th:replace="~{fragments/layout :: topbar}"></header>
         <main class="th-main">
 
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4 class="fw-bold mb-0"><i class="bi bi-journal-text me-2"></i>Мои шаблоны</h4>
+            <div class="lm-page-header">
+                <div>
+                    <h1 class="lm-page-title">Мои шаблоны</h1>
+                    <p class="lm-page-sub">Создавайте и редактируйте шаблоны заданий</p>
+                </div>
                 <div class="d-flex gap-2">
-                    <a th:if="${onboarding}" th:href="@{/parent/onboarding}" class="btn btn-outline-secondary">
-                        <i class="bi bi-arrow-left me-1"></i>Назад к настройке
+                    <a th:if="${onboarding}" th:href="@{/parent/onboarding}" class="lm-btn lm-btn-secondary lm-btn-sm">
+                        <i class="bi bi-arrow-left me-1"></i>Назад
                     </a>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTemplateModal">
+                    <button class="lm-btn lm-btn-primary" data-bs-toggle="modal" data-bs-target="#addTemplateModal">
                         <i class="bi bi-plus-lg me-1"></i>Создать шаблон
                     </button>
                 </div>
             </div>
 
-            <!-- Messages -->
-            <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
-                <i class="bi bi-check-circle me-2"></i><span th:text="${success}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div th:if="${success}" class="lm-banner ok mb-4">
+                <i class="bi bi-check-circle-fill fs-5"></i><span th:text="${success}">Успех</span>
             </div>
-            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
-                <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div th:if="${error}" class="lm-banner err mb-4">
+                <i class="bi bi-exclamation-triangle-fill fs-5"></i><span th:text="${error}">Ошибка</span>
             </div>
 
             <!-- Category filter -->
             <div class="d-flex flex-wrap gap-2 mb-4">
                 <a th:href="@{/parent/templates(onboarding=${onboarding})}"
-                   th:classappend="${selectedCategory == null} ? 'btn-primary' : 'btn-outline-secondary'"
-                   class="btn btn-sm">Все</a>
+                   class="lm-chip" style="text-decoration:none;padding:7px 14px;"
+                   th:classappend="${selectedCategory == null} ? ' primary' : ''">Все</a>
                 <a th:href="@{/parent/templates(onboarding=${onboarding}, category='STUDY')}"
-                   th:classappend="${selectedCategory == 'STUDY'} ? 'btn-primary' : 'btn-outline-secondary'"
-                   class="btn btn-sm"><i class="bi bi-book me-1"></i>Учёба</a>
+                   class="lm-chip" style="text-decoration:none;padding:7px 14px;"
+                   th:classappend="${selectedCategory == 'STUDY'} ? ' primary' : ''">📚 Учёба</a>
                 <a th:href="@{/parent/templates(onboarding=${onboarding}, category='HOUSEHOLD')}"
-                   th:classappend="${selectedCategory == 'HOUSEHOLD'} ? 'btn-primary' : 'btn-outline-secondary'"
-                   class="btn btn-sm"><i class="bi bi-house me-1"></i>По дому</a>
+                   class="lm-chip" style="text-decoration:none;padding:7px 14px;"
+                   th:classappend="${selectedCategory == 'HOUSEHOLD'} ? ' primary' : ''">🏠 По дому</a>
                 <a th:href="@{/parent/templates(onboarding=${onboarding}, category='SPORTS')}"
-                   th:classappend="${selectedCategory == 'SPORTS'} ? 'btn-primary' : 'btn-outline-secondary'"
-                   class="btn btn-sm"><i class="bi bi-trophy me-1"></i>Спорт</a>
+                   class="lm-chip" style="text-decoration:none;padding:7px 14px;"
+                   th:classappend="${selectedCategory == 'SPORTS'} ? ' primary' : ''">⚽ Спорт</a>
                 <a th:href="@{/parent/templates(onboarding=${onboarding}, category='CREATIVITY')}"
-                   th:classappend="${selectedCategory == 'CREATIVITY'} ? 'btn-primary' : 'btn-outline-secondary'"
-                   class="btn btn-sm"><i class="bi bi-palette me-1"></i>Творчество</a>
+                   class="lm-chip" style="text-decoration:none;padding:7px 14px;"
+                   th:classappend="${selectedCategory == 'CREATIVITY'} ? ' primary' : ''">🎨 Творчество</a>
                 <a th:href="@{/parent/templates(onboarding=${onboarding}, category='HYGIENE')}"
-                   th:classappend="${selectedCategory == 'HYGIENE'} ? 'btn-primary' : 'btn-outline-secondary'"
-                   class="btn btn-sm"><i class="bi bi-droplet me-1"></i>Гигиена</a>
+                   class="lm-chip" style="text-decoration:none;padding:7px 14px;"
+                   th:classappend="${selectedCategory == 'HYGIENE'} ? ' primary' : ''">💧 Гигиена</a>
                 <a th:href="@{/parent/templates(onboarding=${onboarding}, category='SOCIAL')}"
-                   th:classappend="${selectedCategory == 'SOCIAL'} ? 'btn-primary' : 'btn-outline-secondary'"
-                   class="btn btn-sm"><i class="bi bi-chat me-1"></i>Общение</a>
+                   class="lm-chip" style="text-decoration:none;padding:7px 14px;"
+                   th:classappend="${selectedCategory == 'SOCIAL'} ? ' primary' : ''">💬 Общение</a>
                 <a th:href="@{/parent/templates(onboarding=${onboarding}, category='READING')}"
-                   th:classappend="${selectedCategory == 'READING'} ? 'btn-primary' : 'btn-outline-secondary'"
-                   class="btn btn-sm"><i class="bi bi-journal me-1"></i>Чтение</a>
+                   class="lm-chip" style="text-decoration:none;padding:7px 14px;"
+                   th:classappend="${selectedCategory == 'READING'} ? ' primary' : ''">📖 Чтение</a>
                 <a th:href="@{/parent/templates(onboarding=${onboarding}, category='OTHER')}"
-                   th:classappend="${selectedCategory == 'OTHER'} ? 'btn-primary' : 'btn-outline-secondary'"
-                   class="btn btn-sm"><i class="bi bi-three-dots me-1"></i>Другое</a>
+                   class="lm-chip" style="text-decoration:none;padding:7px 14px;"
+                   th:classappend="${selectedCategory == 'OTHER'} ? ' primary' : ''">··· Другое</a>
             </div>
 
             <!-- Empty state -->
-            <div th:if="${#lists.isEmpty(templates)}" class="text-center py-5">
-                <i class="bi bi-journal-plus display-1 text-muted"></i>
-                <h4 class="mt-3 text-muted">Нет шаблонов</h4>
-                <p class="text-muted">Создайте шаблон задания или выберите из библиотеки</p>
-                <div class="d-flex gap-2 justify-content-center">
+            <div th:if="${#lists.isEmpty(templates)}" class="lm-empty-state">
+                <div class="lm-empty-icon">📋</div>
+                <div class="lm-empty-title">Нет шаблонов</div>
+                <div class="lm-empty-sub">Создайте шаблон задания или выберите из библиотеки</div>
+                <div class="d-flex gap-2 mt-2">
                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTemplateModal">
                         <i class="bi bi-plus-lg me-1"></i>Создать шаблон
                     </button>

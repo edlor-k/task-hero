@@ -1,7 +1,6 @@
 package ru.taskhero.userservice.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import ru.taskhero.common.model.enums.CharacterType;
 import ru.taskhero.common.model.enums.DifficultyTrajectory;
 
 import java.util.UUID;
@@ -29,12 +28,8 @@ public record ChildResponseDto(
         String loginToken,
         @Schema(description = "Траектория сложности")
         DifficultyTrajectory difficultyTrajectory,
-        @Schema(description = "Тип персонажа")
-        CharacterType characterType,
-        @Schema(description = "Выбран ли персонаж")
-        boolean characterSelected,
-        @Schema(description = "Путь к изображению персонажа")
-        String characterImagePath,
+        @Schema(description = "ID выбранного аватара из галереи")
+        UUID avatarOptionId,
         @Schema(description = "EXP до следующего уровня")
         int expToNextLevel,
         @Schema(description = "EXP текущего уровня (начало)")
@@ -48,5 +43,14 @@ public record ChildResponseDto(
         String nickname,
 
         @Schema(description = "Разблокировано ли изменение никнейма")
-        boolean nicknameUnlocked
+        boolean nicknameUnlocked,
+
+        @Schema(description = "Ссылка на фон")
+        String backgroundUrl,
+
+        @Schema(description = "ID выбранного фона из галереи")
+        UUID backgroundOptionId,
+
+        @Schema(description = "Акцентный цвет UI (ключ палитры: primary, success, accent, danger, pink, cyan, orange, indigo)")
+        String accentColor
 ) { }

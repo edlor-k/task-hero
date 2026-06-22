@@ -3,6 +3,8 @@ package ru.taskhero.app.client;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 import ru.taskhero.app.dto.AdminUserDto;
+import ru.taskhero.app.dto.AvatarOptionDto;
+import ru.taskhero.app.dto.BackgroundOptionDto;
 import ru.taskhero.app.dto.ChildDto;
 import ru.taskhero.app.dto.CreateChildRequest;
 import ru.taskhero.app.dto.LevelInfoDto;
@@ -47,6 +49,12 @@ public interface UserServiceClient {
     LoginResponse loginChild(@RequestBody Map<String, String> request);
 
     /**
+     * Вход или авторегистрация через Yandex SSO.
+     */
+    @PostMapping("/auth/social-login")
+    LoginResponse socialLogin(@RequestBody Map<String, String> request);
+
+    /**
      * Получить список детей текущего родителя.
      */
     @GetMapping("/children")
@@ -59,10 +67,16 @@ public interface UserServiceClient {
     ChildDto getMyChildProfile();
 
     /**
-     * Выбрать персонажа (ребёнок, первый вход).
+     * Выбрать аватар из галереи (ребёнок).
      */
-    @PostMapping("/children/me/character")
-    ChildDto selectCharacter(@RequestParam("characterType") String characterType);
+    @PostMapping("/children/me/avatar")
+    ChildDto selectAvatar(@RequestParam("avatarOptionId") UUID avatarOptionId);
+
+    /**
+     * Получить активные опции аватара (для пикера ребёнка).
+     */
+    @GetMapping("/avatar-options")
+    List<AvatarOptionDto> getAvatarOptions();
 
     /**
      * Добавить ребёнка.
@@ -231,4 +245,22 @@ public interface UserServiceClient {
      */
     @PostMapping("/children/me/nickname")
     ChildDto updateMyNickname(@RequestBody Map<String, String> request);
+
+    /**
+     * Выбрать фон из галереи (ребёнок).
+     */
+    @PostMapping("/children/me/background")
+    ChildDto selectBackground(@RequestParam("backgroundOptionId") UUID backgroundOptionId);
+
+    /**
+     * Получить активные фоны (для пикера ребёнка).
+     */
+    @GetMapping("/background-options")
+    List<BackgroundOptionDto> getBackgroundOptions();
+
+    /**
+     * Выбрать акцентный цвет UI (ребёнок).
+     */
+    @PostMapping("/children/me/accent-color")
+    ChildDto selectAccentColor(@RequestParam("accentColor") String accentColor);
 }

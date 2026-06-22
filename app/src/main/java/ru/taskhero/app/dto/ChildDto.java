@@ -16,15 +16,27 @@ public record ChildDto(
         int level,
         String avatarUrl,
         String difficultyTrajectory,
-        String characterType,
-        boolean characterSelected,
-        String characterImagePath,
+        UUID avatarOptionId,
         int expToNextLevel,
         int currentLevelExp,
         int nextLevelExp,
         Instant createdAt,
         Instant updatedAt,
         String nickname,
-        boolean nicknameUnlocked
+        boolean nicknameUnlocked,
+        String backgroundUrl,
+        UUID backgroundOptionId,
+        String accentColor
 ) {
+    public boolean avatarSelected() {
+        return avatarOptionId != null;
+    }
+
+    public boolean backgroundSelected() {
+        return backgroundOptionId != null;
+    }
+
+    public String effectiveAccentColor() {
+        return accentColor != null ? accentColor : "primary";
+    }
 }

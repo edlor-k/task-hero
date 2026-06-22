@@ -1,44 +1,50 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Вход для ребёнка')}"></head>
-<body class="auth-wrapper d-flex align-items-center justify-content-center">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-5 col-lg-4">
-                <div class="card shadow border-0">
-                    <div class="card-body p-4 p-md-5">
-                        <div class="text-center mb-4">
-                            <a th:href="@{/}" class="text-decoration-none">
-                                <i class="bi bi-trophy-fill text-primary fs-1"></i>
-                                <h4 class="fw-bold text-dark mt-2">TaskGamer</h4>
-                            </a>
-                            <p class="text-muted">Вход по токену</p>
-                        </div>
+<body style="background:linear-gradient(160deg, oklch(0.96 0.04 240) 0%, oklch(0.97 0.03 200) 60%, oklch(0.95 0.05 140) 100%);
+             min-height:100vh;display:flex;align-items:center;justify-content:center;padding:var(--s-6);">
+    <div style="width:100%;max-width:380px;">
 
-                        <div th:if="${error}" class="alert alert-danger py-2">
-                            <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}">Ошибка</span>
-                        </div>
+        <!-- Logo -->
+        <div class="text-center mb-5">
+            <div style="font-size:72px;margin-bottom:8px;">🎮</div>
+            <h2 style="font-size:var(--fs-3xl);font-weight:800;color:var(--ink-900);letter-spacing:-0.02em;margin:0;">TaskGamer</h2>
+            <p style="color:var(--ink-500);font-size:var(--fs-sm);margin-top:6px;">Войди и получай награды!</p>
+        </div>
 
-                        <form th:action="@{/login/child}" method="post">
-                            <div class="mb-4">
-                                <label for="loginToken" class="form-label fw-semibold">Твой секретный токен</label>
-                                <input type="text" class="form-control form-control-lg text-center text-uppercase"
-                                       id="loginToken" name="loginToken"
-                                       placeholder="ABC123XY" required autofocus
-                                       style="letter-spacing: 0.3em; font-weight: 700;">
-                                <div class="form-text text-center">Спроси токен у родителей</div>
-                            </div>
-                            <button type="submit" class="btn btn-success btn-lg w-100 mb-3">
-                                <i class="bi bi-controller me-1"></i>Войти и играть!
-                            </button>
-                            <div class="text-center">
-                                <a th:href="@{/login}" class="text-decoration-none">
-                                    <i class="bi bi-arrow-left me-1"></i>Назад к входу для родителей
-                                </a>
-                            </div>
-                        </form>
+        <!-- Card -->
+        <div class="auth-card">
+
+            <div th:if="${error}" class="lm-banner err mb-4">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <span th:text="${error}">Ошибка</span>
+            </div>
+
+            <form th:action="@{/login/child}" method="post">
+                <div class="mb-4">
+                    <label for="loginToken" class="form-label fw-bold" style="font-size:var(--fs-base);">
+                        Твой секретный токен
+                    </label>
+                    <input type="text" class="form-control form-control-lg text-center text-uppercase"
+                           id="loginToken" name="loginToken"
+                           placeholder="ABC123XY" required autofocus
+                           style="letter-spacing:0.3em;font-weight:700;font-family:var(--font-mono);
+                                  font-size:var(--fs-2xl);height:64px;border-radius:var(--r-md);">
+                    <div class="text-center mt-2" style="font-size:var(--fs-sm);color:var(--ink-500);">
+                        Спроси токен у мамы или папы
                     </div>
                 </div>
+                <button type="submit" class="lm-btn lm-btn-primary lm-btn-xl w-100 justify-content-center"
+                        style="background:var(--brand-success);">
+                    <i class="bi bi-controller me-2"></i>Войти и играть!
+                </button>
+            </form>
+
+            <div class="text-center mt-4">
+                <a th:href="@{/login}" class="text-decoration-none d-inline-flex align-items-center gap-1"
+                   style="color:var(--ink-500);font-size:var(--fs-sm);">
+                    <i class="bi bi-arrow-left"></i>Вход для родителей
+                </a>
             </div>
         </div>
     </div>

@@ -6,10 +6,15 @@
 <head th:fragment="head(title)">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
     <title th:text="${title} + ' | TaskGamer'">TaskGamer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Onest:wght@300..800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link th:href="@{/css/taskhero.css}" rel="stylesheet"/>
+    <link th:href="@{/css/lumi.css}" rel="stylesheet"/>
     <link th:href="@{/images/ico.png}" rel="icon" type="image/png"/>
 </head>
 
@@ -17,11 +22,11 @@
 <nav th:fragment="sidebar-parent" class="th-sidebar d-flex flex-column" id="sidebar">
     <div class="sidebar-header px-3 py-3 mb-2">
         <a th:href="@{/parent/dashboard}" class="text-decoration-none d-flex align-items-center gap-2">
-            <span class="sidebar-logo-icon bg-primary rounded-3 d-flex align-items-center justify-content-center"
+            <span class="sidebar-logo-icon rounded-3 d-flex align-items-center justify-content-center"
                   style="width:36px;height:36px;">
                 <i class="bi bi-trophy-fill text-white fs-5"></i>
             </span>
-            <span class="fw-bold fs-5 text-white">TaskGamer</span>
+            <span class="fw-bold fs-5">TaskGamer</span>
         </a>
     </div>
     <ul class="nav flex-column px-2 flex-grow-1">
@@ -98,7 +103,7 @@
             </a>
         </li>
     </ul>
-    <div class="sidebar-footer px-3 py-3 border-top border-secondary border-opacity-25">
+    <div class="sidebar-footer px-3 py-3 border-top">
         <form th:action="@{/logout}" method="post" class="m-0">
             <button type="submit" class="btn btn-sm btn-outline-light w-100 rounded-3">
                 <i class="bi bi-box-arrow-left me-1"></i>Выйти
@@ -111,11 +116,11 @@
 <nav th:fragment="sidebar-admin" class="th-sidebar d-flex flex-column" id="sidebar">
     <div class="sidebar-header px-3 py-3 mb-2">
         <a th:href="@{/admin/dashboard}" class="text-decoration-none d-flex align-items-center gap-2">
-            <span class="sidebar-logo-icon bg-danger rounded-3 d-flex align-items-center justify-content-center"
-                  style="width:36px;height:36px;">
+            <span class="sidebar-logo-icon rounded-3 d-flex align-items-center justify-content-center"
+                  style="width:36px;height:36px; background:linear-gradient(135deg,oklch(0.55 0.18 25),oklch(0.48 0.20 15));">
                 <i class="bi bi-shield-lock-fill text-white fs-5"></i>
             </span>
-            <span class="fw-bold fs-5 text-white">Admin Panel</span>
+            <span class="fw-bold fs-5">Admin Panel</span>
         </a>
     </div>
     <ul class="nav flex-column px-2 flex-grow-1">
@@ -159,6 +164,16 @@
                 <i class="bi bi-collection"></i><span>Шаблоны</span>
             </a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link sidebar-link" th:href="@{/admin/avatar-options}">
+                <i class="bi bi-person-circle"></i><span>Галерея аватаров</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link sidebar-link" th:href="@{/admin/background-options}">
+                <i class="bi bi-image"></i><span>Галерея фонов</span>
+            </a>
+        </li>
 
         <li class="sidebar-section-label">Журнал</li>
         <li class="nav-item">
@@ -167,7 +182,7 @@
             </a>
         </li>
     </ul>
-    <div class="sidebar-footer px-3 py-3 border-top border-secondary border-opacity-25">
+    <div class="sidebar-footer px-3 py-3 border-top">
         <form th:action="@{/logout}" method="post" class="m-0">
             <button type="submit" class="btn btn-sm btn-outline-light w-100 rounded-3">
                 <i class="bi bi-box-arrow-left me-1"></i>Выйти
@@ -180,11 +195,11 @@
 <nav th:fragment="sidebar-child" class="th-sidebar d-flex flex-column" id="sidebar">
     <div class="sidebar-header px-3 py-3 mb-2">
         <a th:href="@{/child/dashboard}" class="text-decoration-none d-flex align-items-center gap-2">
-            <span class="sidebar-logo-icon bg-primary rounded-3 d-flex align-items-center justify-content-center"
+            <span class="sidebar-logo-icon rounded-3 d-flex align-items-center justify-content-center"
                   style="width:36px;height:36px;">
                 <i class="bi bi-trophy-fill text-white fs-5"></i>
             </span>
-            <span class="fw-bold fs-5 text-white">TaskGamer</span>
+            <span class="fw-bold fs-5">TaskGamer</span>
         </a>
     </div>
     <ul class="nav flex-column px-2 flex-grow-1">
@@ -219,7 +234,7 @@
             </a>
         </li>
     </ul>
-    <div class="sidebar-footer px-3 py-3 border-top border-secondary border-opacity-25">
+    <div class="sidebar-footer px-3 py-3 border-top">
         <form th:action="@{/logout}" method="post" class="m-0">
             <button type="submit" class="btn btn-sm btn-outline-light w-100 rounded-3">
                 <i class="bi bi-box-arrow-left me-1"></i>Выйти
@@ -228,26 +243,107 @@
     </div>
 </nav>
 
+<!-- ========== BOTTOM TAB BAR — CHILD (mobile-only primary nav) ========== -->
+<nav th:fragment="bottom-tab-child" class="lm-bottom-tab">
+    <div class="lm-bt-row">
+        <a class="lm-bt-link bottom-tab-link" th:href="@{/child/dashboard}">
+            <i class="bi bi-grid-1x2-fill"></i><span>Главное</span>
+            <span class="lm-bt-badge" th:if="${sidebarUnseenRewardCount != null && sidebarUnseenRewardCount > 0}"
+                  th:text="${sidebarUnseenRewardCount}">0</span>
+        </a>
+        <a class="lm-bt-link bottom-tab-link" th:href="@{/child/tasks}">
+            <i class="bi bi-list-check"></i><span>Задания</span>
+            <span class="lm-bt-badge" th:if="${sidebarActiveTaskCount != null && sidebarActiveTaskCount > 0}"
+                  th:text="${sidebarActiveTaskCount}">0</span>
+        </a>
+        <a class="lm-bt-link bottom-tab-link" th:href="@{/child/history}">
+            <i class="bi bi-clock-history"></i><span>История</span>
+        </a>
+        <a class="lm-bt-link bottom-tab-link" th:href="@{/child/shop}">
+            <i class="bi bi-cart-fill"></i><span>Магазин</span>
+            <span class="lm-bt-badge" th:if="${sidebarPendingPurchaseCount != null && sidebarPendingPurchaseCount > 0}"
+                  th:text="${sidebarPendingPurchaseCount}">0</span>
+        </a>
+    </div>
+</nav>
+
+<!-- NOTE: fragment names below are deliberately NOT "header"/"header-child" —
+     Thymeleaf fragment selectors also match by literal tag name, so two
+     <header> elements named "header" and "header-child" would BOTH be
+     matched (and both rendered) by ~{layout :: header}, producing a
+     duplicate topbar on every page. Keep these names distinct from the
+     <header> tag name. -->
 <!-- ========== TOP NAVBAR ========== -->
-<header th:fragment="header">
-    <nav class="th-topbar navbar navbar-light bg-white border-bottom sticky-top px-3 px-lg-4">
+<header th:fragment="topbar">
+    <nav class="th-topbar navbar navbar-light sticky-top px-3 px-lg-4" style="height:56px;">
         <button class="btn btn-link text-dark d-lg-none p-0 me-3 border-0" type="button" onclick="toggleSidebar()">
-            <i class="bi bi-list fs-4"></i>
+            <i class="bi bi-list fs-4" style="color:var(--ink-700);"></i>
         </button>
-        <span class="fw-bold text-primary d-lg-none">TaskGamer</span>
+        <span class="fw-bold d-lg-none" style="color:var(--ink-900);font-size:var(--fs-base);">TaskGamer</span>
         <div class="ms-auto d-flex align-items-center gap-2">
             <div class="dropdown">
-                <button class="btn btn-light rounded-circle p-0 d-flex align-items-center justify-content-center"
-                        style="width:38px;height:38px;" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bi bi-person-fill fs-5 text-primary"></i>
+                <button class="lm-topbar-avatar" data-bs-toggle="dropdown" aria-expanded="false"
+                        style="border:none;">
+                    <i class="bi bi-person-fill" style="font-size:16px;"></i>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
-                    <li><a class="dropdown-item" th:href="@{/about}"><i class="bi bi-info-circle me-2"></i>О проекте</a></li>
-                    <li><hr class="dropdown-divider"></li>
+                <ul class="dropdown-menu dropdown-menu-end" style="min-width:180px;">
+                    <li><a class="dropdown-item" th:href="@{/about}">
+                        <i class="bi bi-info-circle me-2" style="color:var(--ink-400);"></i>О проекте</a></li>
+                    <li><hr class="dropdown-divider" style="margin:4px 0;"></li>
                     <li>
-                        <form th:action="@{/logout}" method="post" class="px-3">
-                            <button type="submit" class="btn btn-outline-primary btn-sm w-100 rounded-3">
-                                <i class="bi bi-box-arrow-left me-1"></i>Выйти
+                        <form th:action="@{/logout}" method="post" class="px-2 py-1">
+                            <button type="submit" class="btn btn-sm w-100 text-start"
+                                    style="color:var(--brand-danger);font-size:var(--fs-sm);">
+                                <i class="bi bi-box-arrow-left me-2"></i>Выйти
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<!-- ========== TOP NAVBAR — CHILD (with coin display + avatar) ========== -->
+<header th:fragment="topbar-child(coins, avatarUrl)">
+    <nav class="th-topbar navbar navbar-light sticky-top px-3 px-lg-4" style="height:56px;">
+        <button class="btn btn-link text-dark d-lg-none p-0 me-3 border-0" type="button" onclick="toggleSidebar()">
+            <i class="bi bi-list fs-4" style="color:var(--ink-700);"></i>
+        </button>
+        <span class="fw-bold d-lg-none" style="color:var(--ink-900);font-size:var(--fs-base);">TaskGamer</span>
+        <div class="ms-auto d-flex align-items-center gap-2">
+            <span class="lm-topbar-coin">
+                🪙 <span th:text="${coins}">0</span>
+            </span>
+            <div class="dropdown">
+                <button class="lm-topbar-avatar" data-bs-toggle="dropdown" aria-expanded="false"
+                        style="border:none;overflow:hidden;padding:0;">
+                    <img th:if="${avatarUrl}" th:src="${avatarUrl}" alt="Аватар"
+                         style="width:100%;height:100%;object-fit:cover;">
+                    <i th:unless="${avatarUrl}" class="bi bi-person-fill" style="font-size:16px;"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" style="min-width:180px;">
+                    <li>
+                        <a class="dropdown-item" th:href="@{/child/select-avatar}">
+                            <i class="bi bi-person-circle me-2" style="color:var(--ink-400);"></i>Сменить аватар
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" th:href="@{/child/select-background}">
+                            <i class="bi bi-image me-2" style="color:var(--ink-400);"></i>Сменить фон
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" th:href="@{/child/select-accent-color}">
+                            <i class="bi bi-palette me-2" style="color:var(--ink-400);"></i>Цвет оформления
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider" style="margin:4px 0;"></li>
+                    <li>
+                        <form th:action="@{/logout}" method="post" class="px-2 py-1">
+                            <button type="submit" class="btn btn-sm w-100 text-start"
+                                    style="color:var(--brand-danger);font-size:var(--fs-sm);">
+                                <i class="bi bi-box-arrow-left me-2"></i>Выйти
                             </button>
                         </form>
                     </li>
@@ -267,6 +363,14 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script th:src="@{/js/app.js}"></script>
     <script>
+        (function () {
+            var html = document.documentElement;
+            html.dataset.brand   = html.dataset.brand   || 'purple';
+            html.dataset.font    = html.dataset.font    || 'onest';
+            html.dataset.radius  = html.dataset.radius  || 'soft';
+            html.dataset.density = html.dataset.density || 'cozy';
+        }());
+
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const backdrop = document.getElementById('sidebar-backdrop');
@@ -287,7 +391,7 @@
         }
         document.addEventListener('DOMContentLoaded', function () {
             const path = window.location.pathname;
-            document.querySelectorAll('.sidebar-link').forEach(function (link) {
+            document.querySelectorAll('.sidebar-link, .bottom-tab-link').forEach(function (link) {
                 if (link.getAttribute('href') === path) {
                     link.classList.add('active');
                 }

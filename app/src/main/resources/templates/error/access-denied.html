@@ -1,19 +1,16 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Доступ запрещён')}"></head>
-<body class="auth-wrapper">
-<div class="d-flex align-items-center justify-content-center min-vh-100">
-    <div class="text-center">
-        <div class="display-1 mb-3">🔒</div>
-        <h1 class="display-4 fw-bold text-white">403</h1>
-        <h4 class="text-white-50 mb-4">Доступ запрещён</h4>
-        <p class="text-white-50 mb-4">У вас нет прав для просмотра этой страницы</p>
-        <a th:href="@{/}" class="btn btn-light btn-lg">
-            <i class="bi bi-house me-2"></i>На главную
-        </a>
-    </div>
+<body class="d-flex align-items-center justify-content-center min-vh-100" style="background:var(--surface-page);">
+<div class="text-center" style="max-width:420px;padding:var(--s-8);">
+    <div style="font-size:4rem;margin-bottom:var(--s-4);">🔒</div>
+    <div style="font-size:var(--fs-4xl);font-weight:800;color:var(--ink-900);letter-spacing:-0.03em;margin-bottom:var(--s-2);">403</div>
+    <h1 style="font-size:var(--fs-xl);font-weight:700;color:var(--ink-900);margin-bottom:var(--s-2);">Доступ запрещён</h1>
+    <p style="color:var(--ink-500);font-size:var(--fs-sm);margin-bottom:var(--s-6);">У вас нет прав для просмотра этой страницы</p>
+    <a th:href="@{/}" class="lm-btn lm-btn-primary">
+        <i class="bi bi-house me-2"></i>На главную
+    </a>
 </div>
-
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 </body>
 </html>

@@ -19,6 +19,7 @@ import ru.taskhero.common.exception.ExceptionBody;
 import ru.taskhero.userservice.dto.ChildLoginRequestDto;
 import ru.taskhero.userservice.dto.LoginResponseDto;
 import ru.taskhero.userservice.dto.RegisterResponseDto;
+import ru.taskhero.userservice.dto.SocialLoginRequestDto;
 import ru.taskhero.userservice.dto.UserLoginRequestDto;
 import ru.taskhero.userservice.dto.UserRegisterRequest;
 import ru.taskhero.userservice.service.AuthService;
@@ -102,6 +103,17 @@ public class AuthController {
      * @param request данные для входа (loginToken)
      * @return JWT токен и информация о ребенке
      */
+    @PostMapping("/social-login")
+    @Operation(
+            summary = "Вход через Yandex SSO",
+            description = "Находит пользователя по email или создаёт нового родителя. Вызывается только из app-сервиса."
+    )
+    public ResponseEntity<LoginResponseDto> socialLogin(@Valid @RequestBody SocialLoginRequestDto request) {
+        log.info("SSO-вход: {}", request.email());
+        LoginResponseDto response = authService.socialLogin(request);
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/login/child")
     @Operation(
             summary = "Вход ребенка по токену",

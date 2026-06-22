@@ -1,104 +1,114 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Магазин')}"></head>
-<body>
+<body class="lm-has-bottom-tab">
 <div class="th-layout">
     <nav th:replace="~{fragments/layout :: sidebar-child}"></nav>
+    <nav th:replace="~{fragments/layout :: bottom-tab-child}"></nav>
     <div class="th-content">
-        <header th:replace="~{fragments/layout :: header}"></header>
+        <header th:replace="~{fragments/layout :: topbar-child(coins=${childProfile?.coins ?: 0}, avatarUrl=${topbarAvatarUrl})}"></header>
         <main class="th-main">
 
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4 class="fw-bold mb-0"><i class="bi bi-shop me-2"></i>Магазин</h4>
-                <div class="badge bg-warning text-dark fs-6 px-3 py-2" th:if="${childProfile != null}">
-                    <i class="bi bi-coin me-1"></i><span th:text="${childProfile.coins}">0</span> коинов
+            <div class="lm-page-header">
+                <div>
+                    <h1 class="lm-page-title">Магазин наград</h1>
+                    <p class="lm-page-sub">Обменивай монеты на крутые награды</p>
                 </div>
+                <span class="lm-coin" th:if="${childProfile != null}">
+                    <span th:text="${childProfile.coins}">0</span> монет
+                </span>
             </div>
 
-            <!-- Messages -->
-            <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
-                <i class="bi bi-check-circle me-2"></i><span th:text="${success}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div th:if="${success}" class="lm-banner ok mb-4">
+                <i class="bi bi-check-circle-fill fs-5"></i>
+                <span th:text="${success}">Успех</span>
             </div>
-            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
-                <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-
-            <!-- Shop items -->
-            <div th:if="${#lists.isEmpty(items)}" class="text-center py-5">
-                <i class="bi bi-bag display-1 text-muted"></i>
-                <h4 class="mt-3 text-muted">Магазин пуст</h4>
-                <p class="text-muted">Скоро здесь появятся товары!</p>
+            <div th:if="${error}" class="lm-banner err mb-4">
+                <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+                <span th:text="${error}">Ошибка</span>
             </div>
 
-            <div th:unless="${#lists.isEmpty(items)}" class="row g-4 mb-5">
+            <!-- Empty state -->
+            <div th:if="${#lists.isEmpty(items)}" class="lm-empty-state">
+                <div class="lm-empty-icon">🛍️</div>
+                <div class="lm-empty-title">Магазин пока пуст</div>
+                <div class="lm-empty-sub">Скоро здесь появятся награды!</div>
+            </div>
+
+            <!-- Reward cards -->
+            <div th:unless="${#lists.isEmpty(items)}" class="row g-3 mb-5">
                 <div th:each="item : ${items}" class="col-6 col-md-4 col-lg-3">
-                    <div class="card h-100 text-center">
-                        <div class="card-body">
-                            <div class="display-3 mb-2" th:if="${item.iconName}" th:text="${item.iconName}">🎁</div>
-                            <div class="display-3 mb-2" th:unless="${item.iconName}">🎁</div>
-                            <h6 class="fw-bold" th:text="${item.title}">Товар</h6>
-                            <p class="text-muted small" th:text="${item.description}" th:if="${item.description}">Описание</p>
-                            <div class="mb-3">
-                                <span class="badge bg-warning text-dark" th:text="${item.priceCoins} + ' коинов'">10</span>
-                            </div>
+                    <div class="lm-reward-card h-100">
+                        <!-- Icon -->
+                        <div class="lm-rc-icon">
+                            <span th:if="${item.iconName}" th:text="${item.iconName}">🎁</span>
+                            <span th:unless="${item.iconName}">🎁</span>
                         </div>
-                        <div class="card-footer bg-transparent border-0 pb-3 px-3">
+
+                        <div class="lm-rc-name" th:text="${item.title}">Товар</div>
+                        <p th:if="${item.description}"
+                           style="font-size:var(--fs-xs);color:var(--ink-500);margin:0;"
+                           th:text="${item.description}">Описание</p>
+
+                        <!-- Price -->
+                        <div class="lm-rc-price">
+                            🪙 <span th:text="${item.priceCoins}">10</span>
+                        </div>
+
+                        <!-- Progress bar (how many coins child has vs price) -->
+                        <div th:if="${childProfile != null}">
+                            <div class="lm-rc-bar">
+                                <div class="lm-rc-fill"
+                                     th:style="${'width:' + (item.priceCoins > 0 ? (childProfile.coins >= item.priceCoins ? 100 : childProfile.coins * 100 / item.priceCoins) : 100) + '%'}"></div>
+                            </div>
+                            <div class="lm-rc-sub" th:if="${childProfile.coins < item.priceCoins}"
+                                 th:text="${item.priceCoins - childProfile.coins} + ' монет не хватает'">не хватает</div>
+                            <div class="lm-rc-sub" style="color:var(--brand-success);font-weight:600;"
+                                 th:unless="${childProfile.coins < item.priceCoins}">Доступно!</div>
+                        </div>
+
+                        <!-- Buy button -->
+                        <div class="mt-auto">
                             <form th:unless="${pendingItemIds != null and pendingItemIds.contains(item.id)}"
                                   th:action="@{/child/shop/buy/{id}(id=${item.id})}" method="post">
-                                <button type="submit" class="btn btn-primary w-100"
+                                <button type="submit" class="lm-btn lm-btn-primary w-100 justify-content-center"
                                         th:disabled="${childProfile == null or childProfile.coins < item.priceCoins}"
-                                        onclick="return confirm('Купить этот товар?')">
-                                    <i class="bi bi-cart-plus me-1"></i>Купить
+                                        style="font-size:var(--fs-sm);"
+                                        onclick="return confirm('Запросить эту награду?')">
+                                    <i class="bi bi-cart-plus me-1"></i>Хочу!
                                 </button>
                             </form>
-                            <div th:if="${pendingItemIds != null and pendingItemIds.contains(item.id)}" class="text-center">
-                                <span class="badge bg-warning text-dark w-100 py-2">
-                                    <i class="bi bi-hourglass-split me-1"></i>Ожидает одобрения
-                                </span>
+                            <div th:if="${pendingItemIds != null and pendingItemIds.contains(item.id)}"
+                                 class="lm-chip warning w-100 justify-content-center" style="padding:9px;">
+                                <i class="bi bi-hourglass-split me-1"></i>Ожидает одобрения
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Purchases -->
-            <div th:if="${purchases != null and !purchases.isEmpty()}" class="card">
-                <div class="card-header bg-transparent">
-                    <h5 class="fw-bold mb-0"><i class="bi bi-bag-check me-2"></i>Мои покупки</h5>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light">
-                            <tr>
-                                <th>Товар</th>
-                                <th>Цена</th>
-                                <th>Статус</th>
-                                <th>Дата</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr th:each="p : ${purchases}">
-                                <td>
-                                    <span th:if="${p.shopItem?.iconName}" th:text="${p.shopItem.iconName}" class="me-1"></span>
-                                    <span th:text="${p.shopItem?.title}">Товар</span>
-                                </td>
-                                <td><span th:text="${p.shopItem?.priceCoins}">10</span> коинов</td>
-                                <td>
-                                    <span class="badge"
-                                          th:classappend="${p.status == 'PENDING' ? 'bg-warning text-dark' :
-                                                            p.status == 'APPROVED' ? 'bg-success' :
-                                                            p.status == 'REJECTED' ? 'bg-danger' : 'bg-secondary'}"
-                                          th:text="${p.status == 'PENDING' ? 'Ожидает' :
-                                                     p.status == 'APPROVED' ? 'Одобрено' :
-                                                     p.status == 'REJECTED' ? 'Отклонено' : p.status}">Статус</span>
-                                </td>
-                                <td><small class="text-muted" th:attr="data-utc-datetime=${p.createdAt}" th:text="${p.createdAt}">2025-01-01T09:00:00Z</small></td>
-                            </tr>
-                            </tbody>
-                        </table>
+            <!-- Purchase history -->
+            <div th:if="${purchases != null and !purchases.isEmpty()}">
+                <h2 class="lm-section-title mb-3">Мои покупки</h2>
+                <div class="d-flex flex-column gap-2">
+                    <div th:each="p : ${purchases}"
+                         class="lm-history-item"
+                         th:classappend="${p.status == 'APPROVED' ? 'approved' :
+                                          p.status == 'REJECTED' ? 'rejected' : 'pending'}">
+                        <div class="lm-hi-icon">
+                            <span th:if="${p.shopItem?.iconName}" th:text="${p.shopItem.iconName}">🎁</span>
+                            <span th:unless="${p.shopItem?.iconName}">🎁</span>
+                        </div>
+                        <div class="lm-hi-body">
+                            <div class="lm-hi-title" th:text="${p.shopItem?.title}">Товар</div>
+                            <div class="lm-hi-date" th:attr="data-utc-datetime=${p.createdAt}" th:text="${p.createdAt}">дата</div>
+                        </div>
+                        <div class="lm-hi-reward">🪙 <span th:text="${p.shopItem?.priceCoins}">10</span></div>
+                        <span class="lm-chip ms-2"
+                              th:classappend="${p.status == 'PENDING' ? ' warning' :
+                                               p.status == 'APPROVED' ? ' success' : ' danger'}"
+                              th:text="${p.status == 'PENDING' ? 'Ожидает' :
+                                         p.status == 'APPROVED' ? 'Одобрено' : 'Отклонено'}">Статус</span>
                     </div>
                 </div>
             </div>
@@ -107,7 +117,6 @@
         <footer th:replace="~{fragments/layout :: footer}"></footer>
     </div>
 </div>
-
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 </body>
 </html>

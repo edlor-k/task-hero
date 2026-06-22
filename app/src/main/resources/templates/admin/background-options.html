@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Галерея фонов')}"></head>
+<body>
+<div class="th-layout">
+    <nav th:replace="~{fragments/layout :: sidebar-admin}"></nav>
+    <div class="th-content">
+        <header th:replace="~{fragments/layout :: topbar}"></header>
+        <main class="th-main">
+
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h4 class="fw-bold mb-0"><i class="bi bi-image me-2"></i>Галерея фонов</h4>
+                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                    <i class="bi bi-upload me-1"></i>Загрузить фон
+                </button>
+            </div>
+
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                <i class="bi bi-check-circle me-2"></i><span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <p class="text-muted" style="max-width:640px;">
+                Форматы: PNG, WebP, JPEG. Рекомендуемое разрешение: 1920×1080 и выше (16:9 или шире).
+                Только активные фоны видны ребёнку. Удалить можно только фон, который никто не выбрал.
+            </p>
+
+            <div th:if="${backgroundOptions == null or #lists.isEmpty(backgroundOptions)}" class="card">
+                <div class="card-body text-center py-4">
+                    <p class="text-muted mb-0">Галерея пока пуста — загрузите первый фон</p>
+                </div>
+            </div>
+
+            <div th:unless="${backgroundOptions == null or #lists.isEmpty(backgroundOptions)}" class="row g-3">
+                <div th:each="option : ${backgroundOptions}" class="col-12 col-md-6 col-lg-4">
+                    <div class="card h-100" th:classappend="${!option.active} ? ' opacity-50' : ''">
+                        <img th:src="${option.imageUrl}" th:alt="${option.label}"
+                             style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:0.75rem 0.75rem 0 0;">
+                        <div class="card-body py-2">
+                            <div class="fw-semibold small mb-2" th:text="${option.label ?: '—'}">Название</div>
+                            <span class="badge mb-2"
+                                  th:classappend="${option.active ? 'bg-success' : 'bg-secondary'}"
+                                  th:text="${option.active ? 'Активен' : 'Скрыт'}">Статус</span>
+                            <div class="d-flex gap-1">
+                                <form method="post" th:action="@{'/admin/background-options/' + ${option.id} + '/toggle'}" class="flex-fill">
+                                    <input type="hidden" name="active" th:value="${!option.active}">
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary w-100">
+                                        <i class="bi" th:classappend="${option.active ? 'bi-eye-slash' : 'bi-eye'}"></i>
+                                    </button>
+                                </form>
+                                <form method="post" th:action="@{'/admin/background-options/' + ${option.id} + '/delete'}"
+                                      onsubmit="return confirm('Удалить фон из галереи?')">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upload Modal -->
+            <div class="modal fade" id="uploadModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <form method="post" th:action="@{/admin/background-options}" enctype="multipart/form-data" class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Загрузить фон</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Картинка (PNG/WebP/JPEG, 16:9 или шире) *</label>
+                                <input type="file" name="file" class="form-control"
+                                       accept="image/png,image/webp,image/jpeg" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Название (для админки)</label>
+                                <input type="text" name="label" class="form-control" maxlength="64" placeholder="Ночное небо">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                            <button type="submit" class="btn btn-primary">Загрузить</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

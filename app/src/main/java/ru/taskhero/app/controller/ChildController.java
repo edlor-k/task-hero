@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.taskhero.app.client.TaskServiceClient;
 import ru.taskhero.app.client.UserServiceClient;
+import ru.taskhero.app.dto.AvatarOptionDto;
+import ru.taskhero.app.dto.BackgroundOptionDto;
 import ru.taskhero.app.dto.ChildDto;
 import ru.taskhero.app.dto.LevelRewardDto;
 import ru.taskhero.app.dto.ShopItemDto;
@@ -68,15 +70,52 @@ public class ChildController {
     }
 
     /**
+     * Акцентный цвет ребёнка — доступен на всех страницах раздела /child для data-accent на body.
+     */
+    @ModelAttribute("childAccentColor")
+    public String childAccentColor() {
+        try {
+            ChildDto profile = userServiceClient.getMyChildProfile();
+            return profile.accentColor() != null ? profile.accentColor() : "primary";
+        } catch (Exception e) {
+            return "primary";
+        }
+    }
+
+    /**
+     * Баланс монет ребёнка для отображения в шапке — доступен на всех страницах раздела /child.
+     */
+    @ModelAttribute("topbarCoins")
+    public int topbarCoins() {
+        try {
+            return userServiceClient.getMyChildProfile().coins();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    /**
+     * Аватар ребёнка для отображения в шапке — доступен на всех страницах раздела /child.
+     */
+    @ModelAttribute("topbarAvatarUrl")
+    public String topbarAvatarUrl() {
+        try {
+            return userServiceClient.getMyChildProfile().avatarUrl();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
      * Dashboard ребёнка.
      */
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
         try {
-            // Проверяем, выбран ли персонаж
+            // Проверяем, выбран ли аватар
             ChildDto childProfile = userServiceClient.getMyChildProfile();
-            if (!childProfile.characterSelected()) {
-                return "redirect:/child/select-character";
+            if (!childProfile.avatarSelected()) {
+                return "redirect:/child/select-avatar";
             }
             model.addAttribute("childProfile", childProfile);
 
@@ -159,47 +198,146 @@ public class ChildController {
     }
 
     /**
-     * Страница выбора персонажа (первый вход).
+     * Страница выбора аватара. Используется и при первом входе (онбординг),
+     * и позже, если ребёнок захочет сменить аватар — поэтому редиректа
+     * "уже выбран → на dashboard" здесь нет.
      */
-    @GetMapping("/select-character")
-    public String selectCharacterPage(Model model) {
+    @GetMapping("/select-avatar")
+    public String selectAvatarPage(Model model) {
         try {
             ChildDto childProfile = userServiceClient.getMyChildProfile();
-            if (childProfile.characterSelected()) {
-                return "redirect:/child/dashboard";
-            }
             model.addAttribute("childProfile", childProfile);
+            List<AvatarOptionDto> avatarOptions = userServiceClient.getAvatarOptions();
+            model.addAttribute("avatarOptions", avatarOptions);
         } catch (Exception e) {
-            log.error("Error loading character selection: {}", e.getMessage());
+            log.error("Error loading avatar selection: {}", e.getMessage());
             model.addAttribute("error", "Ошибка загрузки");
         }
-        return "child/select-character";
+        return "child/select-avatar";
     }
 
     /**
-     * Выбрать персонажа.
+     * Выбрать (или сменить) аватар.
+     * При первом выборе — редирект на страницу выбора фона (онбординг).
      */
-    @PostMapping("/select-character")
-    public String selectCharacter(
-            @RequestParam String characterType,
+    @PostMapping("/select-avatar")
+    public String selectAvatar(
+            @RequestParam UUID avatarOptionId,
             RedirectAttributes redirectAttributes
     ) {
         try {
-            ChildDto child = userServiceClient.selectCharacter(characterType);
-            // Создаём вводное задание для ребёнка
-            try {
-                taskServiceClient.createIntroTask(child.id());
-                log.info("Вводное задание создано для ребёнка {}", child.id());
-            } catch (Exception ex) {
-                log.warn("Не удалось создать вводное задание для ребёнка {}: {}", child.id(), ex.getMessage());
+            boolean firstSelection = !userServiceClient.getMyChildProfile().avatarSelected();
+            ChildDto child = userServiceClient.selectAvatar(avatarOptionId);
+
+            if (firstSelection) {
+                try {
+                    taskServiceClient.createIntroTask(child.id());
+                    log.info("Вводное задание создано для ребёнка {}", child.id());
+                } catch (Exception ex) {
+                    log.warn("Не удалось создать вводное задание для ребёнка {}: {}", child.id(), ex.getMessage());
+                }
+                // После первого выбора аватара направляем на выбор фона
+                return "redirect:/child/select-background";
             }
-            redirectAttributes.addFlashAttribute("success", "Персонаж выбран!");
+            redirectAttributes.addFlashAttribute("success", "Аватар обновлён!");
         } catch (Exception e) {
-            log.error("Error selecting character: {}", e.getMessage());
-            redirectAttributes.addFlashAttribute("error", "Ошибка выбора персонажа");
-            return "redirect:/child/select-character";
+            log.error("Error selecting avatar: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", extractError(e, "Ошибка выбора аватара"));
+            return "redirect:/child/select-avatar";
         }
         return "redirect:/child/dashboard";
+    }
+
+    /**
+     * Страница выбора фона. Онбординг после первого аватара или самостоятельная смена (с уровня 3).
+     */
+    @GetMapping("/select-background")
+    public String selectBackgroundPage(Model model) {
+        try {
+            ChildDto childProfile = userServiceClient.getMyChildProfile();
+            model.addAttribute("childProfile", childProfile);
+
+            boolean isFirstSelection = !childProfile.backgroundSelected();
+            boolean canChange = isFirstSelection || childProfile.level() >= 3;
+            model.addAttribute("canChange", canChange);
+
+            if (canChange) {
+                List<BackgroundOptionDto> backgroundOptions = userServiceClient.getBackgroundOptions();
+                model.addAttribute("backgroundOptions", backgroundOptions);
+            }
+        } catch (Exception e) {
+            log.error("Error loading background selection: {}", e.getMessage());
+            model.addAttribute("error", "Ошибка загрузки");
+        }
+        return "child/select-background";
+    }
+
+    /**
+     * Выбрать (или сменить) фон.
+     * При первом выборе — редирект на выбор акцентного цвета (онбординг).
+     */
+    @PostMapping("/select-background")
+    public String selectBackground(
+            @RequestParam UUID backgroundOptionId,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            boolean firstSelection = !userServiceClient.getMyChildProfile().backgroundSelected();
+            userServiceClient.selectBackground(backgroundOptionId);
+            if (firstSelection) {
+                return "redirect:/child/select-accent-color";
+            }
+            redirectAttributes.addFlashAttribute("success", "Фон выбран!");
+        } catch (Exception e) {
+            log.error("Error selecting background: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", extractError(e, "Ошибка выбора фона"));
+            return "redirect:/child/select-background";
+        }
+        return "redirect:/child/dashboard";
+    }
+
+    /**
+     * Страница выбора акцентного цвета. Онбординг после первого фона или самостоятельная смена.
+     */
+    @GetMapping("/select-accent-color")
+    public String selectAccentColorPage(Model model) {
+        try {
+            ChildDto childProfile = userServiceClient.getMyChildProfile();
+            model.addAttribute("childProfile", childProfile);
+        } catch (Exception e) {
+            log.error("Error loading accent color selection: {}", e.getMessage());
+            model.addAttribute("error", "Ошибка загрузки");
+        }
+        return "child/select-accent-color";
+    }
+
+    /**
+     * Выбрать (или сменить) акцентный цвет.
+     */
+    @PostMapping("/select-accent-color")
+    public String selectAccentColor(
+            @RequestParam String accentColor,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            userServiceClient.selectAccentColor(accentColor);
+            redirectAttributes.addFlashAttribute("success", "Цвет оформления сохранён!");
+        } catch (Exception e) {
+            log.error("Error selecting accent color: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", extractError(e, "Ошибка выбора цвета"));
+            return "redirect:/child/select-accent-color";
+        }
+        return "redirect:/child/dashboard";
+    }
+
+    private String extractError(Exception e, String defaultMsg) {
+        String msg = e.getMessage();
+        if (msg != null && msg.contains("\"message\":\"")) {
+            int start = msg.indexOf("\"message\":\"") + 11;
+            int end = msg.indexOf("\"", start);
+            if (end > start) return msg.substring(start, end);
+        }
+        return defaultMsg;
     }
 
     /**

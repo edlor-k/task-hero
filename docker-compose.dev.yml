@@ -114,6 +114,17 @@ services:
       SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: 2
       JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
       JWT_EXPIRATION_MS: 86400000
+      # Объектное хранилище (S3-совместимое) для галереи аватаров — НЕ
+      # самостоятельный MinIO-контейнер (бюджет RAM на этом VPS не позволяет),
+      # а внешний провайдер: Яндекс Object Storage / Selectel S3 / Cloudflare R2.
+      # Опционально: если не задано, остальное приложение работает как
+      # обычно — ломается только загрузка/отдача аватаров.
+      S3_ENDPOINT: ${S3_ENDPOINT:-}
+      S3_REGION: ${S3_REGION:-ru-central1}
+      S3_BUCKET: ${S3_BUCKET:-}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-}
+      S3_PUBLIC_BASE_URL: ${S3_PUBLIC_BASE_URL:-}
       LOGGING_LEVEL_ROOT: ${LOGGING_LEVEL_ROOT:-WARN}
       JAVA_TOOL_OPTIONS: "-Xss512k -XX:MaxMetaspaceSize=128m -XX:ReservedCodeCacheSize=48m"
     healthcheck:

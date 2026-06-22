@@ -9,15 +9,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.taskhero.common.exception.ResourceNotFoundException;
 import ru.taskhero.common.exception.ValidationException;
-import ru.taskhero.common.model.enums.CharacterType;
 import ru.taskhero.common.model.enums.DifficultyTrajectory;
 import ru.taskhero.userservice.dto.ChildCreateRequestDto;
 import ru.taskhero.userservice.dto.ChildResponseDto;
+import ru.taskhero.userservice.entity.AvatarOption;
 import ru.taskhero.userservice.entity.Child;
 import ru.taskhero.userservice.entity.Parent;
 import ru.taskhero.userservice.entity.User;
 import ru.taskhero.userservice.mapper.ChildMapper;
 import ru.taskhero.userservice.mapper.ParentMapper;
+import ru.taskhero.userservice.repository.AvatarOptionRepository;
 import ru.taskhero.userservice.repository.ChildRepository;
 import ru.taskhero.userservice.repository.ParentRepository;
 import ru.taskhero.userservice.service.impl.ChildServiceImpl;
@@ -43,6 +44,9 @@ class ChildServiceImplTest {
 
     @Mock
     private ParentRepository parentRepository;
+
+    @Mock
+    private AvatarOptionRepository avatarOptionRepository;
 
     @Mock
     private ChildMapper childMapper;
@@ -94,7 +98,7 @@ class ChildServiceImplTest {
         childResponseDto = new ChildResponseDto(
                 childId, "Алиса", "Петрова",
                 0, 0, 1, null, "TOKEN-ABC",
-                DifficultyTrajectory.NORMAL, null, false, null,
+                DifficultyTrajectory.NORMAL, null,
                 50, 0, 50, null, null, false
         );
     }
@@ -181,7 +185,7 @@ class ChildServiceImplTest {
         when(childMapper.toDto(any(Child.class), anyInt(), anyInt(), anyInt(), any())).thenReturn(
                 new ChildResponseDto(childId, "Алиса", "Петрова",
                         25, 10, 1, null, "TOKEN-ABC",
-                        DifficultyTrajectory.NORMAL, null, false, null,
+                        DifficultyTrajectory.NORMAL, null,
                         25, 25, 50, null, null, false)
         );
 
@@ -211,16 +215,22 @@ class ChildServiceImplTest {
     }
 
     @Test
-    @DisplayName("Должен разрешить выбор персонажа при первом входе")
-    void shouldSelectCharacterOnFirstLogin() {
+    @DisplayName("Должен разрешить выбор аватара")
+    void shouldSelectAvatar() {
         // Given
-        child.setCharacterSelected(false);
+        UUID avatarOptionId = UUID.randomUUID();
+        AvatarOption avatarOption = AvatarOption.builder()
+                .imageUrl("https://storage.example/avatars/dragon.png")
+                .imageKey("avatars/dragon.png")
+                .active(true)
+                .build();
         when(childRepository.findById(childId)).thenReturn(Optional.of(child));
+        when(avatarOptionRepository.findById(avatarOptionId)).thenReturn(Optional.of(avatarOption));
         when(childRepository.save(any(Child.class))).thenReturn(child);
         when(childMapper.toDto(any(Child.class), anyInt(), anyInt(), anyInt(), any())).thenReturn(childResponseDto);
 
         // When
-        ChildResponseDto result = childService.selectCharacter(childId, CharacterType.WARRIOR);
+        ChildResponseDto result = childService.selectAvatar(childId, avatarOptionId);
 
         // Then
         assertThat(result).isNotNull();
@@ -228,16 +238,22 @@ class ChildServiceImplTest {
     }
 
     @Test
-    @DisplayName("Должен выбросить исключение при повторном выборе персонажа")
-    void shouldThrowExceptionWhenCharacterAlreadySelected() {
+    @DisplayName("Должен выбросить исключение при выборе неактивного аватара")
+    void shouldThrowExceptionWhenAvatarOptionInactive() {
         // Given
-        child.setCharacterSelected(true);
+        UUID avatarOptionId = UUID.randomUUID();
+        AvatarOption avatarOption = AvatarOption.builder()
+                .imageUrl("https://storage.example/avatars/dragon.png")
+                .imageKey("avatars/dragon.png")
+                .active(false)
+                .build();
         when(childRepository.findById(childId)).thenReturn(Optional.of(child));
+        when(avatarOptionRepository.findById(avatarOptionId)).thenReturn(Optional.of(avatarOption));
 
         // When & Then
-        assertThatThrownBy(() -> childService.selectCharacter(childId, CharacterType.MAGE))
+        assertThatThrownBy(() -> childService.selectAvatar(childId, avatarOptionId))
                 .isInstanceOf(ValidationException.class)
-                .hasMessageContaining("уже выбран");
+                .hasMessageContaining("доступна");
     }
 
     @Test

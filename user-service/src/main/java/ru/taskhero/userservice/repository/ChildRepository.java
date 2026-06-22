@@ -56,6 +56,16 @@ public interface ChildRepository extends JpaRepository<Child, UUID> {
     boolean existsByIdAndParentId(@Param("childId") UUID childId, @Param("parentId") UUID parentId);
 
     /**
+     * Есть ли дети, выбравшие данную опцию аватара (для защиты от удаления).
+     */
+    boolean existsByAvatarOptionId(UUID avatarOptionId);
+
+    /**
+     * Есть ли дети, выбравшие данный фон (для защиты от удаления).
+     */
+    boolean existsByBackgroundOptionId(UUID backgroundOptionId);
+
+    /**
      * Поиск детей по имени или фамилии (для админки).
      */
     @Query("SELECT c FROM Child c LEFT JOIN FETCH c.parent "

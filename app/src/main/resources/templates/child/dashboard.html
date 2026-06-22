@@ -1,269 +1,259 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Мой мир')}"></head>
-<body>
+<body class="lm-has-bottom-tab" th:attr="data-accent=${childAccentColor}">
 <div class="th-layout">
     <nav th:replace="~{fragments/layout :: sidebar-child}"></nav>
-    <div class="th-content">
-        <header th:replace="~{fragments/layout :: header}"></header>
+    <nav th:replace="~{fragments/layout :: bottom-tab-child}"></nav>
+    <div class="th-content"
+         th:style="${childProfile != null and childProfile.backgroundUrl() != null}
+             ? 'background: url(' + ${childProfile.backgroundUrl()} + ') center top / cover no-repeat;'
+             : null">
+        <header th:replace="~{fragments/layout :: topbar-child(coins=${totalCoins}, avatarUrl=${topbarAvatarUrl})}"></header>
         <main class="th-main">
 
-            <!-- Messages -->
-            <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
-                <i class="bi bi-check-circle me-2"></i><span th:text="${success}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
-                <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-
-            <!-- Reassigned task notifications -->
-            <div th:if="${reassignedAssignments != null && !reassignedAssignments.isEmpty()}" th:each="ra : ${reassignedAssignments}"
-                 class="alert alert-info alert-dismissible fade show border-start border-4 border-info"
-                 th:attr="data-notification-key=${'task-reassigned-' + ra.id}">
-                <i class="bi bi-arrow-repeat me-2"></i>
-                <strong>Задание возвращено!</strong> «<span th:text="${ra.template?.title}">Задание</span>»
-                <span th:if="${ra.dueDate}">было продлено до <span th:attr="data-utc-datetime=${ra.dueDate}" th:text="${ra.dueDate}">2026-01-01T18:15:00Z</span>.</span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-
-            <!-- Recent results (approved/rejected tasks, purchases) -->
-            <div th:if="${recentResults != null && !recentResults.isEmpty()}" th:each="r : ${recentResults}"
-                 class="alert alert-dismissible fade show border-start border-4"
-                 th:attr="data-notification-key=${'task-result-' + r.id}"
-                 th:classappend="${r.status == 'APPROVED' ? 'alert-success border-success' : 'alert-danger border-danger'}">
-                <div th:if="${r.status == 'APPROVED'}">
-                    <i class="bi bi-check-circle-fill text-success me-2"></i>
-                    Задание «<strong th:text="${r.template?.title}">Задание</strong>» одобрено!
-                    <span th:if="${r.expEarned != null}"> +<span th:text="${r.expEarned}">10</span> EXP</span>
-                    <span th:if="${r.coinsEarned != null}"> +<span th:text="${r.coinsEarned}">5</span> коинов</span>
-                </div>
-                <div th:if="${r.status == 'REJECTED'}">
-                    <i class="bi bi-x-circle-fill text-danger me-2"></i>
-                    Задание «<strong th:text="${r.template?.title}">Задание</strong>» отклонено.
-                    <span th:if="${r.parentComment}" class="d-block mt-1 small text-muted" th:text="${r.parentComment}">Комментарий</span>
-                </div>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-
-            <!-- Recent purchases -->
-            <div th:if="${recentPurchases != null && !recentPurchases.isEmpty()}" th:each="p : ${recentPurchases}"
-                 class="alert alert-dismissible fade show border-start border-4"
-                 th:attr="data-notification-key=${'purchase-result-' + p.id}"
-                 th:classappend="${p.status == 'APPROVED' ? 'alert-success border-success' : p.status == 'REJECTED' ? 'alert-danger border-danger' : 'alert-warning border-warning'}">
-                <div th:if="${p.status == 'APPROVED'}">
-                    <i class="bi bi-bag-check-fill text-success me-2"></i>
-                    Покупка «<strong th:text="${p.shopItem?.title}">Товар</strong>» одобрена!
-                </div>
-                <div th:if="${p.status == 'REJECTED'}">
-                    <i class="bi bi-bag-x-fill text-danger me-2"></i>
-                    Покупка «<strong th:text="${p.shopItem?.title}">Товар</strong>» отклонена.
-                </div>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-
-            <!-- Unseen level rewards -->
-            <div th:if="${unseenRewards != null && !unseenRewards.isEmpty()}" th:each="reward : ${unseenRewards}"
-                 class="alert alert-warning alert-dismissible fade show border-start border-4 border-warning">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <i class="bi bi-trophy-fill text-warning me-2"></i>
-                        <strong>Новая награда за уровень <span th:text="${reward.level()}">2</span>!</strong>
-                        <span th:text="${reward.title()}">Награда</span>
-                        <small th:if="${reward.description()}" class="text-muted d-block ms-4" th:text="${reward.description()}"></small>
+            <!-- ── Level-lock notifications ──────────────── -->
+            <div th:if="${childProfile != null and childProfile.avatarSelected() and childProfile.level() < 2}"
+                 class="lm-banner warn mb-3" data-notification-key="avatar-lock-info">
+                <i class="bi bi-lock-fill fs-5"></i>
+                <div>
+                    <strong>Смена аватара откроется на уровне 2</strong>
+                    <div style="font-size:var(--fs-sm);margin-top:2px;">
+                        Сейчас ты на уровне <span th:text="${childProfile.level()}">1</span>.
+                        <a th:href="@{/child/select-avatar}" class="ms-1" style="color:inherit;opacity:0.8;">Посмотреть аватары →</a>
                     </div>
-                    <form th:action="@{/child/rewards/{id}/seen(id=${reward.id()})}" method="post" class="ms-2">
-                        <button type="submit" class="btn btn-sm btn-outline-warning" title="Понятно">
+                </div>
+            </div>
+            <div th:if="${childProfile != null and childProfile.backgroundSelected() and childProfile.level() < 3}"
+                 class="lm-banner warn mb-3" data-notification-key="background-lock-info">
+                <i class="bi bi-image fs-5"></i>
+                <div>
+                    <strong>Смена фона откроется на уровне 3</strong>
+                    <div style="font-size:var(--fs-sm);margin-top:2px;">
+                        Сейчас ты на уровне <span th:text="${childProfile.level()}">1</span>.
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Notifications ────────────────────────── -->
+            <div th:each="ra : ${reassignedAssignments}"
+                 class="lm-banner mb-3"
+                 th:attr="data-notification-key=${'task-reassigned-' + ra.id}">
+                <i class="bi bi-arrow-repeat fs-5"></i>
+                <div>
+                    <strong>Задание возвращено!</strong>
+                    «<span th:text="${ra.template?.title}">Задание</span>»
+                    <span th:if="${ra.dueDate}"> — продлено до
+                        <span th:attr="data-utc-datetime=${ra.dueDate}" th:text="${ra.dueDate}">—</span>
+                    </span>
+                </div>
+            </div>
+
+            <div th:each="r : ${recentResults}"
+                 class="lm-banner mb-3"
+                 th:classappend="${r.status == 'APPROVED' ? 'ok' : 'err'}"
+                 th:attr="data-notification-key=${'task-result-' + r.id}">
+                <i class="bi bi-check-circle-fill fs-5" th:if="${r.status == 'APPROVED'}"></i>
+                <i class="bi bi-x-circle-fill fs-5" th:unless="${r.status == 'APPROVED'}"></i>
+                <div>
+                    <span th:if="${r.status == 'APPROVED'}">
+                        Задание «<strong th:text="${r.template?.title}">Задание</strong>» одобрено!
+                        <span th:if="${r.expEarned != null}"> +<span th:text="${r.expEarned}">10</span> EXP</span>
+                        <span th:if="${r.coinsEarned != null}"> +<span th:text="${r.coinsEarned}">5</span> 🪙</span>
+                    </span>
+                    <span th:unless="${r.status == 'APPROVED'}">
+                        Задание «<strong th:text="${r.template?.title}">Задание</strong>» отклонено.
+                        <span th:if="${r.parentComment}" class="d-block mt-1"
+                              style="font-size:var(--fs-xs);opacity:0.8;" th:text="${r.parentComment}"></span>
+                    </span>
+                </div>
+            </div>
+
+            <div th:each="p : ${recentPurchases}"
+                 class="lm-banner mb-3"
+                 th:classappend="${p.status == 'APPROVED' ? 'ok' : p.status == 'REJECTED' ? 'err' : 'warn'}"
+                 th:attr="data-notification-key=${'purchase-result-' + p.id}">
+                <i class="bi bi-bag-check-fill fs-5" th:if="${p.status == 'APPROVED'}"></i>
+                <i class="bi bi-bag-x-fill fs-5" th:if="${p.status == 'REJECTED'}"></i>
+                <i class="bi bi-bag-fill fs-5" th:if="${p.status == 'PENDING'}"></i>
+                <div>
+                    <span th:if="${p.status == 'APPROVED'}">Покупка «<strong th:text="${p.shopItem?.title}">Товар</strong>» одобрена!</span>
+                    <span th:if="${p.status == 'REJECTED'}">Покупка «<strong th:text="${p.shopItem?.title}">Товар</strong>» отклонена.</span>
+                    <span th:if="${p.status == 'PENDING'}">Покупка «<strong th:text="${p.shopItem?.title}">Товар</strong>» ожидает одобрения.</span>
+                </div>
+            </div>
+
+            <div th:each="reward : ${unseenRewards}" class="lm-banner warn mb-3">
+                <i class="bi bi-trophy-fill fs-5"></i>
+                <div class="flex-grow-1">
+                    <strong>Новая награда за уровень <span th:text="${reward.level()}">2</span>!</strong>
+                    <span th:text="${reward.title()}">Награда</span>
+                    <small th:if="${reward.description()}" class="d-block" style="opacity:0.75;" th:text="${reward.description()}"></small>
+                </div>
+                <form th:action="@{/child/rewards/{id}/seen(id=${reward.id()})}" method="post" class="ms-auto flex-shrink-0">
+                    <button type="submit" class="btn btn-sm btn-outline-warning"><i class="bi bi-check-lg"></i></button>
+                </form>
+            </div>
+
+            <!-- ── Hero zone ────────────────────────────── -->
+            <div class="lm-child-hero mb-4">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="lm-child-hero-avatar">
+                        <img th:if="${childProfile.avatarUrl}" th:src="${childProfile.avatarUrl}"
+                             alt="Аватар" class="lm-avatar-img">
+                        <span th:unless="${childProfile.avatarUrl}">🧒</span>
+                    </div>
+                    <div>
+                        <div class="lm-child-hero-name"
+                             th:text="'Привет, ' + ${childProfile.nickname ?: childProfile.firstName} + '! 👋'">Привет!</div>
+                        <div class="lm-child-hero-sub">Продолжай в том же духе!</div>
+                        <div class="d-flex gap-2 mt-2 flex-wrap">
+                            <span class="lm-chip" th:classappend="${childProfile.effectiveAccentColor()}" th:text="'Уровень ' + ${childProfile.level}">Уровень 1</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- XP bar -->
+                <div class="lm-xp-bar" th:if="${childProfile.currentLevelExp != null}">
+                    <div class="lm-xp-label">
+                        <span>Прогресс уровня</span>
+                        <span style="font-family:var(--font-mono);"
+                              th:text="${childProfile.currentLevelExp} + ' / ' + ${childProfile.nextLevelExp} + ' EXP'">0 / 100</span>
+                    </div>
+                    <div class="lm-xp-track">
+                        <div class="lm-xp-fill"
+                             th:style="'width:' + (${childProfile.nextLevelExp > 0 ? childProfile.currentLevelExp * 100.0 / childProfile.nextLevelExp : 0}) + '%'"></div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-1" style="font-size:var(--fs-xs);color:var(--ink-500);">
+                        <span>До следующего уровня: <strong th:text="${expRemaining}">80</strong> EXP</span>
+                        <span th:if="${nextReward != null}">
+                            🎁 <strong th:text="${nextReward.title()}">Награда</strong>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Stats + Ring row ──────────────────────── -->
+            <div class="d-flex gap-3 mb-4 align-items-center flex-wrap">
+
+                <!-- Progress ring -->
+                <div class="lm-progress-ring flex-shrink-0" th:if="${childProfile.currentLevelExp != null and childProfile.nextLevelExp > 0}">
+                    <svg width="96" height="96" viewBox="0 0 96 96">
+                        <circle class="lm-pr-track" cx="48" cy="48" r="40"/>
+                        <circle class="lm-pr-fill" cx="48" cy="48" r="40"
+                                stroke-dasharray="251.33"
+                                th:attr="stroke-dashoffset=${251.33 - (childProfile.currentLevelExp * 251.33 / childProfile.nextLevelExp)}"/>
+                        <text x="48" y="44" text-anchor="middle"
+                              style="font-size:18px;font-weight:800;fill:var(--ink-900);font-family:var(--font-sans);"
+                              th:text="${#numbers.formatDecimal(childProfile.currentLevelExp * 100.0 / childProfile.nextLevelExp, 0, 0)} + '%'">0%</text>
+                        <text x="48" y="60" text-anchor="middle"
+                              style="font-size:10px;fill:var(--ink-500);font-family:var(--font-mono);">XP</text>
+                    </svg>
+                    <span class="lm-pr-label">Уровень <span th:text="${childProfile.level}">1</span></span>
+                </div>
+
+                <!-- Stat trio -->
+                <div class="row g-2 flex-grow-1">
+                    <div class="col-4">
+                        <div class="lm-stat-mini">
+                            <div class="lm-stat-mini-icon">⏳</div>
+                            <div class="lm-stat-mini-val" th:text="${pendingCount}">0</div>
+                            <div class="lm-stat-mini-lbl">На проверке</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="lm-stat-mini">
+                            <div class="lm-stat-mini-icon">✅</div>
+                            <div class="lm-stat-mini-val" th:text="${completedCount}">0</div>
+                            <div class="lm-stat-mini-lbl">Выполнено</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="lm-stat-mini">
+                            <div class="lm-stat-mini-icon">🪙</div>
+                            <div class="lm-stat-mini-val" th:text="${totalCoins}">0</div>
+                            <div class="lm-stat-mini-lbl">Монеты</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Streak dots ───────────────────────────── -->
+            <div class="lm-weekly-goal mb-4" th:if="${streakDays != null}">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="lm-wg-title">🔥 Серия дней</span>
+                    <span style="font-family:var(--font-mono);font-size:var(--fs-xs);color:var(--ink-500);"
+                          th:text="${streakDays} + ' / 7 дней'">0 / 7</span>
+                </div>
+                <div class="lm-streak-dots">
+                    <th:block th:each="i : ${#numbers.sequence(1, 7)}">
+                        <span class="lm-streak-dot"
+                              th:classappend="${i < streakDays} ? 'done' : (${i == streakDays} ? 'today' : 'empty')"
+                              th:text="${i < streakDays or i == streakDays} ? '✓' : '·'">·</span>
+                    </th:block>
+                </div>
+            </div>
+
+            <!-- ── Nickname unlock ───────────────────────── -->
+            <div th:if="${childProfile.nicknameUnlocked}" class="lm-banner ok mb-4">
+                <i class="bi bi-person-badge fs-5"></i>
+                <div class="flex-grow-1">
+                    <strong>Ты выполнил первое задание!</strong>
+                    Теперь можешь выбрать себе никнейм.
+                    <form th:action="@{/child/profile/nickname}" method="post" class="d-flex gap-2 mt-2">
+                        <input type="text" name="nickname" class="form-control form-control-sm"
+                               th:value="${childProfile.nickname}" placeholder="Введи никнейм..." maxlength="64">
+                        <button type="submit" class="btn btn-sm btn-success flex-shrink-0">
                             <i class="bi bi-check-lg"></i>
                         </button>
                     </form>
                 </div>
             </div>
 
-            <!-- Character & Level -->
-            <div class="card mb-4 border-0" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);">
-                <div class="card-body text-white">
-                    <div class="row align-items-center">
-                        <div class="col-auto">
-                            <div class="display-1"
-                                 th:text="${childProfile.characterType == 'WARRIOR' ? '⚔️' :
-                                           childProfile.characterType == 'MAGE' ? '🧙' :
-                                           childProfile.characterType == 'ARCHER' ? '🏹' :
-                                           childProfile.characterType == 'HEALER' ? '💚' :
-                                           childProfile.characterType == 'ROGUE' ? '🗡️' :
-                                           childProfile.characterType == 'KNIGHT' ? '🛡️' : '🎮'}">🎮</div>
-                        </div>
-                        <div class="col">
-                            <h3 class="fw-bold mb-1" th:text="${childProfile.nickname ?: childProfile.firstName}">Герой</h3>
-                            <span class="badge bg-white bg-opacity-25 fs-6"
-                                  th:if="${childProfile.characterType}"
-                                  th:text="${childProfile.characterType == 'WARRIOR' ? 'Воин' :
-                                            childProfile.characterType == 'MAGE' ? 'Маг' :
-                                            childProfile.characterType == 'ARCHER' ? 'Лучник' :
-                                            childProfile.characterType == 'HEALER' ? 'Целитель' :
-                                            childProfile.characterType == 'ROGUE' ? 'Разбойник' :
-                                            childProfile.characterType == 'KNIGHT' ? 'Рыцарь' : childProfile.characterType}">Воин</span>
-                            <span class="badge bg-white bg-opacity-25 fs-6" th:text="'Уровень ' + ${childProfile.level}">Уровень 1</span>
-                        </div>
-                    </div>
-
-                    <!-- Level progress -->
-                    <div class="mt-3" th:if="${childProfile.currentLevelExp != null}">
-                        <div class="d-flex justify-content-between small mb-1" style="opacity: 0.8;">
-                            <span>Прогресс уровня</span>
-                            <span th:text="${childProfile.currentLevelExp} + ' / ' + ${childProfile.nextLevelExp} + ' EXP'">0 / 100 EXP</span>
-                        </div>
-                        <div class="progress" style="height: 8px; background: rgba(255,255,255,0.2);">
-                            <div class="progress-bar bg-warning"
-                                 th:style="'width: ' + (${childProfile.nextLevelExp > 0 ? childProfile.currentLevelExp * 100.0 / childProfile.nextLevelExp : 0}) + '%'"></div>
-                        </div>
-                        <div class="mt-2 small" style="opacity: 0.9;">
-                            <i class="bi bi-lightning-fill me-1"></i>
-                            <span>До следующего уровня осталось <strong th:text="${expRemaining}">80</strong> опыта</span>
-                        </div>
-                        <div th:if="${nextReward != null}" class="mt-1 small" style="opacity: 0.9;">
-                            <i class="bi bi-gift-fill me-1 text-warning"></i>
-                            <span>Следующая награда — <strong th:text="${nextReward.title()}">Награда</strong></span>
-                            <span class="badge bg-white bg-opacity-25 ms-1" th:text="'ур. ' + ${nextReward.level()}">ур. 3</span>
-                        </div>
-                    </div>
-                </div>
+            <!-- ── Active assignments ────────────────────── -->
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h2 class="lm-section-title">Задания на сегодня</h2>
+                <a th:href="@{/child/tasks}" style="font-size:var(--fs-sm);color:var(--brand-primary);text-decoration:none;font-weight:600;">
+                    Все задания <i class="bi bi-arrow-right ms-1"></i>
+                </a>
             </div>
 
-            <!-- Stats row -->
-            <div class="row g-3 mb-4">
-                <div class="col-6 col-md-3">
-                    <div class="card text-center h-100">
-                        <div class="card-body py-3">
-                            <div class="stat-icon bg-warning bg-opacity-10 text-warning mx-auto mb-2">
-                                <i class="bi bi-hourglass-split"></i>
-                            </div>
-                            <h3 class="fw-bold mb-0" th:text="${pendingCount}">0</h3>
-                            <small class="text-muted">Ожидают</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="card text-center h-100">
-                        <div class="card-body py-3">
-                            <div class="stat-icon bg-success bg-opacity-10 text-success mx-auto mb-2">
-                                <i class="bi bi-check-circle"></i>
-                            </div>
-                            <h3 class="fw-bold mb-0" th:text="${completedCount}">0</h3>
-                            <small class="text-muted">Выполнено</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="card text-center h-100">
-                        <div class="card-body py-3">
-                            <div class="stat-icon bg-primary bg-opacity-10 text-primary mx-auto mb-2">
-                                <i class="bi bi-star-fill"></i>
-                            </div>
-                            <h3 class="fw-bold mb-0" th:text="${totalExp}">0</h3>
-                            <small class="text-muted">EXP</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="card text-center h-100">
-                        <div class="card-body py-3">
-                            <div class="stat-icon bg-info bg-opacity-10 text-info mx-auto mb-2">
-                                <i class="bi bi-coin"></i>
-                            </div>
-                            <h3 class="fw-bold mb-0" th:text="${totalCoins}">0</h3>
-                            <small class="text-muted">Коины</small>
-                        </div>
-                    </div>
-                </div>
+            <div th:if="${#lists.isEmpty(activeAssignments)}" class="lm-empty-state" style="padding:var(--s-10) var(--s-6);">
+                <div class="lm-empty-icon">🎉</div>
+                <div class="lm-empty-title">На сегодня всё!</div>
+                <div class="lm-empty-sub">Все задания выполнены. Отличная работа!</div>
             </div>
 
-            <!-- Active assignments -->
-            <div class="card">
-                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
-                    <h5 class="fw-bold mb-0"><i class="bi bi-lightning me-2"></i>Активные задания</h5>
-                    <a th:href="@{/child/tasks}" class="btn btn-sm btn-outline-primary">Все задания</a>
-                </div>
-                <div class="card-body p-0">
-                    <div th:if="${#lists.isEmpty(activeAssignments)}" class="text-center py-5 text-muted">
-                        <i class="bi bi-check-all display-4"></i>
-                        <p class="mt-2">Нет активных заданий! 🎉</p>
+            <div th:unless="${#lists.isEmpty(activeAssignments)}" class="lm-child-tasks">
+                <div th:each="a,iter : ${activeAssignments}"
+                     class="lm-child-task"
+                     th:classappend="${a.status == 'SUBMITTED' ? 'submitted' :
+                                      (a.dueDate != null and a.dueDate.isBefore(T(java.time.Instant).now())) ? 'rejected' : ''}">
+                    <div class="lm-ct-icon">
+                        <span th:if="${a.important}">⚠️</span>
+                        <span th:unless="${a.important}"><i class="bi bi-list-check"></i></span>
                     </div>
-                    <div class="list-group list-group-flush" th:unless="${#lists.isEmpty(activeAssignments)}">
-                        <div th:each="a : ${activeAssignments}" class="list-group-item">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div class="me-3">
-                                    <div class="d-flex align-items-center gap-2 mb-1">
-                                        <h6 class="fw-semibold mb-0" th:text="${a.template?.title}">Задание</h6>
-                                        <span th:if="${a.important}" class="badge bg-warning text-dark">
-                                            <i class="bi bi-exclamation-triangle-fill me-1"></i>Важное
-                                        </span>
-                                    </div>
-                                    <small class="text-muted" th:text="${a.template?.description}" th:if="${a.template?.description}">Описание</small>
-                                    <div class="d-flex gap-2 mt-1">
-                                        <span class="badge bg-success-subtle text-success" th:if="${a.template?.expReward}">
-                                            <i class="bi bi-star-fill me-1"></i><span th:text="${a.template.expReward}">10</span> EXP
-                                        </span>
-                                        <span class="badge bg-warning-subtle text-warning" th:if="${a.template?.coinsReward}">
-                                            <i class="bi bi-coin me-1"></i><span th:text="${a.template.coinsReward}">5</span>
-                                        </span>
-                                    </div>
-                                    <!-- Deadline -->
-                                    <div th:if="${a.dueDate}" class="mt-1">
-                                        <small class="text-muted" th:attr="data-deadline-state=${a.dueDate}">
-                                            <i class="bi bi-clock me-1"></i>Дедлайн:
-                                            <span th:attr="data-utc-datetime=${a.dueDate}" th:text="${a.dueDate}">2026-01-01T18:15:00Z</span>
-                                            <span>(<span data-deadline-label></span>)</span>
-                                        </small>
-                                    </div>
-                                    <!-- Sub-items -->
-                                    <div th:if="${a.template?.subItems != null and !a.template.subItems.isEmpty()}" class="mt-2">
-                                        <ul class="list-unstyled mb-0">
-                                            <li th:each="sub : ${a.template.subItems}" class="small text-muted">
-                                                <i class="bi bi-check2-square me-1"></i><span th:text="${sub.title}">Подзадача</span>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div>
-                                    <form th:if="${a.status == 'CREATED' and (a.dueDate == null or !a.dueDate.isBefore(T(java.time.Instant).now()))}"
-                                          th:action="@{/child/tasks/{id}/submit(id=${a.id})}" method="post">
-                                        <button type="submit" class="btn btn-sm btn-success">
-                                            <i class="bi bi-check-lg me-1"></i>Сдать
-                                        </button>
-                                    </form>
-                                    <span th:if="${a.status == 'CREATED' and a.dueDate != null and a.dueDate.isBefore(T(java.time.Instant).now())}"
-                                          class="badge bg-danger">Просрочено</span>
-                                    <span th:if="${a.status == 'SUBMITTED'}" class="badge bg-warning text-dark">На проверке</span>
-                                </div>
-                            </div>
+                    <div class="lm-ct-body">
+                        <div class="lm-ct-title-text" th:text="${a.template?.title}">Задание</div>
+                        <div class="lm-ct-meta">
+                            <span th:if="${a.template?.expReward}">⭐ <span th:text="${a.template.expReward}">10</span> EXP</span>
+                            <span th:if="${a.template?.coinsReward}">🪙 <span th:text="${a.template.coinsReward}">5</span></span>
+                            <span th:if="${a.dueDate}">
+                                <i class="bi bi-clock"></i>
+                                <span th:attr="data-utc-datetime=${a.dueDate}" th:text="${a.dueDate}">срок</span>
+                            </span>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Nickname unlock section -->
-            <div th:if="${childProfile.nicknameUnlocked}" class="card mt-4 border-success">
-                <div class="card-header bg-success bg-opacity-10 border-success">
-                    <h6 class="fw-bold mb-0 text-success">
-                        <i class="bi bi-person-badge me-2"></i>Мой никнейм
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <p class="text-muted small mb-3">
-                        Ты выполнил первое задание! Теперь можешь выбрать себе никнейм — он будет отображаться вместо твоего имени.
-                    </p>
-                    <form th:action="@{/child/profile/nickname}" method="post" class="d-flex gap-2">
-                        <input type="text" name="nickname" class="form-control"
-                               th:value="${childProfile.nickname}"
-                               placeholder="Введи никнейм..." maxlength="64">
-                        <button type="submit" class="btn btn-success flex-shrink-0">
-                            <i class="bi bi-check-lg me-1"></i>Сохранить
-                        </button>
-                    </form>
-                    <div th:if="${childProfile.nickname}" class="mt-2">
-                        <small class="text-muted">Текущий никнейм: <strong th:text="${childProfile.nickname}">—</strong></small>
+                    <!-- CTA -->
+                    <div class="flex-shrink-0">
+                        <form th:if="${a.status == 'CREATED' and (a.dueDate == null or !a.dueDate.isBefore(T(java.time.Instant).now()))}"
+                              th:action="@{/child/tasks/{id}/submit(id=${a.id})}" method="post">
+                            <button type="submit" class="lm-ct-btn">Сдать ✓</button>
+                        </form>
+                        <span th:if="${a.status == 'CREATED' and a.dueDate != null and a.dueDate.isBefore(T(java.time.Instant).now())}"
+                              class="lm-chip danger">Просрочено</span>
+                        <span th:if="${a.status == 'SUBMITTED'}" class="lm-chip warning">На проверке</span>
                     </div>
                 </div>
             </div>
@@ -272,7 +262,6 @@
         <footer th:replace="~{fragments/layout :: footer}"></footer>
     </div>
 </div>
-
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 </body>
 </html>

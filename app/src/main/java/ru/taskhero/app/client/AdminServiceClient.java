@@ -139,4 +139,42 @@ public interface AdminServiceClient {
     /** Получить покупки у родителя. */
     @GetMapping("/admin/parents/{id}/purchases")
     List<Map<String, Object>> getParentPurchases(@PathVariable("id") UUID id);
+
+    // ==================== Avatar gallery ====================
+
+    /** Получить все опции аватара, вкл. неактивные. */
+    @GetMapping("/admin/avatar-options")
+    List<AvatarOptionDto> getAvatarOptions();
+
+    /** Включить/выключить видимость опции аватара. */
+    @PatchMapping("/admin/avatar-options/{id}")
+    AvatarOptionDto toggleAvatarOption(@PathVariable("id") UUID id, @RequestParam("active") boolean active);
+
+    /** Удалить опцию аватара. */
+    @DeleteMapping("/admin/avatar-options/{id}")
+    void deleteAvatarOption(@PathVariable("id") UUID id);
+
+    // ==================== Background gallery ====================
+
+    /** Получить все фоны, вкл. неактивные. */
+    @GetMapping("/admin/background-options")
+    List<BackgroundOptionDto> getBackgroundOptions();
+
+    /** Включить/выключить видимость фона. */
+    @PatchMapping("/admin/background-options/{id}")
+    BackgroundOptionDto toggleBackgroundOption(@PathVariable("id") UUID id, @RequestParam("active") boolean active);
+
+    /** Удалить фон. */
+    @DeleteMapping("/admin/background-options/{id}")
+    void deleteBackgroundOption(@PathVariable("id") UUID id);
+
+    // ==================== Force-change avatar / background ====================
+
+    /** Принудительно установить аватар ребёнку. */
+    @PostMapping("/admin/children/{id}/force-avatar")
+    Map<String, Object> forceSetAvatar(@PathVariable("id") UUID id, @RequestParam("avatarOptionId") UUID avatarOptionId);
+
+    /** Принудительно установить фон ребёнку. */
+    @PostMapping("/admin/children/{id}/force-background")
+    Map<String, Object> forceSetBackground(@PathVariable("id") UUID id, @RequestParam("backgroundOptionId") UUID backgroundOptionId);
 }

@@ -7,6 +7,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.taskhero.app.client.AdminServiceClient;
+import ru.taskhero.app.client.AvatarUploadClient;
+import ru.taskhero.app.client.BackgroundUploadClient;
 import ru.taskhero.app.client.TaskServiceClient;
 
 import java.util.Map;
@@ -23,6 +25,8 @@ public class AdminWebController {
 
     private final AdminServiceClient adminServiceClient;
     private final TaskServiceClient taskServiceClient;
+    private final AvatarUploadClient avatarUploadClient;
+    private final BackgroundUploadClient backgroundUploadClient;
 
     // ==================== Dashboard ====================
 
@@ -238,6 +242,18 @@ public class AdminWebController {
                 model.addAttribute("assignments", assignments);
             } catch (Exception e) {
                 log.warn("Не удалось загрузить назначения ребёнка: {}", e.getMessage());
+            }
+
+            try {
+                model.addAttribute("allAvatarOptions", adminServiceClient.getAvatarOptions());
+            } catch (Exception e) {
+                log.warn("Не удалось загрузить галерею аватаров: {}", e.getMessage());
+            }
+
+            try {
+                model.addAttribute("allBackgroundOptions", adminServiceClient.getBackgroundOptions());
+            } catch (Exception e) {
+                log.warn("Не удалось загрузить галерею фонов: {}", e.getMessage());
             }
         } catch (Exception e) {
             log.error("Error loading child detail: {}", e.getMessage());
@@ -510,5 +526,163 @@ public class AdminWebController {
 
     private String normalizeBootstrapIcon(String iconName) {
         return iconName != null && !iconName.isBlank() ? iconName.trim() : "bi-gift";
+    }
+
+    // ==================== Avatar Gallery ====================
+
+    /** Страница галереи аватаров. */
+    @GetMapping("/avatar-options")
+    public String avatarOptions(Model model) {
+        try {
+            model.addAttribute("avatarOptions", adminServiceClient.getAvatarOptions());
+        } catch (Exception e) {
+            log.error("Error loading avatar options: {}", e.getMessage());
+            model.addAttribute("error", "Ошибка загрузки галереи аватаров");
+        }
+        return "admin/avatar-options";
+    }
+
+    /** Загрузка новой картинки в галерею аватаров. */
+    @PostMapping("/avatar-options")
+    public String uploadAvatarOption(
+            @RequestParam("file") org.springframework.web.multipart.MultipartFile file,
+            @RequestParam(required = false) String label,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            avatarUploadClient.upload(file, label);
+            redirectAttributes.addFlashAttribute("success", "Аватар загружен");
+        } catch (Exception e) {
+            log.error("Error uploading avatar option: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", extractMessage(e));
+        }
+        return "redirect:/admin/avatar-options";
+    }
+
+    /** Включить/выключить видимость аватара в пикере ребёнка. */
+    @PostMapping("/avatar-options/{id}/toggle")
+    public String toggleAvatarOption(
+            @PathVariable UUID id,
+            @RequestParam boolean active,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            adminServiceClient.toggleAvatarOption(id, active);
+            redirectAttributes.addFlashAttribute("success", active ? "Аватар активирован" : "Аватар скрыт");
+        } catch (Exception e) {
+            log.error("Error toggling avatar option: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", extractMessage(e));
+        }
+        return "redirect:/admin/avatar-options";
+    }
+
+    /** Удаление аватара из галереи. */
+    @PostMapping("/avatar-options/{id}/delete")
+    public String deleteAvatarOption(@PathVariable UUID id, RedirectAttributes redirectAttributes) {
+        try {
+            adminServiceClient.deleteAvatarOption(id);
+            redirectAttributes.addFlashAttribute("success", "Аватар удалён");
+        } catch (Exception e) {
+            log.error("Error deleting avatar option: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", extractMessage(e));
+        }
+        return "redirect:/admin/avatar-options";
+    }
+
+    // ==================== Background Gallery ====================
+
+    /** Страница галереи фонов. */
+    @GetMapping("/background-options")
+    public String backgroundOptions(Model model) {
+        try {
+            model.addAttribute("backgroundOptions", adminServiceClient.getBackgroundOptions());
+        } catch (Exception e) {
+            log.error("Error loading background options: {}", e.getMessage());
+            model.addAttribute("error", "Ошибка загрузки галереи фонов");
+        }
+        return "admin/background-options";
+    }
+
+    /** Загрузка нового фона. */
+    @PostMapping("/background-options")
+    public String uploadBackgroundOption(
+            @RequestParam("file") org.springframework.web.multipart.MultipartFile file,
+            @RequestParam(required = false) String label,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            backgroundUploadClient.upload(file, label);
+            redirectAttributes.addFlashAttribute("success", "Фон загружен");
+        } catch (Exception e) {
+            log.error("Error uploading background option: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", extractMessage(e));
+        }
+        return "redirect:/admin/background-options";
+    }
+
+    /** Включить/выключить фон. */
+    @PostMapping("/background-options/{id}/toggle")
+    public String toggleBackgroundOption(
+            @PathVariable UUID id,
+            @RequestParam boolean active,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            adminServiceClient.toggleBackgroundOption(id, active);
+            redirectAttributes.addFlashAttribute("success", active ? "Фон активирован" : "Фон скрыт");
+        } catch (Exception e) {
+            log.error("Error toggling background option: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", extractMessage(e));
+        }
+        return "redirect:/admin/background-options";
+    }
+
+    /** Удаление фона из галереи. */
+    @PostMapping("/background-options/{id}/delete")
+    public String deleteBackgroundOption(@PathVariable UUID id, RedirectAttributes redirectAttributes) {
+        try {
+            adminServiceClient.deleteBackgroundOption(id);
+            redirectAttributes.addFlashAttribute("success", "Фон удалён");
+        } catch (Exception e) {
+            log.error("Error deleting background option: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", extractMessage(e));
+        }
+        return "redirect:/admin/background-options";
+    }
+
+    // ==================== Admin force-change avatar/background ====================
+
+    /** Принудительно поменять аватар ребёнку. */
+    @PostMapping("/children/{id}/force-avatar")
+    public String forceSetAvatar(
+            @PathVariable UUID id,
+            @RequestParam UUID avatarOptionId,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            adminServiceClient.forceSetAvatar(id, avatarOptionId);
+            redirectAttributes.addFlashAttribute("success", "Аватар изменён");
+        } catch (Exception e) {
+            log.error("Error force-setting avatar: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", extractMessage(e));
+        }
+        return "redirect:/admin/children/" + id;
+    }
+
+    /** Принудительно поменять фон ребёнку. */
+    @PostMapping("/children/{id}/force-background")
+    public String forceSetBackground(
+            @PathVariable UUID id,
+            @RequestParam UUID backgroundOptionId,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            adminServiceClient.forceSetBackground(id, backgroundOptionId);
+            redirectAttributes.addFlashAttribute("success", "Фон изменён");
+        } catch (Exception e) {
+            log.error("Error force-setting background: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", extractMessage(e));
+        }
+        return "redirect:/admin/children/" + id;
     }
 }

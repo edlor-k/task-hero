@@ -5,154 +5,150 @@
 <div class="th-layout">
     <nav th:replace="~{fragments/layout :: sidebar-parent}"></nav>
     <div class="th-content">
-        <header th:replace="~{fragments/layout :: header}"></header>
+        <header th:replace="~{fragments/layout :: topbar}"></header>
         <main class="th-main">
 
-            <div class="d-flex align-items-center justify-content-between mb-4">
-                <h4 class="fw-bold mb-0"><i class="bi bi-book me-2"></i>Библиотека шаблонов</h4>
-                <a th:if="${onboarding}" th:href="@{/parent/onboarding}" class="btn btn-outline-secondary btn-sm">
-                    <i class="bi bi-arrow-left me-1"></i>Назад к настройке
+            <div class="lm-page-header">
+                <div>
+                    <h1 class="lm-page-title">Библиотека шаблонов</h1>
+                    <p class="lm-page-sub">Готовые шаблоны заданий — добавьте в свою коллекцию</p>
+                </div>
+                <a th:if="${onboarding}" th:href="@{/parent/onboarding}" class="lm-btn lm-btn-ghost lm-btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i>Назад
                 </a>
             </div>
 
-            <!-- Messages -->
-            <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
-                <i class="bi bi-check-circle me-2"></i><span th:text="${success}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div th:if="${success}" class="lm-banner ok mb-4">
+                <i class="bi bi-check-circle-fill fs-5"></i><span th:text="${success}">Успех</span>
             </div>
-            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
-                <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div th:if="${error}" class="lm-banner err mb-4">
+                <i class="bi bi-exclamation-triangle-fill fs-5"></i><span th:text="${error}">Ошибка</span>
             </div>
 
             <!-- Presets section -->
-            <div class="card mb-4">
-                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
-                    <h5 class="fw-bold mb-0"><i class="bi bi-lightning-charge me-2"></i>Быстрый старт: готовые пресеты</h5>
-                    <button class="btn btn-sm btn-outline-secondary" type="button"
-                            data-bs-toggle="collapse" data-bs-target="#presetsCollapse" aria-expanded="true">
+            <div class="lm-review mb-4" style="padding:0;overflow:hidden;">
+                <div style="padding:var(--s-4) var(--s-5);border-bottom:1px solid var(--border-subtle);
+                            display:flex;align-items:center;justify-content:space-between;">
+                    <h2 class="lm-section-title" style="margin:0;">
+                        <i class="bi bi-lightning-charge me-2" style="color:var(--brand-primary);"></i>Быстрый старт: готовые пресеты
+                    </h2>
+                    <button class="lm-btn lm-btn-ghost lm-btn-sm" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#presetsCollapse">
                         <i class="bi bi-chevron-down"></i>
                     </button>
                 </div>
                 <div class="collapse show" id="presetsCollapse">
-                    <div class="card-body">
-                        <p class="text-muted small mb-3">Добавьте сразу несколько шаблонов одним нажатием. Созданные задания можно изменить в разделе «Мои шаблоны».</p>
+                    <div style="padding:var(--s-4) var(--s-5);">
+                        <p style="color:var(--ink-500);font-size:var(--fs-sm);margin-bottom:var(--s-4);">
+                            Добавьте сразу несколько шаблонов одним нажатием. Созданные задания можно изменить в разделе «Мои шаблоны».
+                        </p>
                         <div class="row g-3">
+
+                            <div th:each="preset : ${ { {name:'study', emoji:'📚', title:'Учёба', desc:'Домашние задания, чтение и порядок — для учебного ритма.', items: {'Сделать д/з · 20', 'Собрать портфель · 3', 'Прочитать 10 стр. · 5', 'Уборка рабочего места · 5'} }, {name:'sports', emoji:'🏃', title:'Спорт', desc:'Зарядка, прогулки и тренировки — для активного ребёнка.', items: {'Зарядка · 10', 'Прогулка / 5000 шагов · 15', 'Тренировка · 20', 'Растяжка · 5'} }, {name:'household', emoji:'🧹', title:'Уборка', desc:'Кровать, игрушки, комната — для привычки к порядку.', items: {'Застелить кровать · 5', 'Убрать игрушки · 5', 'Убрать свою комнату · 20'} }, {name:'routine', emoji:'☀️', title:'Режим дня', desc:'Базовые привычки — подходит для самых младших.', items: {'Почистить зубы · 5', 'Собраться утром · 10', 'Лечь спать вовремя · 5'} }, {name:'hobby', emoji:'🎨', title:'Хобби', desc:'Творчество и практика — для увлечённого ребёнка.', items: {'20 мин. хобби · 15', 'Практика / репетиция · 20', 'Закончить проект · 25'} } } }"
+                                 class="col-md-6 col-xl-4" th:if="${false}"></div>
 
                             <!-- Preset: Учёба -->
                             <div class="col-md-6 col-xl-4">
-                                <div class="card border h-100">
-                                    <div class="card-body d-flex flex-column">
-                                        <h6 class="fw-bold mb-1">📚 Учёба</h6>
-                                        <p class="text-muted small mb-2">Домашние задания, чтение и порядок — для учебного ритма.</p>
-                                        <ul class="list-unstyled small mb-3 flex-grow-1">
-                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Сделать домашнее задание <span class="text-warning fw-semibold">20</span></li>
-                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Собрать портфель на завтра <span class="text-warning fw-semibold">3</span></li>
-                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Прочитать 10 страниц <span class="text-warning fw-semibold">5</span></li>
-                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Уборка рабочего места <span class="text-warning fw-semibold">5</span></li>
-                                        </ul>
-                                        <form th:action="@{/parent/presets/apply}" method="post">
-                                            <input type="hidden" name="presetName" value="study"/>
-                                            <input type="hidden" name="onboarding" th:value="${onboarding}"/>
-                                            <button type="submit" class="btn btn-outline-primary btn-sm w-100">
-                                                <i class="bi bi-plus-circle me-1"></i>Применить пресет
-                                            </button>
-                                        </form>
-                                    </div>
+                                <div class="lm-feature-card h-100 d-flex flex-column">
+                                    <div class="lm-feature-title">📚 Учёба</div>
+                                    <div class="lm-feature-desc mb-3">Домашние задания, чтение и порядок — для учебного ритма.</div>
+                                    <ul class="list-unstyled mb-3 flex-grow-1" style="font-size:var(--fs-xs);color:var(--ink-600);">
+                                        <li class="mb-1"><i class="bi bi-check2" style="color:var(--brand-success);"></i> Сделать домашнее задание <span class="lm-chip accent ms-1" style="font-size:10px;">20</span></li>
+                                        <li class="mb-1"><i class="bi bi-check2" style="color:var(--brand-success);"></i> Собрать портфель <span class="lm-chip accent ms-1" style="font-size:10px;">3</span></li>
+                                        <li class="mb-1"><i class="bi bi-check2" style="color:var(--brand-success);"></i> Прочитать 10 страниц <span class="lm-chip accent ms-1" style="font-size:10px;">5</span></li>
+                                        <li><i class="bi bi-check2" style="color:var(--brand-success);"></i> Уборка рабочего места <span class="lm-chip accent ms-1" style="font-size:10px;">5</span></li>
+                                    </ul>
+                                    <form th:action="@{/parent/presets/apply}" method="post" style="margin-top:auto;">
+                                        <input type="hidden" name="presetName" value="study"/>
+                                        <input type="hidden" name="onboarding" th:value="${onboarding}"/>
+                                        <button type="submit" class="lm-btn lm-btn-secondary lm-btn-sm w-100 justify-content-center">
+                                            <i class="bi bi-plus-circle me-1"></i>Применить пресет
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
 
                             <!-- Preset: Спорт -->
                             <div class="col-md-6 col-xl-4">
-                                <div class="card border h-100">
-                                    <div class="card-body d-flex flex-column">
-                                        <h6 class="fw-bold mb-1">🏃 Спорт</h6>
-                                        <p class="text-muted small mb-2">Зарядка, прогулки и тренировки — для активного ребёнка.</p>
-                                        <ul class="list-unstyled small mb-3 flex-grow-1">
-                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Утренняя зарядка <span class="text-warning fw-semibold">10</span></li>
-                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Прогулка / 5000 шагов <span class="text-warning fw-semibold">15</span></li>
-                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Тренировка <span class="text-warning fw-semibold">20</span></li>
-                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Растяжка <span class="text-warning fw-semibold">5</span></li>
-                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Мини-челлендж <span class="text-warning fw-semibold">5</span></li>
-                                        </ul>
-                                        <form th:action="@{/parent/presets/apply}" method="post">
-                                            <input type="hidden" name="presetName" value="sports"/>
-                                            <input type="hidden" name="onboarding" th:value="${onboarding}"/>
-                                            <button type="submit" class="btn btn-outline-primary btn-sm w-100">
-                                                <i class="bi bi-plus-circle me-1"></i>Применить пресет
-                                            </button>
-                                        </form>
-                                    </div>
+                                <div class="lm-feature-card h-100 d-flex flex-column">
+                                    <div class="lm-feature-title">🏃 Спорт</div>
+                                    <div class="lm-feature-desc mb-3">Зарядка, прогулки и тренировки — для активного ребёнка.</div>
+                                    <ul class="list-unstyled mb-3 flex-grow-1" style="font-size:var(--fs-xs);color:var(--ink-600);">
+                                        <li class="mb-1"><i class="bi bi-check2" style="color:var(--brand-success);"></i> Утренняя зарядка <span class="lm-chip accent ms-1" style="font-size:10px;">10</span></li>
+                                        <li class="mb-1"><i class="bi bi-check2" style="color:var(--brand-success);"></i> Прогулка / 5000 шагов <span class="lm-chip accent ms-1" style="font-size:10px;">15</span></li>
+                                        <li class="mb-1"><i class="bi bi-check2" style="color:var(--brand-success);"></i> Тренировка <span class="lm-chip accent ms-1" style="font-size:10px;">20</span></li>
+                                        <li><i class="bi bi-check2" style="color:var(--brand-success);"></i> Растяжка <span class="lm-chip accent ms-1" style="font-size:10px;">5</span></li>
+                                    </ul>
+                                    <form th:action="@{/parent/presets/apply}" method="post" style="margin-top:auto;">
+                                        <input type="hidden" name="presetName" value="sports"/>
+                                        <input type="hidden" name="onboarding" th:value="${onboarding}"/>
+                                        <button type="submit" class="lm-btn lm-btn-secondary lm-btn-sm w-100 justify-content-center">
+                                            <i class="bi bi-plus-circle me-1"></i>Применить пресет
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
 
                             <!-- Preset: Уборка -->
                             <div class="col-md-6 col-xl-4">
-                                <div class="card border h-100">
-                                    <div class="card-body d-flex flex-column">
-                                        <h6 class="fw-bold mb-1">🧹 Уборка</h6>
-                                        <p class="text-muted small mb-2">Кровать, игрушки, комната — для привычки к порядку.</p>
-                                        <ul class="list-unstyled small mb-3 flex-grow-1">
-                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Застелить кровать <span class="text-warning fw-semibold">5</span></li>
-                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Убрать игрушки / вещи <span class="text-warning fw-semibold">5</span></li>
-                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Протереть стол после занятий <span class="text-warning fw-semibold">5</span></li>
-                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Помочь накрыть / убрать со стола <span class="text-warning fw-semibold">10</span></li>
-                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Убрать свою комнату <span class="text-warning fw-semibold">20</span></li>
-                                        </ul>
-                                        <form th:action="@{/parent/presets/apply}" method="post">
-                                            <input type="hidden" name="presetName" value="household"/>
-                                            <input type="hidden" name="onboarding" th:value="${onboarding}"/>
-                                            <button type="submit" class="btn btn-outline-primary btn-sm w-100">
-                                                <i class="bi bi-plus-circle me-1"></i>Применить пресет
-                                            </button>
-                                        </form>
-                                    </div>
+                                <div class="lm-feature-card h-100 d-flex flex-column">
+                                    <div class="lm-feature-title">🧹 Уборка</div>
+                                    <div class="lm-feature-desc mb-3">Кровать, игрушки, комната — для привычки к порядку.</div>
+                                    <ul class="list-unstyled mb-3 flex-grow-1" style="font-size:var(--fs-xs);color:var(--ink-600);">
+                                        <li class="mb-1"><i class="bi bi-check2" style="color:var(--brand-success);"></i> Застелить кровать <span class="lm-chip accent ms-1" style="font-size:10px;">5</span></li>
+                                        <li class="mb-1"><i class="bi bi-check2" style="color:var(--brand-success);"></i> Убрать игрушки <span class="lm-chip accent ms-1" style="font-size:10px;">5</span></li>
+                                        <li class="mb-1"><i class="bi bi-check2" style="color:var(--brand-success);"></i> Помочь убрать со стола <span class="lm-chip accent ms-1" style="font-size:10px;">10</span></li>
+                                        <li><i class="bi bi-check2" style="color:var(--brand-success);"></i> Убрать свою комнату <span class="lm-chip accent ms-1" style="font-size:10px;">20</span></li>
+                                    </ul>
+                                    <form th:action="@{/parent/presets/apply}" method="post" style="margin-top:auto;">
+                                        <input type="hidden" name="presetName" value="household"/>
+                                        <input type="hidden" name="onboarding" th:value="${onboarding}"/>
+                                        <button type="submit" class="lm-btn lm-btn-secondary lm-btn-sm w-100 justify-content-center">
+                                            <i class="bi bi-plus-circle me-1"></i>Применить пресет
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
 
-                            <!-- Preset: Ежедневная рутина -->
+                            <!-- Preset: Режим дня -->
                             <div class="col-md-6 col-xl-4">
-                                <div class="card border h-100">
-                                    <div class="card-body d-flex flex-column">
-                                        <h6 class="fw-bold mb-1">☀️ Ежедневная рутина</h6>
-                                        <p class="text-muted small mb-2">Базовые привычки — подходит для самых младших.</p>
-                                        <ul class="list-unstyled small mb-3 flex-grow-1">
-                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Почистить зубы утром и вечером <span class="text-warning fw-semibold">5</span></li>
-                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Собраться утром без напоминаний <span class="text-warning fw-semibold">10</span></li>
-                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Лечь спать вовремя <span class="text-warning fw-semibold">5</span></li>
-                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Собрать вещи на завтра <span class="text-warning fw-semibold">7</span></li>
-                                        </ul>
-                                        <form th:action="@{/parent/presets/apply}" method="post">
-                                            <input type="hidden" name="presetName" value="routine"/>
-                                            <input type="hidden" name="onboarding" th:value="${onboarding}"/>
-                                            <button type="submit" class="btn btn-outline-primary btn-sm w-100">
-                                                <i class="bi bi-plus-circle me-1"></i>Применить пресет
-                                            </button>
-                                        </form>
-                                    </div>
+                                <div class="lm-feature-card h-100 d-flex flex-column">
+                                    <div class="lm-feature-title">☀️ Режим дня</div>
+                                    <div class="lm-feature-desc mb-3">Базовые привычки — подходит для самых младших.</div>
+                                    <ul class="list-unstyled mb-3 flex-grow-1" style="font-size:var(--fs-xs);color:var(--ink-600);">
+                                        <li class="mb-1"><i class="bi bi-check2" style="color:var(--brand-success);"></i> Почистить зубы утром и вечером <span class="lm-chip accent ms-1" style="font-size:10px;">5</span></li>
+                                        <li class="mb-1"><i class="bi bi-check2" style="color:var(--brand-success);"></i> Собраться без напоминаний <span class="lm-chip accent ms-1" style="font-size:10px;">10</span></li>
+                                        <li class="mb-1"><i class="bi bi-check2" style="color:var(--brand-success);"></i> Лечь спать вовремя <span class="lm-chip accent ms-1" style="font-size:10px;">5</span></li>
+                                        <li><i class="bi bi-check2" style="color:var(--brand-success);"></i> Собрать вещи на завтра <span class="lm-chip accent ms-1" style="font-size:10px;">7</span></li>
+                                    </ul>
+                                    <form th:action="@{/parent/presets/apply}" method="post" style="margin-top:auto;">
+                                        <input type="hidden" name="presetName" value="routine"/>
+                                        <input type="hidden" name="onboarding" th:value="${onboarding}"/>
+                                        <button type="submit" class="lm-btn lm-btn-secondary lm-btn-sm w-100 justify-content-center">
+                                            <i class="bi bi-plus-circle me-1"></i>Применить пресет
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
 
                             <!-- Preset: Хобби -->
                             <div class="col-md-6 col-xl-4">
-                                <div class="card border h-100">
-                                    <div class="card-body d-flex flex-column">
-                                        <h6 class="fw-bold mb-1">🎨 Хобби</h6>
-                                        <p class="text-muted small mb-2">Творчество, практика и новые идеи — для увлечённого ребёнка.</p>
-                                        <ul class="list-unstyled small mb-3 flex-grow-1">
-                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>20 минут любимого хобби <span class="text-warning fw-semibold">15</span></li>
-                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Практика / репетиция <span class="text-warning fw-semibold">20</span></li>
-                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Закончить маленький проект <span class="text-warning fw-semibold">25</span></li>
-                                            <li class="text-muted"><i class="bi bi-check2 text-success me-1"></i>Попробовать что-то новое <span class="text-warning fw-semibold">25</span></li>
-                                        </ul>
-                                        <form th:action="@{/parent/presets/apply}" method="post">
-                                            <input type="hidden" name="presetName" value="hobby"/>
-                                            <input type="hidden" name="onboarding" th:value="${onboarding}"/>
-                                            <button type="submit" class="btn btn-outline-primary btn-sm w-100">
-                                                <i class="bi bi-plus-circle me-1"></i>Применить пресет
-                                            </button>
-                                        </form>
-                                    </div>
+                                <div class="lm-feature-card h-100 d-flex flex-column">
+                                    <div class="lm-feature-title">🎨 Хобби</div>
+                                    <div class="lm-feature-desc mb-3">Творчество, практика и новые идеи — для увлечённого ребёнка.</div>
+                                    <ul class="list-unstyled mb-3 flex-grow-1" style="font-size:var(--fs-xs);color:var(--ink-600);">
+                                        <li class="mb-1"><i class="bi bi-check2" style="color:var(--brand-success);"></i> 20 минут любимого хобби <span class="lm-chip accent ms-1" style="font-size:10px;">15</span></li>
+                                        <li class="mb-1"><i class="bi bi-check2" style="color:var(--brand-success);"></i> Практика / репетиция <span class="lm-chip accent ms-1" style="font-size:10px;">20</span></li>
+                                        <li class="mb-1"><i class="bi bi-check2" style="color:var(--brand-success);"></i> Закончить маленький проект <span class="lm-chip accent ms-1" style="font-size:10px;">25</span></li>
+                                        <li><i class="bi bi-check2" style="color:var(--brand-success);"></i> Попробовать что-то новое <span class="lm-chip accent ms-1" style="font-size:10px;">25</span></li>
+                                    </ul>
+                                    <form th:action="@{/parent/presets/apply}" method="post" style="margin-top:auto;">
+                                        <input type="hidden" name="presetName" value="hobby"/>
+                                        <input type="hidden" name="onboarding" th:value="${onboarding}"/>
+                                        <button type="submit" class="lm-btn lm-btn-secondary lm-btn-sm w-100 justify-content-center">
+                                            <i class="bi bi-plus-circle me-1"></i>Применить пресет
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
 
@@ -164,32 +160,32 @@
             <!-- Category filter -->
             <div class="d-flex flex-wrap gap-2 mb-4">
                 <a th:href="@{/parent/library(onboarding=${onboarding ?: null})}"
-                   class="btn btn-sm"
-                   th:classappend="${selectedCategory == null} ? 'btn-primary' : 'btn-outline-primary'">Все</a>
+                   class="lm-chip" style="text-decoration:none;padding:7px 14px;"
+                   th:classappend="${selectedCategory == null} ? ' primary' : ''">Все</a>
                 <a th:href="@{/parent/library(category='STUDY', onboarding=${onboarding ?: null})}"
-                   class="btn btn-sm"
-                   th:classappend="${selectedCategory == 'STUDY'} ? 'btn-primary' : 'btn-outline-primary'">📚 Учёба</a>
+                   class="lm-chip" style="text-decoration:none;padding:7px 14px;"
+                   th:classappend="${selectedCategory == 'STUDY'} ? ' primary' : ''">📚 Учёба</a>
                 <a th:href="@{/parent/library(category='HOUSEHOLD', onboarding=${onboarding ?: null})}"
-                   class="btn btn-sm"
-                   th:classappend="${selectedCategory == 'HOUSEHOLD'} ? 'btn-primary' : 'btn-outline-primary'">🏠 По дому</a>
+                   class="lm-chip" style="text-decoration:none;padding:7px 14px;"
+                   th:classappend="${selectedCategory == 'HOUSEHOLD'} ? ' primary' : ''">🏠 По дому</a>
                 <a th:href="@{/parent/library(category='SPORTS', onboarding=${onboarding ?: null})}"
-                   class="btn btn-sm"
-                   th:classappend="${selectedCategory == 'SPORTS'} ? 'btn-primary' : 'btn-outline-primary'">🏆 Спорт</a>
+                   class="lm-chip" style="text-decoration:none;padding:7px 14px;"
+                   th:classappend="${selectedCategory == 'SPORTS'} ? ' primary' : ''">⚽ Спорт</a>
                 <a th:href="@{/parent/library(category='CREATIVITY', onboarding=${onboarding ?: null})}"
-                   class="btn btn-sm"
-                   th:classappend="${selectedCategory == 'CREATIVITY'} ? 'btn-primary' : 'btn-outline-primary'">🎨 Творчество</a>
+                   class="lm-chip" style="text-decoration:none;padding:7px 14px;"
+                   th:classappend="${selectedCategory == 'CREATIVITY'} ? ' primary' : ''">🎨 Творчество</a>
                 <a th:href="@{/parent/library(category='HYGIENE', onboarding=${onboarding ?: null})}"
-                   class="btn btn-sm"
-                   th:classappend="${selectedCategory == 'HYGIENE'} ? 'btn-primary' : 'btn-outline-primary'">💧 Гигиена</a>
+                   class="lm-chip" style="text-decoration:none;padding:7px 14px;"
+                   th:classappend="${selectedCategory == 'HYGIENE'} ? ' primary' : ''">💧 Гигиена</a>
                 <a th:href="@{/parent/library(category='SOCIAL', onboarding=${onboarding ?: null})}"
-                   class="btn btn-sm"
-                   th:classappend="${selectedCategory == 'SOCIAL'} ? 'btn-primary' : 'btn-outline-primary'">🤝 Общение</a>
+                   class="lm-chip" style="text-decoration:none;padding:7px 14px;"
+                   th:classappend="${selectedCategory == 'SOCIAL'} ? ' primary' : ''">💬 Общение</a>
                 <a th:href="@{/parent/library(category='READING', onboarding=${onboarding ?: null})}"
-                   class="btn btn-sm"
-                   th:classappend="${selectedCategory == 'READING'} ? 'btn-primary' : 'btn-outline-primary'">📖 Чтение</a>
+                   class="lm-chip" style="text-decoration:none;padding:7px 14px;"
+                   th:classappend="${selectedCategory == 'READING'} ? ' primary' : ''">📖 Чтение</a>
                 <a th:href="@{/parent/library(category='OTHER', onboarding=${onboarding ?: null})}"
-                   class="btn btn-sm"
-                   th:classappend="${selectedCategory == 'OTHER'} ? 'btn-primary' : 'btn-outline-primary'">📌 Другое</a>
+                   class="lm-chip" style="text-decoration:none;padding:7px 14px;"
+                   th:classappend="${selectedCategory == 'OTHER'} ? ' primary' : ''">··· Другое</a>
             </div>
 
             <!-- Tabs: Available / Added -->
@@ -223,57 +219,52 @@
                     <!-- Templates -->
                     <div th:unless="${#lists.isEmpty(libraryTemplates)}" class="row g-4">
                         <div th:each="t : ${libraryTemplates}" class="col-md-6 col-lg-4">
-                            <div class="card template-card h-100">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <h5 class="fw-bold mb-0" th:text="${t.title}">Шаблон</h5>
-                                        <span class="badge bg-body-secondary text-body" th:if="${t.category}"
-                                              th:text="${t.category == 'STUDY' ? 'Учёба' :
-                                                         t.category == 'HOUSEHOLD' ? 'По дому' :
-                                                         t.category == 'SPORTS' ? 'Спорт' :
-                                                         t.category == 'CREATIVITY' ? 'Творчество' :
-                                                         t.category == 'HYGIENE' ? 'Гигиена' :
-                                                         t.category == 'SOCIAL' ? 'Общение' :
-                                                         t.category == 'READING' ? 'Чтение' :
-                                                         t.category == 'OTHER' ? 'Другое' : t.category}">Категория</span>
-                                    </div>
-                                    <p class="text-muted small mb-3" th:text="${t.description}" th:if="${t.description}">Описание</p>
+                            <div class="lm-feature-card h-100 d-flex flex-column">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div class="lm-feature-title mb-0" th:text="${t.title}">Шаблон</div>
+                                    <span class="lm-chip ms-2" th:if="${t.category}"
+                                          style="white-space:nowrap;flex-shrink:0;"
+                                          th:text="${t.category == 'STUDY' ? 'Учёба' :
+                                                     t.category == 'HOUSEHOLD' ? 'По дому' :
+                                                     t.category == 'SPORTS' ? 'Спорт' :
+                                                     t.category == 'CREATIVITY' ? 'Творчество' :
+                                                     t.category == 'HYGIENE' ? 'Гигиена' :
+                                                     t.category == 'SOCIAL' ? 'Общение' :
+                                                     t.category == 'READING' ? 'Чтение' : 'Другое'}">Категория</span>
+                                </div>
+                                <div class="lm-feature-desc mb-3" th:text="${t.description}" th:if="${t.description}">Описание</div>
 
-                                    <div class="d-flex flex-wrap gap-2 mb-3">
-                                        <span class="badge"
-                                              th:if="${t.difficulty}"
-                                              th:classappend="${t.difficulty == 'EASY' ? 'bg-success' :
-                                                                t.difficulty == 'NORMAL' ? 'bg-warning text-dark' :
-                                                                t.difficulty == 'HARD' ? 'bg-danger' : 'bg-secondary'}"
-                                              th:text="${t.difficulty}">EASY</span>
-                                        <span class="text-success small" th:if="${t.expReward}">
-                                            <i class="bi bi-star-fill me-1"></i><span th:text="${t.expReward}">10</span> EXP
-                                        </span>
-                                        <span class="text-warning small" th:if="${t.coinsReward}">
-                                            <i class="bi bi-coin me-1"></i><span th:text="${t.coinsReward}">5</span>
-                                        </span>
-                                    </div>
+                                <div class="d-flex flex-wrap gap-2 mb-3">
+                                    <span class="lm-chip"
+                                          th:if="${t.difficulty}"
+                                          th:classappend="${t.difficulty == 'EASY' ? ' success' :
+                                                            t.difficulty == 'HARD' ? ' danger' : ' warning'}"
+                                          th:text="${t.difficulty == 'EASY' ? 'Лёгкое' :
+                                                     t.difficulty == 'HARD' ? 'Сложное' : 'Обычное'}">Сложность</span>
+                                    <span class="lm-chip" th:if="${t.expReward}">
+                                        ⭐ <span th:text="${t.expReward}">10</span> EXP
+                                    </span>
+                                    <span class="lm-chip accent" th:if="${t.coinsReward}">
+                                        🪙 <span th:text="${t.coinsReward}">5</span>
+                                    </span>
+                                </div>
 
-                                    <!-- Sub-items preview -->
-                                    <div th:if="${t.subItems != null and !t.subItems.isEmpty()}" class="mb-3">
-                                        <small class="text-muted fw-semibold">Подзадачи:</small>
-                                        <ul class="list-unstyled mb-0 mt-1">
-                                            <li th:each="sub : ${t.subItems}" class="small text-muted">
-                                                <i class="bi bi-check2-square me-1"></i><span th:text="${sub.title}">Подзадача</span>
-                                            </li>
-                                        </ul>
+                                <div th:if="${t.subItems != null and !t.subItems.isEmpty()}" class="mb-3">
+                                    <div th:each="sub : ${t.subItems}"
+                                         style="font-size:var(--fs-xs);color:var(--ink-500);margin-bottom:2px;">
+                                        <i class="bi bi-check2-square me-1" style="color:var(--brand-success);"></i>
+                                        <span th:text="${sub.title}">Подзадача</span>
                                     </div>
                                 </div>
-                                <div class="card-footer bg-transparent border-0 pb-3 px-3">
-                                    <form th:action="@{/parent/library/copy}" method="post">
-                                        <input type="hidden" name="templateId" th:value="${t.id}">
-                                        <input type="hidden" name="onboarding" th:value="${onboarding}">
-                                        <input type="hidden" name="category" th:value="${selectedCategory}">
-                                        <button type="submit" class="btn btn-outline-primary w-100">
-                                            <i class="bi bi-plus-circle me-1"></i>Добавить к себе
-                                        </button>
-                                    </form>
-                                </div>
+
+                                <form th:action="@{/parent/library/copy}" method="post" style="margin-top:auto;">
+                                    <input type="hidden" name="templateId" th:value="${t.id}">
+                                    <input type="hidden" name="onboarding" th:value="${onboarding}">
+                                    <input type="hidden" name="category" th:value="${selectedCategory}">
+                                    <button type="submit" class="lm-btn lm-btn-secondary lm-btn-sm w-100 justify-content-center">
+                                        <i class="bi bi-plus-circle me-1"></i>Добавить к себе
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -281,46 +272,36 @@
 
                 <!-- Added templates -->
                 <div class="tab-pane fade" id="added-pane" role="tabpanel" aria-labelledby="added-tab">
-                    <div th:if="${#lists.isEmpty(addedTemplates)}" class="text-center py-5">
-                        <i class="bi bi-clipboard-check display-1 text-muted"></i>
-                        <h4 class="mt-3 text-muted">Нет добавленных шаблонов</h4>
-                        <p class="text-muted">Добавляйте шаблоны из вкладки «Доступные»</p>
+                    <div th:if="${#lists.isEmpty(addedTemplates)}" class="lm-empty-state" style="padding:var(--s-10);">
+                        <div class="lm-empty-icon">📋</div>
+                        <div class="lm-empty-title">Нет добавленных шаблонов</div>
+                        <div class="lm-empty-sub">Добавляйте шаблоны из вкладки «Доступные»</div>
                     </div>
 
                     <div th:unless="${#lists.isEmpty(addedTemplates)}" class="row g-4">
                         <div th:each="t : ${addedTemplates}" class="col-md-6 col-lg-4">
-                            <div class="card template-card h-100 border-success">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <h5 class="fw-bold mb-0" th:text="${t.title}">Шаблон</h5>
-                                        <span class="badge bg-success"><i class="bi bi-check-lg me-1"></i>Добавлен</span>
-                                    </div>
-                                    <p class="text-muted small mb-3" th:text="${t.description}" th:if="${t.description}">Описание</p>
+                            <div class="lm-feature-card h-100" style="border-color:var(--brand-success);">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div class="lm-feature-title mb-0" th:text="${t.title}">Шаблон</div>
+                                    <span class="lm-chip success ms-2" style="white-space:nowrap;flex-shrink:0;">
+                                        <i class="bi bi-check-lg me-1"></i>Добавлен
+                                    </span>
+                                </div>
+                                <div class="lm-feature-desc mb-3" th:text="${t.description}" th:if="${t.description}">Описание</div>
 
-                                    <div class="d-flex flex-wrap gap-2 mb-3">
-                                        <span class="badge"
-                                              th:if="${t.difficulty}"
-                                              th:classappend="${t.difficulty == 'EASY' ? 'bg-success' :
-                                                                t.difficulty == 'NORMAL' ? 'bg-warning text-dark' :
-                                                                t.difficulty == 'HARD' ? 'bg-danger' : 'bg-secondary'}"
-                                              th:text="${t.difficulty}">EASY</span>
-                                        <span class="text-success small" th:if="${t.expReward}">
-                                            <i class="bi bi-star-fill me-1"></i><span th:text="${t.expReward}">10</span> EXP
-                                        </span>
-                                        <span class="text-warning small" th:if="${t.coinsReward}">
-                                            <i class="bi bi-coin me-1"></i><span th:text="${t.coinsReward}">5</span>
-                                        </span>
-                                    </div>
-
-                                    <!-- Sub-items preview -->
-                                    <div th:if="${t.subItems != null and !t.subItems.isEmpty()}" class="mb-3">
-                                        <small class="text-muted fw-semibold">Подзадачи:</small>
-                                        <ul class="list-unstyled mb-0 mt-1">
-                                            <li th:each="sub : ${t.subItems}" class="small text-muted">
-                                                <i class="bi bi-check2-square me-1"></i><span th:text="${sub.title}">Подзадача</span>
-                                            </li>
-                                        </ul>
-                                    </div>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="lm-chip"
+                                          th:if="${t.difficulty}"
+                                          th:classappend="${t.difficulty == 'EASY' ? ' success' :
+                                                            t.difficulty == 'HARD' ? ' danger' : ' warning'}"
+                                          th:text="${t.difficulty == 'EASY' ? 'Лёгкое' :
+                                                     t.difficulty == 'HARD' ? 'Сложное' : 'Обычное'}">Сложность</span>
+                                    <span class="lm-chip" th:if="${t.expReward}">
+                                        ⭐ <span th:text="${t.expReward}">10</span> EXP
+                                    </span>
+                                    <span class="lm-chip accent" th:if="${t.coinsReward}">
+                                        🪙 <span th:text="${t.coinsReward}">5</span>
+                                    </span>
                                 </div>
                             </div>
                         </div>

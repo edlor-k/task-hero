@@ -91,6 +91,12 @@
             <artifactId>liquibase-core</artifactId>
         </dependency>
 
+        <!-- Object storage: S3-совместимый клиент для галереи аватаров -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
+        </dependency>
+
         <!-- Common module -->
         <dependency>
             <groupId>ru.taskhero</groupId>

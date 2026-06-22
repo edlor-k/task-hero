@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Выбери цвет')}"></head>
+<body class="lm-has-bottom-tab">
+<div class="th-layout">
+    <nav th:replace="~{fragments/layout :: sidebar-child}"></nav>
+    <nav th:replace="~{fragments/layout :: bottom-tab-child}"></nav>
+    <div class="th-content">
+        <header th:replace="~{fragments/layout :: topbar-child(coins=${childProfile?.coins ?: 0}, avatarUrl=${childProfile?.avatarUrl})}"></header>
+        <main class="th-main">
+
+            <div th:if="${error}" class="lm-banner err mb-3">
+                <i class="bi bi-exclamation-circle fs-5"></i>
+                <span th:text="${error}">Ошибка</span>
+            </div>
+
+            <!-- Header -->
+            <div class="text-center mb-4 mt-2">
+                <div style="font-size:48px;line-height:1;margin-bottom:12px;">🎨</div>
+                <h2 style="font-size:var(--fs-xl);font-weight:800;color:var(--ink-900);margin-bottom:6px;">Выбери свой цвет</h2>
+                <p style="color:var(--ink-500);font-size:var(--fs-sm);">Акцентный цвет используется на плашках и прогресс-баре твоего дашборда</p>
+            </div>
+
+            <!-- Color palette -->
+            <form th:action="@{/child/select-accent-color}" method="post">
+                <div class="lm-accent-palette mb-4">
+
+                    <label class="lm-accent-swatch">
+                        <input type="radio" name="accentColor" value="primary"
+                               th:checked="${childProfile?.effectiveAccentColor() == 'primary'}">
+                        <span class="lm-accent-dot" style="background:oklch(0.56 0.19 288);"></span>
+                        <span class="lm-accent-label">Фиолетовый</span>
+                    </label>
+
+                    <label class="lm-accent-swatch">
+                        <input type="radio" name="accentColor" value="indigo"
+                               th:checked="${childProfile?.effectiveAccentColor() == 'indigo'}">
+                        <span class="lm-accent-dot" style="background:oklch(0.50 0.18 265);"></span>
+                        <span class="lm-accent-label">Индиго</span>
+                    </label>
+
+                    <label class="lm-accent-swatch">
+                        <input type="radio" name="accentColor" value="cyan"
+                               th:checked="${childProfile?.effectiveAccentColor() == 'cyan'}">
+                        <span class="lm-accent-dot" style="background:oklch(0.60 0.13 195);"></span>
+                        <span class="lm-accent-label">Голубой</span>
+                    </label>
+
+                    <label class="lm-accent-swatch">
+                        <input type="radio" name="accentColor" value="success"
+                               th:checked="${childProfile?.effectiveAccentColor() == 'success'}">
+                        <span class="lm-accent-dot" style="background:oklch(0.66 0.16 150);"></span>
+                        <span class="lm-accent-label">Зелёный</span>
+                    </label>
+
+                    <label class="lm-accent-swatch">
+                        <input type="radio" name="accentColor" value="accent"
+                               th:checked="${childProfile?.effectiveAccentColor() == 'accent'}">
+                        <span class="lm-accent-dot" style="background:oklch(0.78 0.16 75);"></span>
+                        <span class="lm-accent-label">Золотой</span>
+                    </label>
+
+                    <label class="lm-accent-swatch">
+                        <input type="radio" name="accentColor" value="orange"
+                               th:checked="${childProfile?.effectiveAccentColor() == 'orange'}">
+                        <span class="lm-accent-dot" style="background:oklch(0.72 0.16 55);"></span>
+                        <span class="lm-accent-label">Оранжевый</span>
+                    </label>
+
+                    <label class="lm-accent-swatch">
+                        <input type="radio" name="accentColor" value="danger"
+                               th:checked="${childProfile?.effectiveAccentColor() == 'danger'}">
+                        <span class="lm-accent-dot" style="background:oklch(0.62 0.20 25);"></span>
+                        <span class="lm-accent-label">Красный</span>
+                    </label>
+
+                    <label class="lm-accent-swatch">
+                        <input type="radio" name="accentColor" value="pink"
+                               th:checked="${childProfile?.effectiveAccentColor() == 'pink'}">
+                        <span class="lm-accent-dot" style="background:oklch(0.68 0.20 340);"></span>
+                        <span class="lm-accent-label">Розовый</span>
+                    </label>
+
+                </div>
+
+                <!-- Preview chip -->
+                <div class="text-center mb-4">
+                    <span class="lm-chip primary" id="previewChip" style="font-size:var(--fs-sm);padding:6px 16px;">
+                        Уровень <span th:text="${childProfile?.level ?: 1}">1</span>
+                    </span>
+                </div>
+
+                <div class="d-flex gap-3 justify-content-center">
+                    <button type="submit" class="lm-btn lm-btn-primary" style="min-width:160px;">
+                        <i class="bi bi-check-lg me-1"></i> Сохранить
+                    </button>
+                    <a th:href="@{/child/dashboard}" class="lm-btn lm-btn-ghost">Пропустить</a>
+                </div>
+            </form>
+
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+<script>
+    (function () {
+        // Mark initially checked swatch as selected
+        document.querySelectorAll('input[name="accentColor"]').forEach(radio => {
+            if (radio.checked) radio.closest('.lm-accent-swatch').classList.add('selected');
+        });
+
+        const colorMap = {
+            primary: 'oklch(0.56 0.19 288)',
+            indigo:  'oklch(0.50 0.18 265)',
+            cyan:    'oklch(0.60 0.13 195)',
+            success: 'oklch(0.66 0.16 150)',
+            accent:  'oklch(0.78 0.16 75)',
+            orange:  'oklch(0.72 0.16 55)',
+            danger:  'oklch(0.62 0.20 25)',
+            pink:    'oklch(0.68 0.20 340)',
+        };
+        const bgMap = {
+            primary: 'oklch(0.96 0.03 288)',
+            indigo:  'oklch(0.96 0.03 265)',
+            cyan:    'oklch(0.95 0.04 195)',
+            success: 'oklch(0.97 0.04 150)',
+            accent:  'oklch(0.96 0.06 75)',
+            orange:  'oklch(0.97 0.05 55)',
+            danger:  'oklch(0.97 0.04 25)',
+            pink:    'oklch(0.96 0.04 340)',
+        };
+        const textMap = {
+            primary: 'oklch(0.32 0.16 288)',
+            indigo:  'oklch(0.30 0.13 265)',
+            cyan:    'oklch(0.30 0.12 195)',
+            success: 'oklch(0.30 0.12 150)',
+            accent:  'oklch(0.40 0.13 75)',
+            orange:  'oklch(0.36 0.14 55)',
+            danger:  'oklch(0.30 0.14 25)',
+            pink:    'oklch(0.34 0.16 340)',
+        };
+        const chip = document.getElementById('previewChip');
+        document.querySelectorAll('input[name="accentColor"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                const v = radio.value;
+                chip.style.background = bgMap[v] || '';
+                chip.style.color = textMap[v] || '';
+                // Update selected state for browsers without :has() support
+                document.querySelectorAll('.lm-accent-swatch').forEach(s => s.classList.remove('selected'));
+                radio.closest('.lm-accent-swatch').classList.add('selected');
+            });
+        });
+    })();
+</script>
+</body>
+</html>

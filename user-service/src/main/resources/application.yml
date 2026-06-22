@@ -27,6 +27,21 @@ spring:
         jdbc:
           time_zone: UTC
 
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 3MB
+
+# Object storage (S3-совместимое: Yandex Object Storage / Selectel / R2 / MinIO)
+# для галереи аватаров детей.
+object-storage:
+  endpoint: ${S3_ENDPOINT:}
+  region: ${S3_REGION:ru-central1}
+  bucket: ${S3_BUCKET:}
+  access-key: ${S3_ACCESS_KEY:}
+  secret-key: ${S3_SECRET_KEY:}
+  public-base-url: ${S3_PUBLIC_BASE_URL:}
+
 # JWT Configuration
 jwt:
   secret: ${JWT_SECRET:taskhero-super-secret-key-change-me-in-production-must-be-at-least-256-bits-long}

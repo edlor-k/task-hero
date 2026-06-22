@@ -5,19 +5,21 @@
 <div class="th-layout">
     <nav th:replace="~{fragments/layout :: sidebar-parent}"></nav>
     <div class="th-content">
-        <header th:replace="~{fragments/layout :: header}"></header>
+        <header th:replace="~{fragments/layout :: topbar}"></header>
         <main class="th-main">
 
-            <h4 class="fw-bold mb-4"><i class="bi bi-send me-2"></i>Назначить задание</h4>
-
-            <!-- Messages -->
-            <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
-                <i class="bi bi-check-circle me-2"></i><span th:text="${success}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div class="lm-page-header">
+                <div>
+                    <h1 class="lm-page-title">Назначить задание</h1>
+                    <p class="lm-page-sub">Выберите ребёнка и шаблон или создайте задание вручную</p>
+                </div>
             </div>
-            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
-                <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+
+            <div th:if="${success}" class="lm-banner ok mb-4">
+                <i class="bi bi-check-circle-fill fs-5"></i><span th:text="${success}">Успех</span>
+            </div>
+            <div th:if="${error}" class="lm-banner err mb-4">
+                <i class="bi bi-exclamation-triangle-fill fs-5"></i><span th:text="${error}">Ошибка</span>
             </div>
 
             <!-- Tabs -->

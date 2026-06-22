@@ -16,7 +16,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.taskhero.common.exception.ExceptionBody;
 import ru.taskhero.common.exception.ValidationException;
-import ru.taskhero.common.model.enums.CharacterType;
 import ru.taskhero.userservice.dto.ChildCreateRequestDto;
 import ru.taskhero.userservice.dto.ChildResponseDto;
 import ru.taskhero.userservice.dto.ParentResponseDto;
@@ -376,24 +375,54 @@ public class ChildController {
     }
 
     /**
-     * Выбрать персонажа для ребёнка (при первом входе).
+     * Выбрать аватар из галереи (при первом входе или позже).
      *
-     * @param characterType тип персонажа
+     * @param avatarOptionId ID опции аватара из галереи
      * @return обновленные данные ребёнка
      */
-    @PostMapping("/me/character")
+    @PostMapping("/me/avatar")
     @PreAuthorize("hasRole('CHILD')")
     @Operation(
-            summary = "Выбрать персонажа",
-            description = "Ребёнок выбирает своего персонажа при первом входе"
+            summary = "Выбрать аватар",
+            description = "Ребёнок выбирает аватар из галереи — можно менять в любой момент"
     )
-    public ResponseEntity<ChildResponseDto> selectCharacter(
-            @RequestParam CharacterType characterType
+    public ResponseEntity<ChildResponseDto> selectAvatar(
+            @RequestParam UUID avatarOptionId
     ) {
         UUID childId = SecurityUtils.getCurrentUserId();
-        log.info("Выбор персонажа {} ребёнком {}", characterType, childId);
+        log.info("Выбор аватара {} ребёнком {}", avatarOptionId, childId);
 
-        ChildResponseDto response = childService.selectCharacter(childId, characterType);
+        ChildResponseDto response = childService.selectAvatar(childId, avatarOptionId);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Выбрать (или сменить) фон из галереи.
+     * Смена фона доступна только с уровня 3; первый выбор — без ограничений.
+     */
+    @PostMapping("/me/background")
+    @PreAuthorize("hasRole('CHILD')")
+    @Operation(
+            summary = "Выбрать фон",
+            description = "Ребёнок выбирает фон из галереи. Смена доступна с уровня 3."
+    )
+    public ResponseEntity<ChildResponseDto> selectBackground(@RequestParam UUID backgroundOptionId) {
+        UUID childId = SecurityUtils.getCurrentUserId();
+        log.info("Выбор фона {} ребёнком {}", backgroundOptionId, childId);
+        ChildResponseDto response = childService.selectBackground(childId, backgroundOptionId);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Выбрать акцентный цвет UI. Доступно ребёнку в любое время.
+     */
+    @PostMapping("/me/accent-color")
+    @PreAuthorize("hasRole('CHILD')")
+    @Operation(summary = "Выбрать акцентный цвет", description = "Ребёнок выбирает акцентный цвет оформления из палитры.")
+    public ResponseEntity<ChildResponseDto> selectAccentColor(@RequestParam String accentColor) {
+        UUID childId = SecurityUtils.getCurrentUserId();
+        log.info("Выбор акцентного цвета '{}' ребёнком {}", accentColor, childId);
+        ChildResponseDto response = childService.selectAccentColor(childId, accentColor);
         return ResponseEntity.ok(response);
     }
 

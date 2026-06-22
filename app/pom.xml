@@ -81,10 +81,26 @@
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
+        <!-- OAuth2 Client (Yandex SSO) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-client</artifactId>
+        </dependency>
+
         <!-- Feign для вызова user-service и task-service -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+
+        <!-- Multipart-форма для одного Feign-клиента (загрузка аватара админом) -->
+        <dependency>
+            <groupId>io.github.openfeign.form</groupId>
+            <artifactId>feign-form</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.openfeign.form</groupId>
+            <artifactId>feign-form-spring</artifactId>
         </dependency>
 
         <!-- Common module -->

@@ -2,7 +2,6 @@ package ru.taskhero.userservice.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import ru.taskhero.common.model.enums.CharacterType;
 import ru.taskhero.userservice.dto.ChildCreateRequestDto;
 import ru.taskhero.userservice.dto.ChildDetailDto;
 import ru.taskhero.userservice.dto.ChildResponseDto;
@@ -74,13 +73,18 @@ public interface ChildService {
     ChildResponseDto addReward(UUID childId, int exp, int coins, boolean capExp);
 
     /**
-     * Выбрать персонажа для ребёнка (при первом входе).
+     * Выбрать аватар из галереи для ребёнка (при первом входе или позже).
      *
      * @param childId       ID ребёнка
-     * @param characterType тип персонажа
+     * @param avatarOptionId ID опции аватара из галереи
      * @return обновленные данные ребёнка
      */
-    ChildResponseDto selectCharacter(UUID childId, CharacterType characterType);
+    ChildResponseDto selectAvatar(UUID childId, UUID avatarOptionId);
+
+    /**
+     * Выбрать фон из галереи (при первом входе или позже начиная с уровня 3).
+     */
+    ChildResponseDto selectBackground(UUID childId, UUID backgroundOptionId);
 
     /**
      * Поиск детей по имени или фамилии.
@@ -96,4 +100,19 @@ public interface ChildService {
      * Обновить никнейм ребёнка (доступно только после разблокировки).
      */
     ChildResponseDto updateNickname(UUID childId, String nickname);
+
+    /**
+     * Выбрать акцентный цвет UI для ребёнка (доступно всегда, без ограничений по уровню).
+     */
+    ChildResponseDto selectAccentColor(UUID childId, String accentColor);
+
+    /**
+     * Принудительно (без проверки уровня) установить аватар ребёнку — только для администратора.
+     */
+    ChildResponseDto adminForceSetAvatar(UUID childId, UUID avatarOptionId);
+
+    /**
+     * Принудительно (без проверки уровня) установить фон ребёнку — только для администратора.
+     */
+    ChildResponseDto adminForceSetBackground(UUID childId, UUID backgroundOptionId);
 }

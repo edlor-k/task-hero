@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Выбери аватар')}"></head>
+<body style="background:linear-gradient(160deg, oklch(0.96 0.04 240), oklch(0.97 0.03 200) 60%, oklch(0.96 0.04 130)); min-height:100vh;">
+<div class="container py-5" style="max-width:700px;">
+
+    <div class="text-center mb-5">
+        <div style="font-size:48px;margin-bottom:12px;">🎨</div>
+        <h2 class="fw-bold" style="font-size:var(--fs-3xl);letter-spacing:-0.02em;color:var(--ink-900);">
+            <span th:if="${childProfile != null and !childProfile.avatarSelected()}">Выбери свой аватар!</span>
+            <span th:unless="${childProfile != null and !childProfile.avatarSelected()}">Смени аватар</span>
+        </h2>
+        <p style="color:var(--ink-500);font-size:var(--fs-base);margin-top:8px;">Выбирай того, кто тебе ближе — это можно изменить в любой момент</p>
+    </div>
+
+    <div th:if="${error}" class="lm-banner err mb-4">
+        <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+        <span th:text="${error}">Ошибка</span>
+    </div>
+
+    <!-- Locked: avatar change requires level 2 (but first selection is always allowed) -->
+    <div th:if="${childProfile != null and childProfile.avatarSelected() and childProfile.level() < 2}"
+         class="lm-banner warn mb-4">
+        <i class="bi bi-lock-fill fs-5"></i>
+        <div>
+            <strong>Смена аватара откроется на уровне 2</strong>
+            <div style="font-size:var(--fs-sm);margin-top:2px;">
+                Ты на уровне <span th:text="${childProfile.level()}">1</span>. Продолжай выполнять задания!
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty state: галерея ещё пуста (админ не загрузил аватары) -->
+    <div th:if="${avatarOptions == null or #lists.isEmpty(avatarOptions)}" class="lm-empty-state">
+        <div class="lm-empty-icon">🖼️</div>
+        <div class="lm-empty-title">Аватары пока не добавлены</div>
+        <div class="lm-empty-sub">Попроси родителя обратиться к администратору — галерея аватаров скоро появится</div>
+    </div>
+
+    <div th:unless="${avatarOptions == null or #lists.isEmpty(avatarOptions)}"
+         th:classappend="${childProfile != null and childProfile.avatarSelected() and childProfile.level() < 2} ? 'opacity-50 pe-none' : ''"
+         class="lm-char-grid">
+        <form th:each="option : ${avatarOptions}" th:action="@{/child/select-avatar}" method="post">
+            <input type="hidden" name="avatarOptionId" th:value="${option.id}">
+            <button type="submit"
+                    class="lm-char-tile w-100 border-0 bg-transparent"
+                    th:classappend="${childProfile != null and childProfile.avatarOptionId == option.id} ? ' selected' : ''"
+                    th:disabled="${childProfile != null and childProfile.avatarSelected() and childProfile.level() < 2}">
+                <img th:src="${option.imageUrl}" th:alt="${option.label}" class="lm-avatar-img"
+                     style="width:64px;height:64px;border-radius:var(--r-md);object-fit:cover;">
+                <span class="lm-char-name" th:if="${option.label}" th:text="${option.label}">Аватар</span>
+            </button>
+        </form>
+    </div>
+
+    <p class="text-center mt-4" style="font-size:var(--fs-xs);color:var(--ink-400);">
+        <span th:if="${childProfile == null or !childProfile.avatarSelected()}">Выбери аватар, чтобы начать!</span>
+        <span th:if="${childProfile != null and childProfile.avatarSelected() and childProfile.level() >= 2}">Можно сменить аватар когда захочешь</span>
+        <span th:if="${childProfile != null and childProfile.avatarSelected() and childProfile.level() < 2}">
+            <i class="bi bi-lock me-1"></i>Смена доступна с уровня 2
+        </span>
+    </p>
+</div>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

@@ -5,38 +5,33 @@
 <div class="th-layout">
     <nav th:replace="~{fragments/layout :: sidebar-parent}"></nav>
     <div class="th-content">
-        <header th:replace="~{fragments/layout :: header}"></header>
+        <header th:replace="~{fragments/layout :: topbar}"></header>
         <main class="th-main">
 
-            <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="lm-page-header">
                 <div>
-                    <h4 class="fw-bold mb-0"><i class="bi bi-shop-window me-2"></i>Маркетплейс наград</h4>
-                    <p class="text-muted mb-0 small">Готовые шаблоны наград — добавьте в свой магазин одним кликом или применить весь пресет</p>
+                    <h1 class="lm-page-title">Маркетплейс наград</h1>
+                    <p class="lm-page-sub">Готовые шаблоны наград — добавьте в свой магазин одним кликом</p>
                 </div>
                 <div class="d-flex gap-2">
-                    <a th:if="${onboarding}" th:href="@{/parent/onboarding}" class="btn btn-outline-secondary">
-                        <i class="bi bi-arrow-left me-1"></i>Назад к настройке
+                    <a th:if="${onboarding}" th:href="@{/parent/onboarding}" class="lm-btn lm-btn-ghost lm-btn-sm">
+                        <i class="bi bi-arrow-left me-1"></i>Назад
                     </a>
-                    <a th:href="@{/parent/shop}" class="btn btn-outline-secondary">
+                    <a th:href="@{/parent/shop}" class="lm-btn lm-btn-secondary lm-btn-sm">
                         <i class="bi bi-cart me-1"></i>Мой магазин
                     </a>
                 </div>
             </div>
 
-            <!-- Messages -->
-            <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
-                <i class="bi bi-check-circle me-2"></i><span th:text="${success}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div th:if="${success}" class="lm-banner ok mb-4">
+                <i class="bi bi-check-circle-fill fs-5"></i><span th:text="${success}">Успех</span>
             </div>
-            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
-                <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div th:if="${error}" class="lm-banner err mb-4">
+                <i class="bi bi-exclamation-triangle-fill fs-5"></i><span th:text="${error}">Ошибка</span>
             </div>
-
-            <!-- No children warning -->
-            <div th:if="${children == null or children.isEmpty()}" class="alert alert-warning">
-                <i class="bi bi-exclamation-circle me-2"></i>
-                Сначала <a th:href="@{/parent/children}" class="alert-link">добавьте ребёнка</a>, чтобы добавлять награды в магазин.
+            <div th:if="${children == null or children.isEmpty()}" class="lm-banner warn mb-4">
+                <i class="bi bi-exclamation-triangle fs-5"></i>
+                Сначала <a th:href="@{/parent/children}" style="color:inherit;font-weight:600;">добавьте ребёнка</a>, чтобы добавлять награды в магазин.
             </div>
 
             <!-- Empty marketplace -->

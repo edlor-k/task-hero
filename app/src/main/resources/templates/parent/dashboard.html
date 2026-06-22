@@ -5,215 +5,264 @@
 <div class="th-layout">
     <nav th:replace="~{fragments/layout :: sidebar-parent}"></nav>
     <div class="th-content">
-        <header th:replace="~{fragments/layout :: header}"></header>
+        <header th:replace="~{fragments/layout :: topbar}"></header>
         <main class="th-main">
 
-            <div class="d-flex align-items-center justify-content-between mb-4">
-                <h4 class="fw-bold mb-0">Dashboard</h4>
-                <a th:href="@{/parent/assign}" class="btn btn-primary">
+            <div class="lm-page-header">
+                <div>
+                    <h1 class="lm-page-title">Dashboard</h1>
+                    <p class="lm-page-sub">Обзор активности семьи</p>
+                </div>
+                <a th:href="@{/parent/assign}" class="lm-btn lm-btn-primary">
                     <i class="bi bi-plus-lg me-1"></i>Назначить задание
                 </a>
             </div>
 
             <!-- Messages -->
-            <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
-                <i class="bi bi-check-circle me-2"></i><span th:text="${success}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div th:if="${success}" class="lm-banner ok mb-4">
+                <i class="bi bi-check-circle-fill fs-5"></i><span th:text="${success}">Успех</span>
             </div>
-            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
-                <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div th:if="${error}" class="lm-banner err mb-4">
+                <i class="bi bi-exclamation-triangle-fill fs-5"></i><span th:text="${error}">Ошибка</span>
             </div>
 
             <!-- Onboarding banner -->
-            <div th:if="${onboardingIncomplete}" class="alert alert-info alert-dismissible fade show">
-                <i class="bi bi-info-circle me-2"></i>
-                <strong>Настройка не завершена.</strong> Не все шаги онбординга пройдены.
-                <a th:href="@{/parent/onboarding}" class="alert-link ms-1">Перейти к настройке</a>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div th:if="${onboardingIncomplete}" class="lm-banner mb-4">
+                <i class="bi bi-info-circle fs-5"></i>
+                <div>
+                    <strong>Настройка не завершена.</strong> Не все шаги онбординга пройдены.
+                    <a th:href="@{/parent/onboarding}" class="fw-semibold ms-1"
+                       style="color:var(--brand-primary-ink);">Перейти к настройке →</a>
+                </div>
             </div>
 
             <!-- Level reward alerts -->
-            <div th:each="alert : ${childRewardAlerts}" class="alert alert-warning alert-dismissible fade show">
-                <i class="bi bi-exclamation-triangle me-2"></i>
-                У ребёнка <strong th:text="${alert.childName}">Имя</strong> осталось
-                <strong th:text="${alert.unfilledCount}">0</strong> незаполненных уровней с наградами.
-                <a th:href="@{/parent/level-rewards(childId=${alert.childId})}" class="alert-link ms-1">Добавить награды</a>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-
-            <!-- Expired task alerts -->
-            <div th:if="${expiredAssignments != null and !expiredAssignments.isEmpty()}" class="card mb-4 border-danger">
-                <div class="card-header bg-danger text-white">
-                    <i class="bi bi-clock-history me-2"></i>
-                    <strong>Просроченные задания</strong>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table align-middle mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Задание</th>
-                                    <th>Дедлайн</th>
-                                    <th>Награда</th>
-                                    <th>Действия</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:each="expired : ${expiredAssignments}">
-                                    <td class="fw-semibold" th:text="${expired.template.title}">Задание</td>
-                                    <td>
-                                        <span class="text-danger"
-                                              th:if="${expired.dueDate != null}"
-                                              th:attr="data-utc-datetime=${expired.dueDate}"
-                                              th:text="${expired.dueDate}">---</span>
-                                        <span th:unless="${expired.dueDate != null}">---</span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-success-subtle text-success" th:text="${expired.template.expReward} + ' EXP'">10 EXP</span>
-                                        <span class="badge bg-warning-subtle text-warning" th:text="${expired.template.coinsReward} + ' коинов'">5 коинов</span>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex gap-1 flex-wrap align-items-center">
-                                            <form th:action="@{/parent/assignments/{id}/extend-deadline(id=${expired.id})}" method="post" class="d-flex gap-1 align-items-center flex-wrap">
-                                                <input type="datetime-local" name="newDueDate" required class="form-control form-control-sm" style="width: 200px;">
-                                                <input type="number" name="newExpReward" th:value="${expired.template.expReward}" min="0" class="form-control form-control-sm" style="width: 70px;" title="EXP">
-                                                <input type="number" name="newCoinsReward" th:value="${expired.template.coinsReward}" min="0" class="form-control form-control-sm" style="width: 70px;" title="Коины">
-                                                <button type="submit" class="btn btn-sm btn-outline-warning" title="Продлить дедлайн">
-                                                    <i class="bi bi-calendar-plus"></i>
-                                                </button>
-                                            </form>
-                                            <form th:action="@{/parent/assignments/{id}/delete(id=${expired.id})}" method="post" class="d-inline">
-                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Удалить задание"
-                                                        onclick="return confirm('Удалить просроченное задание?');">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+            <div th:each="alert : ${childRewardAlerts}" class="lm-banner warn mb-3">
+                <i class="bi bi-trophy-fill fs-5"></i>
+                <div>
+                    У ребёнка <strong th:text="${alert.childName}">Имя</strong> осталось
+                    <strong th:text="${alert.unfilledCount}">0</strong> незаполненных уровней с наградами.
+                    <a th:href="@{/parent/level-rewards(childId=${alert.childId})}" class="fw-semibold ms-1">Добавить →</a>
                 </div>
             </div>
 
-            <!-- Stat cards -->
+            <!-- Expired tasks -->
+            <div th:if="${expiredAssignments != null and !expiredAssignments.isEmpty()}" class="lm-review mb-4"
+                 style="padding:0;overflow:hidden;border-left:3px solid var(--brand-danger);">
+                <div style="padding:var(--s-3) var(--s-5);border-bottom:1px solid var(--border-subtle);
+                            display:flex;align-items:center;gap:var(--s-2);">
+                    <i class="bi bi-clock-history" style="color:var(--brand-danger);"></i>
+                    <span class="fw-semibold" style="color:var(--brand-danger);">Просроченные задания</span>
+                    <span class="lm-chip danger ms-auto" th:text="${#lists.size(expiredAssignments)}">0</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Задание</th>
+                                <th>Дедлайн</th>
+                                <th>Награда</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="expired : ${expiredAssignments}">
+                                <td class="fw-semibold" style="font-size:var(--fs-sm);" th:text="${expired.template.title}">Задание</td>
+                                <td>
+                                    <span style="color:var(--brand-danger);font-size:var(--fs-xs);"
+                                          th:if="${expired.dueDate != null}"
+                                          th:attr="data-utc-datetime=${expired.dueDate}"
+                                          th:text="${expired.dueDate}">—</span>
+                                    <span th:unless="${expired.dueDate != null}" style="color:var(--ink-400);">—</span>
+                                </td>
+                                <td>
+                                    <span class="lm-chip success" th:text="${expired.template.expReward} + ' EXP'">10 EXP</span>
+                                    <span class="lm-chip accent ms-1" th:text="${expired.template.coinsReward} + ' 🪙'">5 🪙</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1 flex-wrap align-items-center">
+                                        <form th:action="@{/parent/assignments/{id}/extend-deadline(id=${expired.id})}" method="post"
+                                              class="d-flex gap-1 align-items-center flex-wrap">
+                                            <input type="datetime-local" name="newDueDate" required
+                                                   class="form-control form-control-sm" style="width:190px;">
+                                            <input type="number" name="newExpReward" th:value="${expired.template.expReward}"
+                                                   min="0" class="form-control form-control-sm" style="width:65px;" title="EXP">
+                                            <input type="number" name="newCoinsReward" th:value="${expired.template.coinsReward}"
+                                                   min="0" class="form-control form-control-sm" style="width:65px;" title="Коины">
+                                            <button type="submit" class="lm-btn lm-btn-ghost lm-btn-sm" title="Продлить">
+                                                <i class="bi bi-calendar-plus"></i>
+                                            </button>
+                                        </form>
+                                        <form th:action="@{/parent/assignments/{id}/delete(id=${expired.id})}" method="post"
+                                              class="d-inline">
+                                            <button type="submit" class="lm-btn lm-btn-ghost lm-btn-icon"
+                                                    style="color:var(--brand-danger);"
+                                                    onclick="return confirm('Удалить просроченное задание?');" title="Удалить">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- KPI stat tiles -->
             <div class="row g-3 mb-4">
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="stat-icon bg-primary bg-opacity-10 text-primary">
-                                    <i class="bi bi-people-fill"></i>
-                                </div>
-                                <div>
-                                    <h4 class="mb-0 fw-bold" th:text="${#lists.size(children)}">0</h4>
-                                    <small class="text-muted">Детей</small>
-                                </div>
-                            </div>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="lm-stat-tile">
+                        <div class="lm-tile-icon"><i class="bi bi-people-fill"></i></div>
+                        <div class="lm-tile-body">
+                            <div class="lm-tile-label">Детей</div>
+                            <div class="lm-tile-value" th:text="${#lists.size(children)}">0</div>
+                            <div class="lm-tile-sub">Активных профилей</div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="stat-icon bg-warning bg-opacity-10 text-warning">
-                                    <i class="bi bi-hourglass-split"></i>
-                                </div>
-                                <div>
-                                    <h4 class="mb-0 fw-bold" th:text="${pendingCount != null ? pendingCount : 0}">0</h4>
-                                    <small class="text-muted">На проверке</small>
-                                </div>
-                            </div>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="lm-stat-tile warning">
+                        <div class="lm-tile-icon"><i class="bi bi-hourglass-split"></i></div>
+                        <div class="lm-tile-body">
+                            <div class="lm-tile-label">На проверке</div>
+                            <div class="lm-tile-value" th:text="${pendingCount != null ? pendingCount : 0}">0</div>
+                            <div class="lm-tile-sub">Ожидают решения</div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="stat-icon bg-success bg-opacity-10 text-success">
-                                    <i class="bi bi-list-check"></i>
-                                </div>
-                                <div>
-                                    <h4 class="mb-0 fw-bold" th:text="${templates != null ? #lists.size(templates) : 0}">0</h4>
-                                    <small class="text-muted">Шаблонов</small>
-                                </div>
-                            </div>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="lm-stat-tile success">
+                        <div class="lm-tile-icon"><i class="bi bi-list-check"></i></div>
+                        <div class="lm-tile-body">
+                            <div class="lm-tile-label">Шаблонов</div>
+                            <div class="lm-tile-value" th:text="${templates != null ? #lists.size(templates) : 0}">0</div>
+                            <div class="lm-tile-sub">Заданий в базе</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="lm-stat-tile danger">
+                        <div class="lm-tile-icon"><i class="bi bi-clock-history"></i></div>
+                        <div class="lm-tile-body">
+                            <div class="lm-tile-label">Просрочено</div>
+                            <div class="lm-tile-value" th:text="${expiredAssignments != null ? #lists.size(expiredAssignments) : 0}">0</div>
+                            <div class="lm-tile-sub">Требуют внимания</div>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Main content grid -->
             <div class="row g-4">
                 <!-- Children table -->
                 <div class="col-lg-8">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="fw-bold mb-3"><i class="bi bi-people me-2"></i>Мои дети</h5>
-                            <div th:if="${#lists.isEmpty(children)}" class="text-center py-4">
-                                <p class="text-muted">Нет добавленных детей</p>
-                                <a th:href="@{/parent/children}" class="btn btn-primary btn-sm">
-                                    <i class="bi bi-plus-lg me-1"></i>Добавить
-                                </a>
-                            </div>
-                            <div class="table-responsive" th:unless="${#lists.isEmpty(children)}">
-                                <table class="table align-middle mb-0">
-                                    <thead>
-                                        <tr>
-                                            <th>Имя</th>
-                                            <th>Уровень</th>
-                                            <th>EXP</th>
-                                            <th>Коины</th>
-                                            <th></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr th:each="child : ${children}">
-                                            <td class="fw-semibold" th:text="${child.firstName + ' ' + child.surname}">Имя</td>
-                                            <td><span class="badge bg-primary bg-opacity-10 text-primary" th:text="'Ур. ' + ${child.level}">1</span></td>
-                                            <td th:text="${child.exp}">0</td>
-                                            <td th:text="${child.coins}">0</td>
-                                            <td>
-                                                <a th:href="@{/parent/children/{id}(id=${child.id})}" class="btn btn-sm btn-outline-primary">
-                                                    <i class="bi bi-eye"></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                    <div class="lm-review" style="padding:0;overflow:hidden;">
+                        <div style="padding:var(--s-4) var(--s-5);border-bottom:1px solid var(--border-subtle);
+                                    display:flex;align-items:center;justify-content:space-between;">
+                            <h2 class="lm-section-title" style="margin:0;">
+                                <i class="bi bi-people me-2" style="color:var(--brand-primary);"></i>Мои дети
+                            </h2>
+                            <a th:href="@{/parent/children}" style="font-size:var(--fs-xs);color:var(--brand-primary);text-decoration:none;">
+                                Все дети →
+                            </a>
+                        </div>
+
+                        <div th:if="${#lists.isEmpty(children)}" class="lm-empty-state" style="padding:var(--s-10);">
+                            <div class="lm-empty-icon">👨‍👧</div>
+                            <div class="lm-empty-title">Нет добавленных детей</div>
+                            <a th:href="@{/parent/children}" class="lm-btn lm-btn-primary lm-btn-sm mt-2">
+                                <i class="bi bi-plus-lg me-1"></i>Добавить
+                            </a>
+                        </div>
+
+                        <div class="table-responsive" th:unless="${#lists.isEmpty(children)}">
+                            <table class="table align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Ребёнок</th>
+                                        <th>Уровень</th>
+                                        <th>EXP</th>
+                                        <th>Монеты</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="child : ${children}">
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div style="width:40px;height:40px;border-radius:var(--r-sm);
+                                                            background:var(--brand-primary-soft);
+                                                            display:flex;align-items:center;justify-content:center;
+                                                            font-size:20px;flex-shrink:0;">
+                                                    <img th:if="${child.avatarUrl}" th:src="${child.avatarUrl}" alt="Аватар" class="lm-avatar-img">
+                                                    <span th:unless="${child.avatarUrl}">🧒</span>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-semibold" style="font-size:var(--fs-sm);"
+                                                         th:text="${child.nickname ?: (child.firstName + ' ' + child.surname)}">Имя</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td><span class="lm-chip primary" th:text="'Ур. ' + ${child.level}">1</span></td>
+                                        <td style="font-family:var(--font-mono);font-size:var(--fs-sm);" th:text="${child.exp}">0</td>
+                                        <td><span class="lm-chip accent" th:text="${child.coins} + ' 🪙'">0 🪙</span></td>
+                                        <td>
+                                            <a th:href="@{/parent/children/{id}(id=${child.id})}"
+                                               class="lm-btn lm-btn-ghost lm-btn-sm">
+                                                <i class="bi bi-eye me-1"></i>Профиль
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
 
-                <!-- Quick actions -->
+                <!-- Sidebar: quick actions + pending review -->
                 <div class="col-lg-4">
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h5 class="fw-bold mb-3"><i class="bi bi-lightning me-2"></i>Быстрые действия</h5>
-                            <div class="d-grid gap-2">
-                                <a th:href="@{/parent/templates}" class="btn btn-outline-primary"><i class="bi bi-list-check me-1"></i>Шаблоны заданий</a>
-                                <a th:href="@{/parent/assign}" class="btn btn-outline-success"><i class="bi bi-send me-1"></i>Назначить задание</a>
-                                <a th:href="@{/parent/review}" class="btn btn-outline-warning"><i class="bi bi-clipboard-check me-1"></i>Проверить задания</a>
-                                <a th:href="@{/parent/shop}" class="btn btn-outline-info"><i class="bi bi-cart me-1"></i>Магазин наград</a>
-                            </div>
-                        </div>
+                    <!-- Quick actions -->
+                    <div class="lm-review mb-4" style="gap:var(--s-2);">
+                        <h2 class="lm-section-title" style="margin-bottom:var(--s-2);">
+                            <i class="bi bi-lightning me-2" style="color:var(--brand-primary);"></i>Быстрые действия
+                        </h2>
+                        <a th:href="@{/parent/assign}" class="lm-btn lm-btn-secondary w-100 justify-content-start">
+                            <i class="bi bi-send me-2" style="color:var(--brand-primary);"></i>Назначить задание
+                        </a>
+                        <a th:href="@{/parent/review}" class="lm-btn lm-btn-secondary w-100 justify-content-start">
+                            <i class="bi bi-clipboard-check me-2" style="color:var(--brand-warning);"></i>Проверить задания
+                            <span class="lm-chip warning ms-auto" th:if="${pendingCount != null and pendingCount > 0}"
+                                  th:text="${pendingCount}">0</span>
+                        </a>
+                        <a th:href="@{/parent/shop}" class="lm-btn lm-btn-secondary w-100 justify-content-start">
+                            <i class="bi bi-cart me-2" style="color:var(--brand-info);"></i>Магазин наград
+                        </a>
+                        <a th:href="@{/parent/children}" class="lm-btn lm-btn-secondary w-100 justify-content-start">
+                            <i class="bi bi-people me-2" style="color:var(--brand-success);"></i>Мои дети
+                        </a>
                     </div>
 
-                    <div th:if="${!#lists.isEmpty(pendingReview)}" class="card">
-                        <div class="card-body">
-                            <h5 class="fw-bold mb-3"><i class="bi bi-hourglass-split text-warning me-2"></i>Ожидают проверки</h5>
-                            <div th:each="assignment : ${pendingReview}" class="d-flex align-items-center justify-content-between py-2 border-bottom">
-                                <div>
-                                    <p class="mb-0 fw-semibold small" th:text="${assignment.template.title}">Задание</p>
-                                    <small class="text-muted" th:if="${assignment.childComment}" th:text="${assignment.childComment}"></small>
-                                </div>
-                                <a th:href="@{/parent/review}" class="btn btn-sm btn-warning">Проверить</a>
+                    <!-- Pending review mini-list -->
+                    <div th:if="${pendingReview != null and !#lists.isEmpty(pendingReview)}" class="lm-review" style="padding:var(--s-4);">
+                        <h2 class="lm-section-title" style="margin-bottom:var(--s-3);">
+                            <i class="bi bi-hourglass-split me-2" style="color:var(--brand-warning);"></i>Ожидают проверки
+                        </h2>
+                        <div th:each="a : ${pendingReview}" class="d-flex align-items-center justify-content-between py-2"
+                             style="border-bottom:1px solid var(--border-subtle);">
+                            <div style="min-width:0;">
+                                <div class="fw-semibold" style="font-size:var(--fs-sm);" th:text="${a.template?.title}">Задание</div>
+                                <div style="font-size:var(--fs-xs);color:var(--ink-500);" th:if="${a.childComment}"
+                                     th:text="${a.childComment}">Комментарий</div>
                             </div>
+                            <a th:href="@{/parent/review}" class="lm-btn lm-btn-sm ms-2"
+                               style="background:oklch(0.97 0.05 70);color:oklch(0.36 0.14 70);border:1px solid oklch(0.86 0.10 70);white-space:nowrap;">
+                                Проверить
+                            </a>
                         </div>
+                        <a th:href="@{/parent/review}" class="lm-btn lm-btn-ghost lm-btn-sm w-100 justify-content-center mt-1">
+                            Все задания на проверке →
+                        </a>
                     </div>
                 </div>
             </div>
