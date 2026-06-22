@@ -204,6 +204,8 @@ services:
     environment:
       USER_SERVICE_URL: http://user-service:8081/users
       TASK_SERVICE_URL: http://task-service:8082/tasks
+      YANDEX_CLIENT_ID: ${YANDEX_CLIENT_ID:-}
+      YANDEX_CLIENT_SECRET: ${YANDEX_CLIENT_SECRET:-}
       LOGGING_LEVEL_ROOT: ${LOGGING_LEVEL_ROOT:-WARN}
       JAVA_TOOL_OPTIONS: "-Xss512k -XX:MaxMetaspaceSize=110m -XX:ReservedCodeCacheSize=40m"
     healthcheck:

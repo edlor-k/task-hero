@@ -404,7 +404,7 @@ body {
 
 
 /* ── 6. Content area ─────────────────────────────────────────── */
-.th-content { background: var(--surface-page) !important; }
+.th-content { background-color: var(--surface-page) !important; }
 
 
 /* ── 7. Auth pages ───────────────────────────────────────────── */
@@ -862,16 +862,15 @@ body {
 
 /* ── 25. Child UI — hero zone ────────────────────────────────── */
 .lm-child-hero {
-  background: linear-gradient(180deg,
-    oklch(0.96 0.04 240) 0%,
-    oklch(0.97 0.03 200) 60%,
-    oklch(0.95 0.05 140) 100%);
+  background: linear-gradient(160deg,
+    var(--lm-accent-soft, oklch(0.96 0.04 288)) 0%,
+    color-mix(in oklch, var(--lm-accent, oklch(0.56 0.19 288)) 10%, oklch(0.99 0.01 0)) 100%);
   border-radius: var(--r-xl);
   padding: var(--s-6);
   margin-bottom: var(--s-4);
   position: relative; overflow: hidden;
 }
-/* Decorative "sky" blobs — sun + clouds, purely cosmetic, behind content */
+/* Decorative blobs — purely cosmetic, behind content */
 .lm-child-hero::before,
 .lm-child-hero::after {
   content: ""; position: absolute; border-radius: 50%;
@@ -879,12 +878,16 @@ body {
 }
 .lm-child-hero::before {
   width: 140px; height: 140px; top: -50px; right: -30px;
-  background: radial-gradient(circle, oklch(0.92 0.08 90 / 55%), transparent 70%);
+  background: radial-gradient(circle,
+    color-mix(in oklch, var(--lm-accent, oklch(0.56 0.19 288)) 35%, oklch(0.95 0.05 90)) 0%,
+    transparent 70%);
   filter: blur(2px);
 }
 .lm-child-hero::after {
   width: 220px; height: 90px; bottom: -40px; left: -50px;
-  background: radial-gradient(ellipse, oklch(0.99 0.01 140 / 70%), transparent 75%);
+  background: radial-gradient(ellipse,
+    color-mix(in oklch, var(--lm-accent, oklch(0.56 0.19 288)) 8%, oklch(0.99 0.01 0)) 0%,
+    transparent 75%);
   filter: blur(4px);
 }
 .lm-child-hero > * { position: relative; z-index: 1; }
@@ -1272,7 +1275,7 @@ body {
 
 /* ── 38. Child area background — color fallback; image set via inline style from backend ── */
 body.lm-has-bottom-tab .th-content {
-  background-color: oklch(0.22 0.17 284);
+  background-color: oklch(0.22 0.17 284) !important;
   background-size: cover;
   background-position: center top;
   background-repeat: no-repeat;
@@ -1291,6 +1294,12 @@ body.lm-has-bottom-tab .card {
    Elements that should follow the accent use these vars.
    Default (no attribute or data-accent="primary") falls back to --brand-primary via var() fallback. */
 
+[data-accent="primary"] {
+  --lm-accent:       oklch(0.56 0.19 288);
+  --lm-accent-end:   oklch(0.46 0.21 298);
+  --lm-accent-hover: oklch(0.48 0.20 288);
+  --lm-accent-soft:  oklch(0.96 0.04 288);
+}
 [data-accent="success"] {
   --lm-accent:       oklch(0.66 0.16 150);
   --lm-accent-end:   oklch(0.56 0.18 165);
