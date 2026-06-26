@@ -93,6 +93,12 @@
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
 
+        <!-- OkHttp для Feign — поддержка PATCH (HttpURLConnection не поддерживает PATCH в Java 21) -->
+        <dependency>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-okhttp</artifactId>
+        </dependency>
+
         <!-- Multipart-форма для одного Feign-клиента (загрузка аватара админом) -->
         <dependency>
             <groupId>io.github.openfeign.form</groupId>

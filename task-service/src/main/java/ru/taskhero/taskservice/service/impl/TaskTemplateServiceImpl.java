@@ -251,6 +251,7 @@ public class TaskTemplateServiceImpl implements TaskTemplateService {
         TaskTemplate template = templateMapper.toEntity(request);
         template.setLibraryTemplate(true);
         template.setActive(true);
+        template.setParentId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
         if (request.expReward() != null) template.setExpReward(request.expReward());
         if (request.coinsReward() != null) template.setCoinsReward(request.coinsReward());
