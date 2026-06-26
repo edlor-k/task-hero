@@ -113,6 +113,17 @@ public class AvatarOptionServiceImpl implements AvatarOptionService {
 
     @Override
     @Transactional
+    public AvatarOptionResponseDto updateLabel(UUID id, String label) {
+        AvatarOption avatarOption = avatarOptionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Опция аватара с ID " + id + " не найдена"));
+        avatarOption.setLabel(label != null && !label.isBlank() ? label.trim() : null);
+        avatarOption = avatarOptionRepository.save(avatarOption);
+        log.info("Обновлено название опции аватара {}: label={}", id, label);
+        return avatarOptionMapper.toDto(avatarOption);
+    }
+
+    @Override
+    @Transactional
     public void delete(UUID id) {
         AvatarOption avatarOption = avatarOptionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Опция аватара с ID " + id + " не найдена"));

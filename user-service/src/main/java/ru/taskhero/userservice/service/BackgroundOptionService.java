@@ -16,5 +16,7 @@ public interface BackgroundOptionService {
 
     BackgroundOptionResponseDto setActive(UUID id, boolean active);
 
+    BackgroundOptionResponseDto updateLabel(UUID id, String label);
+
     void delete(UUID id);
 }

@@ -566,6 +566,24 @@ public class AdminController {
     }
 
     /**
+     * Обновить название аватара.
+     */
+    @PatchMapping("/avatar-options/{id}/label")
+    @Operation(summary = "Обновить название аватара")
+    public ResponseEntity<AvatarOptionResponseDto> updateAvatarOptionLabel(
+            @PathVariable UUID id,
+            @RequestParam String label
+    ) {
+        UUID currentAdminId = SecurityUtils.getCurrentUserId();
+        log.info("Админ: обновление названия опции аватара {}: label={}", id, label);
+        AvatarOptionResponseDto option = avatarOptionService.updateLabel(id, label);
+        UserResponseDto admin = userService.getById(currentAdminId);
+        auditService.log(currentAdminId, admin.email(), AuditAction.AVATAR_OPTION_UPDATED,
+                "AVATAR_OPTION", id, "label=" + label);
+        return ResponseEntity.ok(option);
+    }
+
+    /**
      * Включить/выключить видимость опции аватара в пикере ребёнка.
      */
     @PatchMapping("/avatar-options/{id}")
@@ -620,6 +638,21 @@ public class AdminController {
         auditService.log(currentAdminId, admin.email(), AuditAction.BACKGROUND_OPTION_CREATED,
                 "BACKGROUND_OPTION", option.id(), null);
         return ResponseEntity.status(HttpStatus.CREATED).body(option);
+    }
+
+    @PatchMapping("/background-options/{id}/label")
+    @Operation(summary = "Обновить название фона")
+    public ResponseEntity<BackgroundOptionResponseDto> updateBackgroundOptionLabel(
+            @PathVariable UUID id,
+            @RequestParam String label
+    ) {
+        UUID currentAdminId = SecurityUtils.getCurrentUserId();
+        log.info("Админ: обновление названия опции фона {}: label={}", id, label);
+        BackgroundOptionResponseDto option = backgroundOptionService.updateLabel(id, label);
+        UserResponseDto admin = userService.getById(currentAdminId);
+        auditService.log(currentAdminId, admin.email(), AuditAction.BACKGROUND_OPTION_UPDATED,
+                "BACKGROUND_OPTION", id, "label=" + label);
+        return ResponseEntity.ok(option);
     }
 
     @PatchMapping("/background-options/{id}")

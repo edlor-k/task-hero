@@ -146,6 +146,10 @@ public interface AdminServiceClient {
     @GetMapping("/admin/avatar-options")
     List<AvatarOptionDto> getAvatarOptions();
 
+    /** Обновить название аватара. */
+    @PatchMapping("/admin/avatar-options/{id}/label")
+    AvatarOptionDto updateAvatarOptionLabel(@PathVariable("id") UUID id, @RequestParam("label") String label);
+
     /** Включить/выключить видимость опции аватара. */
     @PatchMapping("/admin/avatar-options/{id}")
     AvatarOptionDto toggleAvatarOption(@PathVariable("id") UUID id, @RequestParam("active") boolean active);
@@ -159,6 +163,10 @@ public interface AdminServiceClient {
     /** Получить все фоны, вкл. неактивные. */
     @GetMapping("/admin/background-options")
     List<BackgroundOptionDto> getBackgroundOptions();
+
+    /** Обновить название фона. */
+    @PatchMapping("/admin/background-options/{id}/label")
+    BackgroundOptionDto updateBackgroundOptionLabel(@PathVariable("id") UUID id, @RequestParam("label") String label);
 
     /** Включить/выключить видимость фона. */
     @PatchMapping("/admin/background-options/{id}")

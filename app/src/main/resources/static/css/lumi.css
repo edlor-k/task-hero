@@ -1275,17 +1275,34 @@ body {
 
 /* ── 38. Child area background — color fallback; image set via inline style from backend ── */
 body.lm-has-bottom-tab .th-content {
-  background-color: oklch(0.22 0.17 284) !important;
+  background-color: var(--surface-page) !important;
   background-size: cover;
   background-position: center top;
   background-repeat: no-repeat;
 }
-/* Cards and content stay readable on top of the bg */
+/* Cards and content blocks stay readable on top of the bg image */
 body.lm-has-bottom-tab .lm-card,
-body.lm-has-bottom-tab .card {
+body.lm-has-bottom-tab .card,
+body.lm-has-bottom-tab .lm-child-task,
+body.lm-has-bottom-tab .lm-reward-card,
+body.lm-has-bottom-tab .lm-child-tasks {
   background: color-mix(in oklch, var(--surface-card) 92%, transparent) !important;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+}
+/* When background image is active: give bare text containers a frosted-glass backdrop */
+body.lm-has-bg-image .lm-page-header {
+  background: color-mix(in oklch, var(--surface-card) 85%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: var(--r-lg);
+  padding: var(--s-3) var(--s-4);
+}
+body.lm-has-bg-image .lm-empty-state {
+  background: color-mix(in oklch, var(--surface-card) 85%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: var(--r-lg);
 }
 
 

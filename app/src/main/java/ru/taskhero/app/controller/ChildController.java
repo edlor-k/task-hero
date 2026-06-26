@@ -83,6 +83,18 @@ public class ChildController {
     }
 
     /**
+     * URL фона ребёнка — доступен на всех страницах раздела /child для инлайн-стиля th-content.
+     */
+    @ModelAttribute("childBackgroundUrl")
+    public String childBackgroundUrl() {
+        try {
+            return userServiceClient.getMyChildProfile().backgroundUrl();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
      * Баланс монет ребёнка для отображения в шапке — доступен на всех страницах раздела /child.
      */
     @ModelAttribute("topbarCoins")

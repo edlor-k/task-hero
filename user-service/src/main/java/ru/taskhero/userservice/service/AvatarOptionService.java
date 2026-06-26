@@ -32,6 +32,11 @@ public interface AvatarOptionService {
     AvatarOptionResponseDto setActive(UUID id, boolean active);
 
     /**
+     * Обновить отображаемое название аватара.
+     */
+    AvatarOptionResponseDto updateLabel(UUID id, String label);
+
+    /**
      * Удалить опцию из галереи (и файл из хранилища).
      */
     void delete(UUID id);

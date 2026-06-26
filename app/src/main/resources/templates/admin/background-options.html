@@ -46,21 +46,50 @@
                                   th:classappend="${option.active ? 'bg-success' : 'bg-secondary'}"
                                   th:text="${option.active ? 'Активен' : 'Скрыт'}">Статус</span>
                             <div class="d-flex gap-1">
+                                <button type="button" class="btn btn-sm btn-outline-primary"
+                                        data-bs-toggle="modal"
+                                        th:data-bs-target="'#renameBgModal-' + ${option.id}"
+                                        title="Переименовать">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
                                 <form method="post" th:action="@{'/admin/background-options/' + ${option.id} + '/toggle'}" class="flex-fill">
                                     <input type="hidden" name="active" th:value="${!option.active}">
-                                    <button type="submit" class="btn btn-sm btn-outline-secondary w-100">
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary w-100"
+                                            th:title="${option.active ? 'Скрыть' : 'Показать'}">
                                         <i class="bi" th:classappend="${option.active ? 'bi-eye-slash' : 'bi-eye'}"></i>
                                     </button>
                                 </form>
                                 <form method="post" th:action="@{'/admin/background-options/' + ${option.id} + '/delete'}"
                                       onsubmit="return confirm('Удалить фон из галереи?')">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Удалить">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </form>
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Rename Modals (one per background) -->
+            <div th:each="option : ${backgroundOptions}"
+                 class="modal fade" th:id="'renameBgModal-' + ${option.id}" tabindex="-1">
+                <div class="modal-dialog modal-sm">
+                    <form method="post" th:action="@{'/admin/background-options/' + ${option.id} + '/rename'}" class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Переименовать фон</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <label class="form-label">Название</label>
+                            <input type="text" name="label" class="form-control" maxlength="64"
+                                   th:value="${option.label}" placeholder="Например: Ночное небо" required>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                            <button type="submit" class="btn btn-primary">Сохранить</button>
+                        </div>
+                    </form>
                 </div>
             </div>
 

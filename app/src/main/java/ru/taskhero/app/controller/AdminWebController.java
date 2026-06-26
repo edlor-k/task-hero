@@ -559,6 +559,23 @@ public class AdminWebController {
         return "redirect:/admin/avatar-options";
     }
 
+    /** Переименовать аватар. */
+    @PostMapping("/avatar-options/{id}/rename")
+    public String renameAvatarOption(
+            @PathVariable UUID id,
+            @RequestParam String label,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            adminServiceClient.updateAvatarOptionLabel(id, label);
+            redirectAttributes.addFlashAttribute("success", "Название аватара обновлено");
+        } catch (Exception e) {
+            log.error("Error renaming avatar option: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", extractMessage(e));
+        }
+        return "redirect:/admin/avatar-options";
+    }
+
     /** Включить/выключить видимость аватара в пикере ребёнка. */
     @PostMapping("/avatar-options/{id}/toggle")
     public String toggleAvatarOption(
@@ -615,6 +632,23 @@ public class AdminWebController {
             redirectAttributes.addFlashAttribute("success", "Фон загружен");
         } catch (Exception e) {
             log.error("Error uploading background option: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", extractMessage(e));
+        }
+        return "redirect:/admin/background-options";
+    }
+
+    /** Переименовать фон. */
+    @PostMapping("/background-options/{id}/rename")
+    public String renameBackgroundOption(
+            @PathVariable UUID id,
+            @RequestParam String label,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            adminServiceClient.updateBackgroundOptionLabel(id, label);
+            redirectAttributes.addFlashAttribute("success", "Название фона обновлено");
+        } catch (Exception e) {
+            log.error("Error renaming background option: {}", e.getMessage());
             redirectAttributes.addFlashAttribute("error", extractMessage(e));
         }
         return "redirect:/admin/background-options";

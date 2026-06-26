@@ -1,11 +1,16 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('История заданий')}"></head>
-<body class="lm-has-bottom-tab">
+<body class="lm-has-bottom-tab"
+      th:classappend="${childBackgroundUrl != null} ? 'lm-has-bg-image'"
+      th:attr="data-accent=${childAccentColor}">
 <div class="th-layout">
     <nav th:replace="~{fragments/layout :: sidebar-child}"></nav>
     <nav th:replace="~{fragments/layout :: bottom-tab-child}"></nav>
-    <div class="th-content">
+    <div class="th-content"
+         th:style="${childBackgroundUrl != null}
+             ? 'background: url(' + ${childBackgroundUrl} + ') center top / cover no-repeat;'
+             : null">
         <header th:replace="~{fragments/layout :: topbar-child(coins=${topbarCoins}, avatarUrl=${topbarAvatarUrl})}"></header>
         <main class="th-main">
 

@@ -105,6 +105,17 @@ public class BackgroundOptionServiceImpl implements BackgroundOptionService {
 
     @Override
     @Transactional
+    public BackgroundOptionResponseDto updateLabel(UUID id, String label) {
+        BackgroundOption backgroundOption = backgroundOptionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Опция фона с ID " + id + " не найдена"));
+        backgroundOption.setLabel(label != null && !label.isBlank() ? label.trim() : null);
+        backgroundOption = backgroundOptionRepository.save(backgroundOption);
+        log.info("Обновлено название опции фона {}: label={}", id, label);
+        return backgroundOptionMapper.toDto(backgroundOption);
+    }
+
+    @Override
+    @Transactional
     public void delete(UUID id) {
         BackgroundOption backgroundOption = backgroundOptionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Опция фона с ID " + id + " не найдена"));
