@@ -10,7 +10,7 @@
 
             <div class="d-flex align-items-center justify-content-between mb-4">
                 <h4 class="fw-bold mb-0"><i class="bi bi-shop-window me-2"></i>Маркетплейс наград</h4>
-                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createModal">
+                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createModal">
                     <i class="bi bi-plus-lg me-1"></i>Добавить товар
                 </button>
             </div>
@@ -83,7 +83,7 @@
                                           th:text="${item['active'] == true ? 'Активен' : 'Выключен'}">-</span>
                                 </td>
                                 <td class="text-end">
-                                    <button class="btn btn-sm btn-outline-primary me-1"
+                                    <button type="button" class="btn btn-sm btn-outline-primary me-1"
                                             data-bs-toggle="modal"
                                             th:data-bs-target="'#editModal-' + ${item['id']}"
                                             title="Редактировать">
@@ -100,99 +100,6 @@
                             </tbody>
                         </table>
                     </div>
-                </div>
-            </div>
-
-            <!-- Create Modal -->
-            <div class="modal fade" id="createModal" tabindex="-1">
-                <div class="modal-dialog">
-                    <form method="post" th:action="@{/admin/marketplace}" class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Новый товар</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="mb-3">
-                                <label class="form-label">Название *</label>
-                                <input type="text" name="title" class="form-control" required maxlength="128"/>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Описание</label>
-                                <textarea name="description" class="form-control" rows="3" maxlength="512"></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Цена (коины) *</label>
-                                <input type="number" name="priceCoins" class="form-control" required min="1" value="10"/>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Иконка (Bootstrap Icons)</label>
-                                <div class="d-flex flex-wrap gap-2 mb-2">
-                                    <button type="button" class="btn btn-outline-secondary icon-choice" onclick="selectMarketplaceIcon('createMarketplaceIcon', this, 'bi-gift')"><i class="bi bi-gift"></i></button>
-                                    <button type="button" class="btn btn-outline-secondary icon-choice" onclick="selectMarketplaceIcon('createMarketplaceIcon', this, 'bi-controller')"><i class="bi bi-controller"></i></button>
-                                    <button type="button" class="btn btn-outline-secondary icon-choice" onclick="selectMarketplaceIcon('createMarketplaceIcon', this, 'bi-ticket-perforated')"><i class="bi bi-ticket-perforated"></i></button>
-                                    <button type="button" class="btn btn-outline-secondary icon-choice" onclick="selectMarketplaceIcon('createMarketplaceIcon', this, 'bi-cup-straw')"><i class="bi bi-cup-straw"></i></button>
-                                    <button type="button" class="btn btn-outline-secondary icon-choice" onclick="selectMarketplaceIcon('createMarketplaceIcon', this, 'bi-star-fill')"><i class="bi bi-star-fill"></i></button>
-                                    <button type="button" class="btn btn-outline-secondary icon-choice" onclick="selectMarketplaceIcon('createMarketplaceIcon', this, 'bi-trophy-fill')"><i class="bi bi-trophy-fill"></i></button>
-                                    <button type="button" class="btn btn-outline-secondary icon-choice" onclick="selectMarketplaceIcon('createMarketplaceIcon', this, 'bi-music-note-beamed')"><i class="bi bi-music-note-beamed"></i></button>
-                                    <button type="button" class="btn btn-outline-secondary icon-choice" onclick="selectMarketplaceIcon('createMarketplaceIcon', this, 'bi-phone')"><i class="bi bi-phone"></i></button>
-                                </div>
-                                <input type="text" id="createMarketplaceIcon" name="iconName" class="form-control" value="bi-gift" placeholder="bi-gift"/>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                            <button type="submit" class="btn btn-primary">Создать</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Edit Modals (one per item) -->
-            <div th:each="item : ${items}" class="modal fade" th:id="'editModal-' + ${item['id']}" tabindex="-1">
-                <div class="modal-dialog">
-                    <form method="post" th:action="@{'/admin/marketplace/' + ${item['id']} + '/edit'}" class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Редактировать товар</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="mb-3">
-                                <label class="form-label">Название *</label>
-                                <input type="text" name="title" class="form-control" required maxlength="128"
-                                       th:value="${item['title']}"/>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Описание</label>
-                                <textarea name="description" class="form-control" rows="3" maxlength="512"
-                                          th:text="${item['description']}"></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Цена (коины) *</label>
-                                <input type="number" name="priceCoins" class="form-control" required min="1"
-                                       th:value="${item['priceCoins']}"/>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Иконка (Bootstrap Icons)</label>
-                                <div class="d-flex flex-wrap gap-2 mb-2">
-                                    <button type="button" class="btn btn-outline-secondary icon-choice" th:onclick="|selectMarketplaceIcon('editMarketplaceIcon-${item['id']}', this, 'bi-gift')|"><i class="bi bi-gift"></i></button>
-                                    <button type="button" class="btn btn-outline-secondary icon-choice" th:onclick="|selectMarketplaceIcon('editMarketplaceIcon-${item['id']}', this, 'bi-controller')|"><i class="bi bi-controller"></i></button>
-                                    <button type="button" class="btn btn-outline-secondary icon-choice" th:onclick="|selectMarketplaceIcon('editMarketplaceIcon-${item['id']}', this, 'bi-ticket-perforated')|"><i class="bi bi-ticket-perforated"></i></button>
-                                    <button type="button" class="btn btn-outline-secondary icon-choice" th:onclick="|selectMarketplaceIcon('editMarketplaceIcon-${item['id']}', this, 'bi-cup-straw')|"><i class="bi bi-cup-straw"></i></button>
-                                    <button type="button" class="btn btn-outline-secondary icon-choice" th:onclick="|selectMarketplaceIcon('editMarketplaceIcon-${item['id']}', this, 'bi-star-fill')|"><i class="bi bi-star-fill"></i></button>
-                                    <button type="button" class="btn btn-outline-secondary icon-choice" th:onclick="|selectMarketplaceIcon('editMarketplaceIcon-${item['id']}', this, 'bi-trophy-fill')|"><i class="bi bi-trophy-fill"></i></button>
-                                    <button type="button" class="btn btn-outline-secondary icon-choice" th:onclick="|selectMarketplaceIcon('editMarketplaceIcon-${item['id']}', this, 'bi-music-note-beamed')|"><i class="bi bi-music-note-beamed"></i></button>
-                                    <button type="button" class="btn btn-outline-secondary icon-choice" th:onclick="|selectMarketplaceIcon('editMarketplaceIcon-${item['id']}', this, 'bi-phone')|"><i class="bi bi-phone"></i></button>
-                                </div>
-                                <input type="text" name="iconName" class="form-control"
-                                       th:id="'editMarketplaceIcon-' + ${item['id']}"
-                                       th:value="${item['iconName']}"/>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                            <button type="submit" class="btn btn-primary">Сохранить</button>
-                        </div>
-                    </form>
                 </div>
             </div>
 
@@ -233,5 +140,100 @@ document.addEventListener('DOMContentLoaded', function() {
     if (input) input.addEventListener('input', filterMarketplace);
 });
 </script>
+
+<!-- Create Modal -->
+<div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form method="post" th:action="@{/admin/marketplace}" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createModalLabel">Новый товар</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Название *</label>
+                    <input type="text" name="title" class="form-control" required maxlength="128"/>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Описание</label>
+                    <textarea name="description" class="form-control" rows="3" maxlength="512"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Цена (коины) *</label>
+                    <input type="number" name="priceCoins" class="form-control" required min="1" value="10"/>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Иконка (Bootstrap Icons)</label>
+                    <div class="d-flex flex-wrap gap-2 mb-2">
+                        <button type="button" class="btn btn-outline-secondary icon-choice" onclick="selectMarketplaceIcon('createMarketplaceIcon', this, 'bi-gift')"><i class="bi bi-gift"></i></button>
+                        <button type="button" class="btn btn-outline-secondary icon-choice" onclick="selectMarketplaceIcon('createMarketplaceIcon', this, 'bi-controller')"><i class="bi bi-controller"></i></button>
+                        <button type="button" class="btn btn-outline-secondary icon-choice" onclick="selectMarketplaceIcon('createMarketplaceIcon', this, 'bi-ticket-perforated')"><i class="bi bi-ticket-perforated"></i></button>
+                        <button type="button" class="btn btn-outline-secondary icon-choice" onclick="selectMarketplaceIcon('createMarketplaceIcon', this, 'bi-cup-straw')"><i class="bi bi-cup-straw"></i></button>
+                        <button type="button" class="btn btn-outline-secondary icon-choice" onclick="selectMarketplaceIcon('createMarketplaceIcon', this, 'bi-star-fill')"><i class="bi bi-star-fill"></i></button>
+                        <button type="button" class="btn btn-outline-secondary icon-choice" onclick="selectMarketplaceIcon('createMarketplaceIcon', this, 'bi-trophy-fill')"><i class="bi bi-trophy-fill"></i></button>
+                        <button type="button" class="btn btn-outline-secondary icon-choice" onclick="selectMarketplaceIcon('createMarketplaceIcon', this, 'bi-music-note-beamed')"><i class="bi bi-music-note-beamed"></i></button>
+                        <button type="button" class="btn btn-outline-secondary icon-choice" onclick="selectMarketplaceIcon('createMarketplaceIcon', this, 'bi-phone')"><i class="bi bi-phone"></i></button>
+                    </div>
+                    <input type="text" id="createMarketplaceIcon" name="iconName" class="form-control" value="bi-gift" placeholder="bi-gift"/>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="submit" class="btn btn-primary">Создать</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Modals (one per item) -->
+<div th:each="item : ${items}" class="modal fade" th:id="'editModal-' + ${item['id']}" tabindex="-1"
+     th:aria-labelledby="'editModalLabel-' + ${item['id']}" aria-hidden="true">
+    <div class="modal-dialog">
+        <form method="post" th:action="@{'/admin/marketplace/' + ${item['id']} + '/edit'}" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" th:id="'editModalLabel-' + ${item['id']}">Редактировать товар</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Название *</label>
+                    <input type="text" name="title" class="form-control" required maxlength="128"
+                           th:value="${item['title']}"/>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Описание</label>
+                    <textarea name="description" class="form-control" rows="3" maxlength="512"
+                              th:text="${item['description']}"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Цена (коины) *</label>
+                    <input type="number" name="priceCoins" class="form-control" required min="1"
+                           th:value="${item['priceCoins']}"/>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Иконка (Bootstrap Icons)</label>
+                    <div class="d-flex flex-wrap gap-2 mb-2">
+                        <button type="button" class="btn btn-outline-secondary icon-choice" th:onclick="|selectMarketplaceIcon('editMarketplaceIcon-${item['id']}', this, 'bi-gift')|"><i class="bi bi-gift"></i></button>
+                        <button type="button" class="btn btn-outline-secondary icon-choice" th:onclick="|selectMarketplaceIcon('editMarketplaceIcon-${item['id']}', this, 'bi-controller')|"><i class="bi bi-controller"></i></button>
+                        <button type="button" class="btn btn-outline-secondary icon-choice" th:onclick="|selectMarketplaceIcon('editMarketplaceIcon-${item['id']}', this, 'bi-ticket-perforated')|"><i class="bi bi-ticket-perforated"></i></button>
+                        <button type="button" class="btn btn-outline-secondary icon-choice" th:onclick="|selectMarketplaceIcon('editMarketplaceIcon-${item['id']}', this, 'bi-cup-straw')|"><i class="bi bi-cup-straw"></i></button>
+                        <button type="button" class="btn btn-outline-secondary icon-choice" th:onclick="|selectMarketplaceIcon('editMarketplaceIcon-${item['id']}', this, 'bi-star-fill')|"><i class="bi bi-star-fill"></i></button>
+                        <button type="button" class="btn btn-outline-secondary icon-choice" th:onclick="|selectMarketplaceIcon('editMarketplaceIcon-${item['id']}', this, 'bi-trophy-fill')|"><i class="bi bi-trophy-fill"></i></button>
+                        <button type="button" class="btn btn-outline-secondary icon-choice" th:onclick="|selectMarketplaceIcon('editMarketplaceIcon-${item['id']}', this, 'bi-music-note-beamed')|"><i class="bi bi-music-note-beamed"></i></button>
+                        <button type="button" class="btn btn-outline-secondary icon-choice" th:onclick="|selectMarketplaceIcon('editMarketplaceIcon-${item['id']}', this, 'bi-phone')|"><i class="bi bi-phone"></i></button>
+                    </div>
+                    <input type="text" name="iconName" class="form-control"
+                           th:id="'editMarketplaceIcon-' + ${item['id']}"
+                           th:value="${item['iconName']}"/>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 </body>
 </html>
