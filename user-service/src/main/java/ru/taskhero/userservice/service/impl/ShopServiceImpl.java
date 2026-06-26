@@ -437,6 +437,7 @@ public class ShopServiceImpl implements ShopService {
         log.info("Создание товара маркетплейса: {}", request.title());
 
         ShopItem item = ShopItem.builder()
+                .parentId(UUID.fromString("00000000-0000-0000-0000-000000000000"))
                 .title(request.title())
                 .description(request.description())
                 .priceCoins(request.priceCoins())
