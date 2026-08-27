@@ -149,6 +149,25 @@ public class ChildController {
             model.addAttribute("totalExp", totalExp);
             model.addAttribute("totalCoins", totalCoins);
 
+            // Главный фокус экрана — следующее задание, которое нужно сделать: ближайшее
+            // по дедлайну среди активных, либо просто первое, если дедлайнов нет.
+            TaskAssignmentDto nextAssignment = activeAssignments.stream()
+                    .filter(a -> "CREATED".equals(a.status()))
+                    .min(java.util.Comparator.comparing(
+                            a -> a.dueDate() != null ? a.dueDate() : java.time.Instant.MAX))
+                    .orElse(null);
+            model.addAttribute("nextAssignment", nextAssignment);
+
+            // Прогресс «на сегодня»: сколько уже одобрено сегодня + сколько ещё осталось активных
+            long approvedToday = allAssignments.stream()
+                    .filter(a -> "APPROVED".equals(a.status()))
+                    .filter(a -> a.reviewedAt() != null
+                            && a.reviewedAt().isAfter(java.time.LocalDate.now()
+                                    .atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()))
+                    .count();
+            model.addAttribute("todayDoneCount", approvedToday);
+            model.addAttribute("todayTotalCount", approvedToday + pendingCount);
+
             // Reassigned tasks: tasks that were extended after expiration
             List<TaskAssignmentDto> reassigned = activeAssignments.stream()
                     .filter(a -> "CREATED".equals(a.status()))
@@ -407,7 +426,7 @@ public class ChildController {
 
             taskServiceClient.submitTask(id, request);
 
-            redirectAttributes.addFlashAttribute("success", "Задание сдано на проверку!");
+            redirectAttributes.addFlashAttribute("success", "Задание отправлено родителю на проверку!");
 
         } catch (Exception e) {
             log.error("Error submitting task: {}", e.getMessage());

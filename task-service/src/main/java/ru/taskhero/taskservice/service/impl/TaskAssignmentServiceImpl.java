@@ -257,14 +257,10 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
 
         assignment = assignmentRepository.save(assignment);
 
-        // Проверяем, есть ли ещё незавершённые важные задания у ребёнка
-        List<TaskStatus> incompleteStatuses = List.of(TaskStatus.CREATED, TaskStatus.SUBMITTED, TaskStatus.EXPIRED);
-        boolean hasIncompleteImportant = assignmentRepository.existsByChildIdAndImportantTrueAndStatusIn(
-                assignment.getChildId(), incompleteStatuses
-        );
-
-        // Начисляем награду (с ограничением EXP, если есть незавершённые важные задания)
-        rewardService.grantReward(assignment.getChildId(), expToGrant, coinsToGrant, hasIncompleteImportant);
+        // Невыполненные важные задания больше не блокируют прогресс уровня — это
+        // превращало отставание в наказание. Признак important сохранён технически
+        // (используется только для визуальной пометки), но на начисление не влияет.
+        rewardService.grantReward(assignment.getChildId(), expToGrant, coinsToGrant, false);
 
         log.info("Задание {} одобрено, начислено {} EXP и {} коинов",
                 assignmentId, expToGrant, coinsToGrant);
@@ -333,9 +329,11 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
 
     /**
      * Найти назначение и проверить, что оно принадлежит указанному ребёнку.
+     * Строка блокируется на запись (PESSIMISTIC_WRITE), так как метод используется
+     * только в операциях смены статуса — это исключает гонку между параллельными запросами.
      */
     private TaskAssignment findAssignmentAndVerifyChild(UUID assignmentId, UUID childId) {
-        TaskAssignment assignment = assignmentRepository.findByIdWithTemplate(assignmentId)
+        TaskAssignment assignment = assignmentRepository.findByIdWithTemplateForUpdate(assignmentId)
                 .orElseThrow(() -> {
                     log.error("Назначение {} не найдено", assignmentId);
                     return new ResourceNotFoundException("Назначение не найдено");
@@ -351,9 +349,12 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
 
     /**
      * Найти назначение и проверить, что шаблон принадлежит указанному родителю.
+     * Строка блокируется на запись (PESSIMISTIC_WRITE), так как метод используется
+     * только в операциях смены статуса — это исключает гонку между параллельными запросами
+     * (например, двойное нажатие «Одобрить», которое иначе могло бы дважды начислить награду).
      */
     private TaskAssignment findAssignmentAndVerifyParent(UUID assignmentId, UUID parentId) {
-        TaskAssignment assignment = assignmentRepository.findByIdWithTemplate(assignmentId)
+        TaskAssignment assignment = assignmentRepository.findByIdWithTemplateForUpdate(assignmentId)
                 .orElseThrow(() -> {
                     log.error("Назначение {} не найдено", assignmentId);
                     return new ResourceNotFoundException("Назначение не найдено");

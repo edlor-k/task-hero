@@ -1,8 +1,10 @@
 package ru.taskhero.taskservice.repository;
 
+import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -130,6 +132,43 @@ public interface TaskAssignmentRepository extends JpaRepository<TaskAssignment, 
     Optional<TaskAssignment> findByIdWithTemplate(@Param("id") UUID id);
 
     /**
+     * Найти назначение по ID с загруженным шаблоном и блокировкой строки на запись.
+     * Используется в операциях, меняющих статус задания (сдача, одобрение, отклонение),
+     * чтобы исключить гонку между одновременными запросами и двойное начисление награды.
+     *
+     * @param id ID назначения
+     * @return назначение или empty
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT a FROM TaskAssignment a JOIN FETCH a.template WHERE a.id = :id")
+    Optional<TaskAssignment> findByIdWithTemplateForUpdate(@Param("id") UUID id);
+
+    /**
+     * Найти ID детей, которым когда-либо назначался данный шаблон (для генерации повторов).
+     */
+    @Query("SELECT DISTINCT a.childId FROM TaskAssignment a WHERE a.template.id = :templateId")
+    List<UUID> findDistinctChildIdsByTemplateId(@Param("templateId") UUID templateId);
+
+    /**
+     * Найти самое первое назначение по шаблону и ребёнку (точка отсчёта для повторения).
+     */
+    Optional<TaskAssignment> findFirstByTemplateIdAndChildIdOrderByCreatedAtAsc(UUID templateId, UUID childId);
+
+    /**
+     * Проверить, существует ли уже назначение по шаблону и ребёнку с дедлайном в указанном окне
+     * (используется, чтобы не создать повторяющееся задание дважды за один и тот же день).
+     */
+    boolean existsByTemplateIdAndChildIdAndDueDateBetween(UUID templateId, UUID childId, Instant start, Instant end);
+
+    /**
+     * Проверить, существует ли уже назначение без дедлайна, созданное в указанном окне
+     * (покрывает случай, когда самое первое назначение серии создано вручную без дедлайна —
+     * чтобы в тот же день планировщик не создал ещё одно на то же вхождение правила).
+     */
+    boolean existsByTemplateIdAndChildIdAndDueDateIsNullAndCreatedAtBetween(
+            UUID templateId, UUID childId, Instant start, Instant end);
+
+    /**
      * Найти просроченные назначения.
      *
      * @param date   дата для сравнения
@@ -156,11 +195,6 @@ public interface TaskAssignmentRepository extends JpaRepository<TaskAssignment, 
      * @return true если существует
      */
     boolean existsByChildIdAndTemplateIdAndStatusIn(UUID childId, UUID templateId, List<TaskStatus> statuses);
-
-    /**
-     * Проверить, есть ли у ребёнка невыполненные важные задания.
-     */
-    boolean existsByChildIdAndImportantTrueAndStatusIn(UUID childId, List<TaskStatus> statuses);
 
     /**
      * Найти просроченные задания для родителя: EXPIRED или CREATED с истёкшим дедлайном.

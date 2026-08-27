@@ -13,15 +13,15 @@
                 <div style="font-size:56px;margin-bottom:var(--s-3);">🎉</div>
                 <h1 class="lm-page-title" style="font-size:var(--fs-3xl);">Добро пожаловать в TaskGamer!</h1>
                 <p style="color:var(--ink-500);font-size:var(--fs-base);margin-top:var(--s-2);max-width:480px;margin-left:auto;margin-right:auto;line-height:1.6;">
-                    Настройте приложение за четыре шага, чтобы начать вместе с детьми.
+                    Два шага — и ребёнок увидит своё первое задание.
                 </p>
             </div>
 
             <!-- Step cards -->
-            <div class="row g-4 mb-5">
+            <div class="row g-4 mb-4 justify-content-center">
 
                 <!-- Step 1: Add child -->
-                <div class="col-sm-6 col-xl-3">
+                <div class="col-sm-8 col-xl-5">
                     <div class="lm-step-card h-100"
                          th:classappend="${hasChildren} ? 'done' : 'active'">
                         <span class="lm-step-num">
@@ -30,9 +30,9 @@
                         </span>
                         <div class="lm-step-emoji">👶</div>
                         <div class="lm-step-title">Добавьте ребёнка</div>
-                        <div class="lm-step-desc">Создайте профиль ребёнка и получите уникальный токен для его входа.</div>
+                        <div class="lm-step-desc">Имя и возрастная группа — этого достаточно, чтобы начать.</div>
                         <div th:if="${hasChildren}" class="lm-chip success" style="padding:6px 14px;">
-                            <i class="bi bi-check-circle-fill me-1"></i>Выполнено
+                            <i class="bi bi-check-circle-fill me-1"></i>Готово
                         </div>
                         <a th:href="@{/parent/children(onboarding=true)}"
                            class="lm-btn w-100 justify-content-center"
@@ -44,114 +44,44 @@
                     </div>
                 </div>
 
-                <!-- Step 2: Level rewards -->
-                <div class="col-sm-6 col-xl-3">
+                <!-- Step 2: First task -->
+                <div class="col-sm-8 col-xl-5">
                     <div class="lm-step-card h-100"
-                         th:classappend="${hasLevelRewards} ? 'done' : ''">
+                         th:classappend="${hasFirstAssignment} ? 'done' : (${hasChildren} ? 'active' : '')">
                         <span class="lm-step-num">
-                            <span th:if="${hasLevelRewards}">✓</span>
-                            <span th:unless="${hasLevelRewards}">2</span>
-                        </span>
-                        <div class="lm-step-emoji">🏆</div>
-                        <div class="lm-step-title">Награды за уровни</div>
-                        <div class="lm-step-desc">Настройте подарки, которые ребёнок получит за достижение ближайших уровней.</div>
-                        <div th:if="${hasLevelRewards}" class="lm-chip success" style="padding:6px 14px;">
-                            <i class="bi bi-check-circle-fill me-1"></i>Выполнено
-                        </div>
-                        <a th:href="@{/parent/level-rewards(onboarding=true)}"
-                           class="lm-btn w-100 justify-content-center"
-                           th:classappend="${hasLevelRewards} ? 'lm-btn-secondary' : 'lm-btn-primary'"
-                           style="margin-top:auto;">
-                            <i class="bi bi-trophy me-1"></i>
-                            <span th:text="${hasLevelRewards} ? 'Управлять наградами' : 'Настроить награды'">Настроить</span>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Step 3: Shop -->
-                <div class="col-sm-6 col-xl-3">
-                    <div class="lm-step-card h-100"
-                         th:classappend="${hasShopItems} ? 'done' : ''">
-                        <span class="lm-step-num">
-                            <span th:if="${hasShopItems}">✓</span>
-                            <span th:unless="${hasShopItems}">3</span>
-                        </span>
-                        <div class="lm-step-emoji">🛍️</div>
-                        <div class="lm-step-title">Магазин наград</div>
-                        <div class="lm-step-desc">Добавьте награды, которые дети смогут получать за накопленные монеты.</div>
-                        <div th:if="${hasShopItems}" class="lm-chip success" style="padding:6px 14px;">
-                            <i class="bi bi-check-circle-fill me-1"></i>Выполнено
-                        </div>
-                        <div th:unless="${hasShopItems}" class="d-flex flex-column gap-2 w-100" style="margin-top:auto;">
-                            <a th:href="@{/parent/shop/marketplace(onboarding=true)}" class="lm-btn lm-btn-primary w-100 justify-content-center">
-                                <i class="bi bi-shop-window me-1"></i>Маркетплейс
-                            </a>
-                            <a th:href="@{/parent/shop(onboarding=true)}" class="lm-btn lm-btn-secondary w-100 justify-content-center">
-                                <i class="bi bi-plus-lg me-1"></i>Создать вручную
-                            </a>
-                        </div>
-                        <a th:if="${hasShopItems}" th:href="@{/parent/shop(onboarding=true)}"
-                           class="lm-btn lm-btn-secondary w-100 justify-content-center" style="margin-top:auto;">
-                            <i class="bi bi-cart me-1"></i>Открыть магазин
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Step 4: Task templates -->
-                <div class="col-sm-6 col-xl-3">
-                    <div class="lm-step-card h-100"
-                         th:classappend="${hasTemplates} ? 'done' : ''">
-                        <span class="lm-step-num">
-                            <span th:if="${hasTemplates}">✓</span>
-                            <span th:unless="${hasTemplates}">4</span>
+                            <span th:if="${hasFirstAssignment}">✓</span>
+                            <span th:unless="${hasFirstAssignment}">2</span>
                         </span>
                         <div class="lm-step-emoji">📋</div>
-                        <div class="lm-step-title">Задания</div>
-                        <div class="lm-step-desc">Создайте шаблоны заданий или выберите готовые из библиотеки.</div>
-                        <div th:if="${hasTemplates}" class="lm-chip success" style="padding:6px 14px;">
-                            <i class="bi bi-check-circle-fill me-1"></i>Выполнено
+                        <div class="lm-step-title">Выберите первое задание</div>
+                        <div class="lm-step-desc">Готовое популярное задание или своё — монеты и опыт уже посчитаны.</div>
+                        <div th:if="${hasFirstAssignment}" class="lm-chip success" style="padding:6px 14px;">
+                            <i class="bi bi-check-circle-fill me-1"></i>Назначено
                         </div>
-                        <div th:unless="${hasTemplates}" class="d-flex flex-column gap-2 w-100" style="margin-top:auto;">
-                            <a th:href="@{/parent/library(onboarding=true)}" class="lm-btn lm-btn-primary w-100 justify-content-center">
-                                <i class="bi bi-book me-1"></i>Библиотека
-                            </a>
-                            <a th:href="@{/parent/templates(onboarding=true)}" class="lm-btn lm-btn-secondary w-100 justify-content-center">
-                                <i class="bi bi-plus-lg me-1"></i>Создать шаблон
-                            </a>
-                        </div>
-                        <a th:if="${hasTemplates}" th:href="@{/parent/templates(onboarding=true)}"
-                           class="lm-btn lm-btn-secondary w-100 justify-content-center" style="margin-top:auto;">
-                            <i class="bi bi-list-check me-1"></i>Мои шаблоны
+                        <a th:if="${hasChildren}"
+                           th:href="@{/parent/assign(onboarding=true)}"
+                           class="lm-btn w-100 justify-content-center"
+                           th:classappend="${hasFirstAssignment} ? 'lm-btn-secondary' : 'lm-btn-primary'"
+                           style="margin-top:auto;">
+                            <i class="bi bi-send me-1"></i>
+                            <span th:text="${hasFirstAssignment} ? 'Назначить ещё' : 'Создать задание'">Создать</span>
                         </a>
+                        <button th:unless="${hasChildren}" type="button" class="lm-btn lm-btn-secondary w-100 justify-content-center" disabled
+                                style="margin-top:auto;">Сначала добавьте ребёнка</button>
                     </div>
                 </div>
 
             </div>
 
-            <!-- Progress bar -->
-            <div class="lm-setup-progress mb-4">
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="fw-semibold" style="font-size:var(--fs-sm);">Прогресс настройки</span>
-                    <span style="font-family:var(--font-mono);font-size:var(--fs-sm);color:var(--ink-500);"
-                          th:text="${(hasChildren ? 1 : 0) + (hasLevelRewards ? 1 : 0) + (hasShopItems ? 1 : 0) + (hasTemplates ? 1 : 0)} + ' / 4'">0 / 4</span>
+            <!-- All done -->
+            <div th:if="${hasChildren and hasFirstAssignment}" class="lm-banner ok mb-4">
+                <i class="bi bi-trophy-fill fs-5"></i>
+                <div>
+                    <strong>Готово! Первое задание уже ждёт ребёнка.</strong>
                 </div>
-                <div class="lm-sp-track">
-                    <div class="lm-sp-fill"
-                         th:style="'width:' + (${((hasChildren ? 1 : 0) + (hasLevelRewards ? 1 : 0) + (hasShopItems ? 1 : 0) + (hasTemplates ? 1 : 0)) * 25}) + '%'"></div>
-                </div>
-
-                <!-- All done -->
-                <div th:if="${(hasChildren ? 1 : 0) + (hasLevelRewards ? 1 : 0) + (hasShopItems ? 1 : 0) + (hasTemplates ? 1 : 0) >= 4}"
-                     class="lm-banner ok mt-3">
-                    <i class="bi bi-trophy-fill fs-5"></i>
-                    <div>
-                        <strong>Отлично! Всё настроено.</strong>
-                        Можно назначать задания и начинать!
-                    </div>
-                    <a th:href="@{/parent/dashboard}" class="lm-btn lm-btn-primary lm-btn-sm ms-auto flex-shrink-0">
-                        На дашборд →
-                    </a>
-                </div>
+                <a th:href="@{/parent/dashboard}" class="lm-btn lm-btn-primary lm-btn-sm ms-auto flex-shrink-0">
+                    На дашборд →
+                </a>
             </div>
 
             <!-- Skip -->

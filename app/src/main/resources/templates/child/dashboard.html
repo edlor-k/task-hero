@@ -97,6 +97,92 @@
                 </form>
             </div>
 
+            <!-- ══════════════ 1. Что нужно сделать сейчас ══════════════ -->
+            <div th:if="${nextAssignment != null}" class="lm-child-task mb-3" style="border-width:2px;">
+                <div class="lm-ct-icon">
+                    <span th:if="${nextAssignment.important}">⚠️</span>
+                    <span th:unless="${nextAssignment.important}"><i class="bi bi-star-fill"></i></span>
+                </div>
+                <div class="lm-ct-body">
+                    <div style="font-size:var(--fs-xs);font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--brand-primary);">
+                        Твоё следующее задание
+                    </div>
+                    <div class="lm-ct-title-text" th:text="${nextAssignment.template?.title}">Задание</div>
+                    <div class="lm-ct-meta">
+                        <span th:if="${nextAssignment.template?.expReward}">⭐ <span th:text="${nextAssignment.template.expReward}">10</span> EXP</span>
+                        <span th:if="${nextAssignment.template?.coinsReward}">🪙 <span th:text="${nextAssignment.template.coinsReward}">5</span></span>
+                        <span th:if="${nextAssignment.dueDate}">
+                            <i class="bi bi-clock"></i>
+                            <span th:attr="data-utc-datetime=${nextAssignment.dueDate}" th:text="${nextAssignment.dueDate}">срок</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="flex-shrink-0">
+                    <a th:href="@{/child/tasks}" class="lm-ct-btn">Открыть</a>
+                </div>
+            </div>
+
+            <!-- ── Задания на сегодня ───────────────────── -->
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h2 class="lm-section-title">
+                    Задания на сегодня
+                    <span th:if="${todayTotalCount != null and todayTotalCount > 0}"
+                          style="font-weight:500;color:var(--ink-500);font-size:var(--fs-sm);"
+                          th:text="'· ' + ${todayDoneCount} + ' из ' + ${todayTotalCount} + ' выполнено'"></span>
+                </h2>
+                <a th:href="@{/child/tasks}" style="font-size:var(--fs-sm);color:var(--brand-primary);text-decoration:none;font-weight:600;">
+                    Все задания <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+
+            <div th:if="${#lists.isEmpty(activeAssignments)}" class="lm-empty-state" style="padding:var(--s-10) var(--s-6);">
+                <div class="lm-empty-icon">🎉</div>
+                <div class="lm-empty-title">На сегодня всё!</div>
+                <div class="lm-empty-sub">Все задания выполнены. Отличная работа!</div>
+            </div>
+
+            <div th:unless="${#lists.isEmpty(activeAssignments)}" class="lm-child-tasks mb-4">
+                <div th:each="a,iter : ${activeAssignments}"
+                     class="lm-child-task"
+                     th:classappend="${a.status == 'SUBMITTED' ? 'submitted' :
+                                      (a.dueDate != null and a.dueDate.isBefore(T(java.time.Instant).now())) ? 'rejected' : ''}">
+                    <div class="lm-ct-icon">
+                        <span th:if="${a.important}">⚠️</span>
+                        <span th:unless="${a.important}"><i class="bi bi-list-check"></i></span>
+                    </div>
+                    <div class="lm-ct-body">
+                        <div class="lm-ct-title-text" data-bs-toggle="collapse"
+                             th:attr="data-bs-target='#dash-desc-' + ${a.id}"
+                             style="cursor:pointer;"
+                             th:text="${a.template?.title}">Задание</div>
+                        <div th:if="${a.template?.description}" class="collapse" th:id="'dash-desc-' + ${a.id}">
+                            <div style="font-size:var(--fs-sm);color:var(--ink-500);margin:4px 0 8px;"
+                                 th:text="${a.template.description}">Описание задания</div>
+                        </div>
+                        <div class="lm-ct-meta">
+                            <span th:if="${a.template?.expReward}">⭐ <span th:text="${a.template.expReward}">10</span> EXP</span>
+                            <span th:if="${a.template?.coinsReward}">🪙 <span th:text="${a.template.coinsReward}">5</span></span>
+                            <span th:if="${a.dueDate}">
+                                <i class="bi bi-clock"></i>
+                                <span th:attr="data-utc-datetime=${a.dueDate}" th:text="${a.dueDate}">срок</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- CTA -->
+                    <div class="flex-shrink-0">
+                        <form th:if="${a.status == 'CREATED' and (a.dueDate == null or !a.dueDate.isBefore(T(java.time.Instant).now()))}"
+                              th:action="@{/child/tasks/{id}/submit(id=${a.id})}" method="post">
+                            <button type="submit" class="lm-ct-btn">Выполнено ✓</button>
+                        </form>
+                        <span th:if="${a.status == 'CREATED' and a.dueDate != null and a.dueDate.isBefore(T(java.time.Instant).now())}"
+                              class="lm-chip danger">Просрочено</span>
+                        <span th:if="${a.status == 'SUBMITTED'}" class="lm-chip warning">На проверке</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══════════════ 3. Игровой прогресс ══════════════ -->
             <!-- ── Hero zone ────────────────────────────── -->
             <div class="lm-child-hero mb-4">
                 <div class="d-flex align-items-center gap-3 mb-3">
@@ -209,54 +295,6 @@
                             <i class="bi bi-check-lg"></i>
                         </button>
                     </form>
-                </div>
-            </div>
-
-            <!-- ── Active assignments ────────────────────── -->
-            <div class="d-flex align-items-center justify-content-between mb-3">
-                <h2 class="lm-section-title">Задания на сегодня</h2>
-                <a th:href="@{/child/tasks}" style="font-size:var(--fs-sm);color:var(--brand-primary);text-decoration:none;font-weight:600;">
-                    Все задания <i class="bi bi-arrow-right ms-1"></i>
-                </a>
-            </div>
-
-            <div th:if="${#lists.isEmpty(activeAssignments)}" class="lm-empty-state" style="padding:var(--s-10) var(--s-6);">
-                <div class="lm-empty-icon">🎉</div>
-                <div class="lm-empty-title">На сегодня всё!</div>
-                <div class="lm-empty-sub">Все задания выполнены. Отличная работа!</div>
-            </div>
-
-            <div th:unless="${#lists.isEmpty(activeAssignments)}" class="lm-child-tasks">
-                <div th:each="a,iter : ${activeAssignments}"
-                     class="lm-child-task"
-                     th:classappend="${a.status == 'SUBMITTED' ? 'submitted' :
-                                      (a.dueDate != null and a.dueDate.isBefore(T(java.time.Instant).now())) ? 'rejected' : ''}">
-                    <div class="lm-ct-icon">
-                        <span th:if="${a.important}">⚠️</span>
-                        <span th:unless="${a.important}"><i class="bi bi-list-check"></i></span>
-                    </div>
-                    <div class="lm-ct-body">
-                        <div class="lm-ct-title-text" th:text="${a.template?.title}">Задание</div>
-                        <div class="lm-ct-meta">
-                            <span th:if="${a.template?.expReward}">⭐ <span th:text="${a.template.expReward}">10</span> EXP</span>
-                            <span th:if="${a.template?.coinsReward}">🪙 <span th:text="${a.template.coinsReward}">5</span></span>
-                            <span th:if="${a.dueDate}">
-                                <i class="bi bi-clock"></i>
-                                <span th:attr="data-utc-datetime=${a.dueDate}" th:text="${a.dueDate}">срок</span>
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- CTA -->
-                    <div class="flex-shrink-0">
-                        <form th:if="${a.status == 'CREATED' and (a.dueDate == null or !a.dueDate.isBefore(T(java.time.Instant).now()))}"
-                              th:action="@{/child/tasks/{id}/submit(id=${a.id})}" method="post">
-                            <button type="submit" class="lm-ct-btn">Сдать ✓</button>
-                        </form>
-                        <span th:if="${a.status == 'CREATED' and a.dueDate != null and a.dueDate.isBefore(T(java.time.Instant).now())}"
-                              class="lm-chip danger">Просрочено</span>
-                        <span th:if="${a.status == 'SUBMITTED'}" class="lm-chip warning">На проверке</span>
-                    </div>
                 </div>
             </div>
 

@@ -103,6 +103,11 @@
                                 <i class="bi bi-plus-lg me-1"></i>Задание
                             </a>
                         </div>
+                        <form th:action="@{/parent/children/{id}/open-cabinet(id=${child.id})}" method="post">
+                            <button type="submit" class="lm-btn lm-btn-secondary w-100 justify-content-center">
+                                <i class="bi bi-box-arrow-in-right me-1"></i>Открыть кабинет ребёнка
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>

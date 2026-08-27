@@ -25,6 +25,7 @@ import ru.taskhero.app.config.FeignConfig;
 import ru.taskhero.app.dto.LoginResponse;
 import ru.taskhero.app.dto.RegisterRequest;
 import ru.taskhero.app.security.AuthenticatedUser;
+import ru.taskhero.app.security.ChildSessionStarter;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,6 +40,7 @@ import java.util.Map;
 public class AuthController {
 
     private final UserServiceClient userServiceClient;
+    private final ChildSessionStarter childSessionStarter;
     private final SecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
 
     /**
@@ -87,22 +89,7 @@ public class AuthController {
 
             LoginResponse loginResponse = userServiceClient.loginChild(loginRequest);
 
-            // Сохраняем токен в сессии
-            HttpSession session = request.getSession(true);
-            session.setAttribute(FeignConfig.SESSION_TOKEN_KEY, loginResponse.token());
-
-            // Устанавливаем аутентификацию
-            SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_CHILD");
-            AuthenticatedUser user = new AuthenticatedUser(loginResponse.displayName(), "CHILD", loginResponse.token());
-
-            UsernamePasswordAuthenticationToken auth =
-                    new UsernamePasswordAuthenticationToken(user, null, Collections.singletonList(authority));
-
-            // Создаём новый SecurityContext и сохраняем его в сессию
-            SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-            securityContext.setAuthentication(auth);
-            SecurityContextHolder.setContext(securityContext);
-            securityContextRepository.saveContext(securityContext, request, response);
+            childSessionStarter.start(loginResponse, request, response);
 
             log.info("Child logged in successfully: {}", loginResponse.displayName());
 

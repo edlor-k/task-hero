@@ -70,7 +70,14 @@
                         </div>
 
                         <div class="lm-ct-body">
-                            <div class="lm-ct-title-text" th:text="${a.template?.title}">Задание</div>
+                            <div class="lm-ct-title-text" data-bs-toggle="collapse"
+                                 th:attr="data-bs-target='#desc-' + ${a.id}"
+                                 style="cursor:pointer;"
+                                 th:text="${a.template?.title}">Задание</div>
+                            <div th:if="${a.template?.description}" class="collapse" th:id="'desc-' + ${a.id}">
+                                <div style="font-size:var(--fs-sm);color:var(--ink-500);margin:4px 0 8px;"
+                                     th:text="${a.template.description}">Описание задания</div>
+                            </div>
                             <div class="lm-ct-meta">
                                 <span th:if="${a.template?.expReward}">⭐ <span th:text="${a.template.expReward}">10</span> EXP</span>
                                 <span th:if="${a.template?.coinsReward}">🪙 <span th:text="${a.template.coinsReward}">5</span></span>
@@ -116,7 +123,7 @@
                         <div class="flex-shrink-0">
                             <form th:if="${a.status == 'CREATED' and (a.dueDate == null or !a.dueDate.isBefore(T(java.time.Instant).now()))}"
                                   th:action="@{/child/tasks/{id}/submit(id=${a.id})}" method="post">
-                                <button type="submit" class="lm-ct-btn">Сдать ✓</button>
+                                <button type="submit" class="lm-ct-btn">Выполнено ✓</button>
                             </form>
                             <span th:if="${a.status == 'CREATED' and a.dueDate != null and a.dueDate.isBefore(T(java.time.Instant).now())}"
                                   class="lm-chip danger">Просрочено</span>

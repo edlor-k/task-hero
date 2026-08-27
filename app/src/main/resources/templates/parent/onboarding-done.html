@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Готово')}"></head>
+<body>
+<div class="th-layout">
+    <nav th:replace="~{fragments/layout :: sidebar-parent}"></nav>
+    <div class="th-content">
+        <header th:replace="~{fragments/layout :: topbar}"></header>
+        <main class="th-main">
+
+            <div class="text-center" style="max-width:480px;margin:0 auto;">
+                <div style="font-size:64px;margin-bottom:var(--s-3);">🎉</div>
+                <h1 class="lm-page-title" style="font-size:var(--fs-3xl);">Готово!</h1>
+                <p style="color:var(--ink-500);font-size:var(--fs-base);margin-top:var(--s-2);line-height:1.6;">
+                    Первое задание уже ждёт ребёнка.
+                </p>
+
+                <div class="d-flex flex-column gap-2 mt-4" th:if="${child != null}">
+                    <form th:action="@{/parent/children/{id}/open-cabinet(id=${child.id})}" method="post">
+                        <button type="submit" class="lm-btn lm-btn-primary btn-lg w-100 justify-content-center">
+                            <i class="bi bi-box-arrow-in-right me-1"></i>Открыть кабинет ребёнка
+                        </button>
+                    </form>
+                    <a th:href="@{/parent/dashboard}" class="lm-btn lm-btn-secondary w-100 justify-content-center">
+                        На дашборд
+                    </a>
+                </div>
+                <a th:if="${child == null}" th:href="@{/parent/dashboard}" class="lm-btn lm-btn-primary btn-lg mt-4">
+                    На дашборд
+                </a>
+            </div>
+
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

@@ -32,7 +32,10 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -138,6 +141,29 @@ class TaskAssignmentServiceImplTest {
     }
 
     @Test
+    @DisplayName("Должен выбросить исключение при назначении неактивного шаблона " +
+            "(регрессия «Ошибка назначения задания»: одноразовые задания раньше создавались " +
+            "неактивными и тут же не могли быть назначены)")
+    void shouldThrowExceptionWhenAssigningInactiveTemplate() {
+        // Given
+        TaskTemplate inactiveTemplate = TaskTemplate.builder()
+                .parentId(parentId)
+                .title("Разовое задание")
+                .expReward(10)
+                .coinsReward(5)
+                .active(false)
+                .build();
+        TaskAssignRequest request = new TaskAssignRequest(templateId, childId, null, null);
+
+        when(templateRepository.findById(templateId)).thenReturn(Optional.of(inactiveTemplate));
+
+        // When & Then
+        assertThatThrownBy(() -> assignmentService.assign(parentId, request))
+                .isInstanceOf(ValidationException.class)
+                .hasMessageContaining("неактивен");
+    }
+
+    @Test
     @DisplayName("Должен выбросить исключение при повторном назначении не-повторяемого задания")
     void shouldThrowExceptionWhenAssigningDuplicateNonRepeatable() {
         // Given
@@ -159,7 +185,7 @@ class TaskAssignmentServiceImplTest {
         // Given
         TaskSubmitRequest request = new TaskSubmitRequest("Я все сделал!");
 
-        when(assignmentRepository.findByIdWithTemplate(assignmentId)).thenReturn(Optional.of(assignment));
+        when(assignmentRepository.findByIdWithTemplateForUpdate(assignmentId)).thenReturn(Optional.of(assignment));
         when(assignmentRepository.save(any(TaskAssignment.class))).thenReturn(assignment);
         when(assignmentMapper.toDto(assignment)).thenReturn(
                 new TaskAssignmentResponseDto(
@@ -184,7 +210,7 @@ class TaskAssignmentServiceImplTest {
         UUID otherChildId = UUID.randomUUID();
         TaskSubmitRequest request = new TaskSubmitRequest(null);
 
-        when(assignmentRepository.findByIdWithTemplate(assignmentId)).thenReturn(Optional.of(assignment));
+        when(assignmentRepository.findByIdWithTemplateForUpdate(assignmentId)).thenReturn(Optional.of(assignment));
 
         // When & Then
         assertThatThrownBy(() -> assignmentService.submit(assignmentId, otherChildId, request))
@@ -199,7 +225,7 @@ class TaskAssignmentServiceImplTest {
         assignment.setStatus(TaskStatus.SUBMITTED);
         TaskReviewRequest request = new TaskReviewRequest("Молодец!", null, null);
 
-        when(assignmentRepository.findByIdWithTemplate(assignmentId)).thenReturn(Optional.of(assignment));
+        when(assignmentRepository.findByIdWithTemplateForUpdate(assignmentId)).thenReturn(Optional.of(assignment));
         when(assignmentRepository.save(any(TaskAssignment.class))).thenReturn(assignment);
         when(assignmentMapper.toDto(assignment)).thenReturn(
                 new TaskAssignmentResponseDto(
@@ -208,8 +234,6 @@ class TaskAssignmentServiceImplTest {
                         null, null, null, null, Instant.now(), Instant.now()
                 )
         );
-        when(assignmentRepository.existsByChildIdAndImportantTrueAndStatusIn(any(), any()))
-                .thenReturn(false);
 
         // When
         TaskAssignmentResponseDto result = assignmentService.approve(assignmentId, parentId, request);
@@ -227,7 +251,7 @@ class TaskAssignmentServiceImplTest {
         assignment.setStatus(TaskStatus.SUBMITTED);
         TaskReviewRequest request = new TaskReviewRequest("Нужно переделать", null, null);
 
-        when(assignmentRepository.findByIdWithTemplate(assignmentId)).thenReturn(Optional.of(assignment));
+        when(assignmentRepository.findByIdWithTemplateForUpdate(assignmentId)).thenReturn(Optional.of(assignment));
         when(assignmentRepository.save(any(TaskAssignment.class))).thenReturn(assignment);
         when(assignmentMapper.toDto(assignment)).thenReturn(
                 new TaskAssignmentResponseDto(
@@ -252,12 +276,51 @@ class TaskAssignmentServiceImplTest {
         assignment.setStatus(TaskStatus.CREATED);
         TaskReviewRequest request = new TaskReviewRequest(null, null, null);
 
-        when(assignmentRepository.findByIdWithTemplate(assignmentId)).thenReturn(Optional.of(assignment));
+        when(assignmentRepository.findByIdWithTemplateForUpdate(assignmentId)).thenReturn(Optional.of(assignment));
 
         // When & Then
         assertThatThrownBy(() -> assignmentService.approve(assignmentId, parentId, request))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("не находится на проверке");
+    }
+
+    @Test
+    @DisplayName("Не должен повторно начислять награду при повторном одобрении уже одобренного задания " +
+            "(защита от двойного начисления, например при двойном клике или обновлении страницы)")
+    void shouldNotGrantRewardTwiceOnDoubleApprove() {
+        // Given — задание уже было одобрено первым запросом
+        assignment.setStatus(TaskStatus.APPROVED);
+        assignment.setExpEarned(25);
+        assignment.setCoinsEarned(10);
+        TaskReviewRequest request = new TaskReviewRequest(null, null, null);
+
+        when(assignmentRepository.findByIdWithTemplateForUpdate(assignmentId)).thenReturn(Optional.of(assignment));
+
+        // When & Then — второй вызов approve() должен быть отклонён и не должен начислять награду снова
+        assertThatThrownBy(() -> assignmentService.approve(assignmentId, parentId, request))
+                .isInstanceOf(ValidationException.class);
+
+        verify(rewardService, never()).grantReward(any(), anyInt(), anyInt(), anyBoolean());
+        verify(assignmentRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Использует блокировку строки на запись при одобрении, чтобы исключить гонку между параллельными запросами")
+    void shouldUseLockingFetchOnApprove() {
+        // Given
+        assignment.setStatus(TaskStatus.SUBMITTED);
+        TaskReviewRequest request = new TaskReviewRequest(null, null, null);
+
+        when(assignmentRepository.findByIdWithTemplateForUpdate(assignmentId)).thenReturn(Optional.of(assignment));
+        when(assignmentRepository.save(any(TaskAssignment.class))).thenReturn(assignment);
+        when(assignmentMapper.toDto(assignment)).thenReturn(responseDto);
+
+        // When
+        assignmentService.approve(assignmentId, parentId, request);
+
+        // Then — именно блокирующий метод должен использоваться, а не обычный findByIdWithTemplate
+        verify(assignmentRepository).findByIdWithTemplateForUpdate(assignmentId);
+        verify(assignmentRepository, never()).findByIdWithTemplate(any());
     }
 
     @Test

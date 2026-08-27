@@ -245,6 +245,37 @@ class TaskAssignmentControllerIT extends AbstractIntegrationTest {
     }
 
     @Test
+    @DisplayName("Не должен начислить награду дважды при повторном одобрении (защита от двойного клика)")
+    void shouldNotDoubleGrantRewardOnRepeatedApprove() throws Exception {
+        // Given
+        TaskAssignment assignment = assignmentRepository.save(TaskAssignment.builder()
+                .template(template)
+                .childId(childId)
+                .status(TaskStatus.SUBMITTED)
+                .dueDate(Instant.now().plus(Duration.ofDays(7)))
+                .build());
+
+        TaskReviewRequest request = new TaskReviewRequest("Отлично!", null, null);
+
+        // When — первый запрос одобряет и начисляет награду
+        mockMvc.perform(post("/assignments/{id}/approve", assignment.getId())
+                        .with(parentAuth())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status", is("APPROVED")));
+
+        // Then — повторный запрос на то же задание должен быть отклонён без повторного начисления
+        mockMvc.perform(post("/assignments/{id}/approve", assignment.getId())
+                        .with(parentAuth())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+
+        org.mockito.Mockito.verify(userServiceClient, org.mockito.Mockito.times(1)).addReward(any(), any());
+    }
+
+    @Test
     @DisplayName("Должен вернуть 400 при одобрении не-сданного задания")
     void shouldReturn400WhenApprovingNonSubmittedTask() throws Exception {
         // Given — задание ещё в статусе CREATED

@@ -22,7 +22,10 @@ import ru.taskhero.app.dto.ShopItemDto;
 import ru.taskhero.app.dto.ShopPurchaseDto;
 import ru.taskhero.app.dto.TaskAssignmentDto;
 import ru.taskhero.app.dto.TaskTemplateDto;
+import ru.taskhero.app.security.ChildSessionStarter;
+import ru.taskhero.app.util.FormDateTimeParser;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,27 +46,38 @@ public class ParentController {
     private final UserServiceClient userServiceClient;
     private final TaskServiceClient taskServiceClient;
     private final AdminServiceClient adminServiceClient;
+    private final ChildSessionStarter childSessionStarter;
 
     /**
      * Добавляет атрибут onboardingComplete для всех страниц родителя.
      * Используется для скрытия пункта меню «Онбординг» после завершения настройки.
+     * <p>
+     * Онбординг считается пройденным, как только есть ребёнок и ему назначено хотя бы
+     * одно задание — этого достаточно, чтобы семья начала пользоваться основным циклом.
+     * Магазин наград и награды за уровни — необязательные дополнения, а не обязательные
+     * подсистемы для запуска (см. п.13 продуктового ТЗ).
      */
     @ModelAttribute("onboardingComplete")
     public boolean isOnboardingComplete() {
         try {
             List<ChildDto> children = userServiceClient.getChildren();
-            if (children.isEmpty()) return false;
-            boolean hasLevelRewards = children.stream().allMatch(child -> {
-                try {
-                    List<LevelRewardDto> rewards = userServiceClient.getLevelRewards(child.id());
-                    return rewards != null && rewards.size() >= 2;
-                } catch (Exception e) {
-                    return false;
-                }
-            });
-            boolean hasShopItems = !userServiceClient.getShopItems().isEmpty();
-            boolean hasTemplates = !taskServiceClient.getActiveTemplates().isEmpty();
-            return hasLevelRewards && hasShopItems && hasTemplates;
+            if (children.isEmpty()) {
+                return false;
+            }
+            return hasAnyAssignmentEver();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Есть ли у родителя хотя бы одно когда-либо назначенное задание.
+     */
+    private boolean hasAnyAssignmentEver() {
+        try {
+            Map<String, Object> page = taskServiceClient.getAssignments(0, 1);
+            Object totalElements = page.get("totalElements");
+            return totalElements instanceof Number && ((Number) totalElements).longValue() > 0;
         } catch (Exception e) {
             return false;
         }
@@ -113,41 +127,41 @@ public class ParentController {
     }
 
     /**
-     * Страница онбординга для новых родителей.
+     * Страница онбординга для новых родителей: два шага — добавить ребёнка,
+     * назначить первое задание. Магазин наград и награды за уровни в онбординг
+     * не входят — это необязательные дополнения, а не обязательные подсистемы.
      */
     @GetMapping("/onboarding")
     public String onboarding(Model model) {
         try {
             List<ChildDto> children = userServiceClient.getChildren();
-            List<ShopItemDto> shopItems = userServiceClient.getShopItems();
-            List<TaskTemplateDto> templates = taskServiceClient.getActiveTemplates();
-
             boolean hasChildren = !children.isEmpty();
-            boolean hasLevelRewards = false;
-            if (hasChildren) {
-                hasLevelRewards = children.stream().allMatch(child -> {
-                    try {
-                        List<LevelRewardDto> rewards = userServiceClient.getLevelRewards(child.id());
-                        return rewards != null && rewards.size() >= 2;
-                    } catch (Exception e) {
-                        return false;
-                    }
-                });
-            }
+            boolean hasFirstAssignment = hasChildren && hasAnyAssignmentEver();
 
             model.addAttribute("hasChildren", hasChildren);
-            model.addAttribute("hasLevelRewards", hasLevelRewards);
-            model.addAttribute("hasShopItems", !shopItems.isEmpty());
-            model.addAttribute("hasTemplates", !templates.isEmpty());
+            model.addAttribute("hasFirstAssignment", hasFirstAssignment);
             model.addAttribute("children", children);
         } catch (Exception e) {
             log.error("Error loading onboarding: {}", e.getMessage());
             model.addAttribute("hasChildren", false);
-            model.addAttribute("hasLevelRewards", false);
-            model.addAttribute("hasShopItems", false);
-            model.addAttribute("hasTemplates", false);
+            model.addAttribute("hasFirstAssignment", false);
         }
         return "parent/onboarding";
+    }
+
+    /**
+     * Финальный шаг онбординга: первое задание назначено, приложение готово
+     * передавать ребёнку.
+     */
+    @GetMapping("/onboarding/done")
+    public String onboardingDone(Model model) {
+        try {
+            List<ChildDto> children = userServiceClient.getChildren();
+            model.addAttribute("child", children.isEmpty() ? null : children.get(children.size() - 1));
+        } catch (Exception e) {
+            log.error("Error loading onboarding done page: {}", e.getMessage());
+        }
+        return "parent/onboarding-done";
     }
 
     /**
@@ -157,6 +171,11 @@ public class ParentController {
     public String dashboard(Model model) {
         try {
             List<ChildDto> children = userServiceClient.getChildren();
+            // Родитель без единого ребёнка ещё не может пройти основной цикл — вместо
+            // пустого дашборда сразу направляем в сценарий добавления первого ребёнка.
+            if (children.isEmpty()) {
+                return "redirect:/parent/onboarding";
+            }
             List<TaskAssignmentDto> pendingReview = taskServiceClient.getPendingReview();
             List<TaskTemplateDto> templates = taskServiceClient.getActiveTemplates();
 
@@ -165,28 +184,10 @@ public class ParentController {
             model.addAttribute("pendingCount", pendingReview.size());
             model.addAttribute("templates", templates);
 
-            // Check onboarding completeness
+            // Онбординг считается неполным, пока нет ни ребёнка, ни первого назначенного
+            // задания — магазин наград и награды за уровни для запуска не обязательны.
             boolean hasChildren = !children.isEmpty();
-            boolean hasLevelRewards = false;
-            boolean hasShopItems = false;
-            boolean hasTemplates = false;
-            try {
-                hasShopItems = !userServiceClient.getShopItems().isEmpty();
-                hasTemplates = !templates.isEmpty();
-                if (hasChildren) {
-                    hasLevelRewards = children.stream().allMatch(child -> {
-                        try {
-                            List<LevelRewardDto> rewards = userServiceClient.getLevelRewards(child.id());
-                            return rewards != null && rewards.size() >= 2;
-                        } catch (Exception ex) {
-                            return false;
-                        }
-                    });
-                }
-            } catch (Exception ex) {
-                log.warn("Error checking onboarding status: {}", ex.getMessage());
-            }
-            boolean onboardingIncomplete = !hasChildren || !hasLevelRewards || !hasShopItems || !hasTemplates;
+            boolean onboardingIncomplete = !hasChildren || !hasAnyAssignmentEver();
             model.addAttribute("onboardingIncomplete", onboardingIncomplete);
 
             // Check unfilled level rewards for each child
@@ -302,6 +303,39 @@ public class ParentController {
             return "redirect:/parent/onboarding";
         }
         return "redirect:/parent/children";
+    }
+
+    /**
+     * Открыть кабинет ребёнка прямо с устройства родителя — ребёнку не нужно
+     * переписывать длинный технический токен на своём устройстве. Работает только
+     * для детей текущего родителя. Токен входа никогда не попадает в браузер.
+     */
+    @PostMapping("/children/{id}/open-cabinet")
+    public String openChildCabinet(
+            @PathVariable UUID id,
+            jakarta.servlet.http.HttpServletRequest request,
+            jakarta.servlet.http.HttpServletResponse response,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            ChildDto child = userServiceClient.getChildren().stream()
+                    .filter(c -> c.id().equals(id))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("Ребёнок не найден"));
+
+            Map<String, String> loginRequest = new HashMap<>();
+            loginRequest.put("loginToken", child.loginToken());
+            ru.taskhero.app.dto.LoginResponse loginResponse = userServiceClient.loginChild(loginRequest);
+
+            childSessionStarter.start(loginResponse, request, response);
+            log.info("Parent opened child cabinet for child {}", id);
+
+            return "redirect:/child/dashboard";
+        } catch (Exception e) {
+            log.error("Error opening child cabinet for {}: {}", id, e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Не удалось открыть кабинет ребёнка");
+            return "redirect:/parent/children";
+        }
     }
 
     /**
@@ -648,13 +682,17 @@ public class ParentController {
      * Страница назначения задания.
      */
     @GetMapping("/assign")
-    public String assignPage(Model model) {
+    public String assignPage(@RequestParam(required = false) boolean onboarding, Model model) {
         try {
             List<ChildDto> children = userServiceClient.getChildren();
             List<TaskTemplateDto> templates = taskServiceClient.getActiveTemplates();
 
             model.addAttribute("children", children);
             model.addAttribute("templates", templates);
+            // Если у родителя всего один ребёнок — выбирать его каждый раз не нужно,
+            // форма подставит его автоматически и скроет селектор.
+            model.addAttribute("singleChild", children.size() == 1 ? children.get(0) : null);
+            model.addAttribute("onboarding", onboarding);
 
         } catch (Exception e) {
             log.error("Error loading assign page: {}", e.getMessage());
@@ -666,56 +704,88 @@ public class ParentController {
 
     /**
      * Назначить задание.
+     * <p>
+     * Один путь для обеих исходных точек: выбор готового задания в форме — это лишь
+     * клиентское автозаполнение полей ниже (см. assign.html), а не отдельная ветка
+     * бизнес-логики. Если {@code templateId} передан — используем существующий шаблон
+     * как есть; если нет (родитель создаёт своё задание или изменил предзаполненные
+     * поля) — создаём новый шаблон из введённых значений.
      */
     @PostMapping("/assign")
     public String assignTask(
-            @RequestParam UUID childId,
-            @RequestParam(required = false) UUID templateId,
+            @RequestParam(required = false) UUID childId,
+            @RequestParam(required = false) String templateId,
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String description,
             @RequestParam(required = false) String dueDate,
             @RequestParam(required = false) String recurrenceRule,
-            @RequestParam(required = false) String quickTitle,
-            @RequestParam(required = false) String quickDescription,
-            @RequestParam(defaultValue = "10") int quickExpReward,
-            @RequestParam(defaultValue = "5") int quickCoinsReward,
-            @RequestParam(defaultValue = "NORMAL") String quickDifficulty,
-            @RequestParam(required = false) String quickCategory,
-            @RequestParam(defaultValue = "false") boolean saveAsTemplate,
-            @RequestParam(defaultValue = "false") boolean important,
+            @RequestParam(defaultValue = "5") int coinsReward,
+            @RequestParam(defaultValue = "false") boolean onboarding,
             RedirectAttributes redirectAttributes
     ) {
+        String redirectBack = "redirect:/parent/assign" + (onboarding ? "?onboarding=true" : "");
         try {
-            UUID finalTemplateId = templateId;
+            UUID finalChildId = childId;
+            if (finalChildId == null) {
+                List<ChildDto> children = userServiceClient.getChildren();
+                if (children.size() == 1) {
+                    finalChildId = children.get(0).id();
+                }
+            }
+            if (finalChildId == null) {
+                redirectAttributes.addFlashAttribute("error", "Выберите ребёнка");
+                return redirectBack;
+            }
 
-            // Быстрое создание разового задания
-            if (finalTemplateId == null && quickTitle != null && !quickTitle.isBlank()) {
+            UUID finalTemplateId;
+            try {
+                finalTemplateId = (templateId != null && !templateId.isBlank()) ? UUID.fromString(templateId) : null;
+            } catch (IllegalArgumentException ex) {
+                redirectAttributes.addFlashAttribute("error", "Некорректное задание");
+                return redirectBack;
+            }
+
+            // Своё задание (с нуля или изменённое после выбора готового)
+            if (finalTemplateId == null) {
+                if (title == null || title.isBlank()) {
+                    redirectAttributes.addFlashAttribute("error", "Введите название задания или выберите готовое");
+                    return redirectBack;
+                }
                 Map<String, Object> templateRequest = new HashMap<>();
-                templateRequest.put("title", quickTitle);
-                templateRequest.put("description", quickDescription);
-                templateRequest.put("expReward", quickExpReward);
-                templateRequest.put("coinsReward", quickCoinsReward);
-                templateRequest.put("difficulty", quickDifficulty);
-                if (quickCategory != null && !quickCategory.isBlank()) {
-                    templateRequest.put("category", quickCategory);
+                templateRequest.put("title", title);
+                templateRequest.put("description", description);
+                templateRequest.put("coinsReward", coinsReward);
+                // EXP теперь — системная величина: родитель её не задаёт, task-service
+                // применит разумное значение по умолчанию для нового шаблона.
+                if (recurrenceRule != null && !recurrenceRule.isBlank()) {
+                    templateRequest.put("recurrenceRule", recurrenceRule);
+                    templateRequest.put("repeatable", true);
                 }
-                if (!saveAsTemplate) {
-                    templateRequest.put("active", false); // Разовое, не сохранять как активный шаблон
-                }
+                // Шаблон создаётся активным независимо от того, разовое это задание или нет:
+                // assign() ниже проверяет template.isActive() и отклоняет назначение по
+                // неактивному шаблону — если создавать одноразовые задания неактивными
+                // (как было раньше), самое первое назначение по ним падало с ошибкой
+                // «Шаблон неактивен», которую родитель видел как «Ошибка назначения задания».
+                // Скрыть одноразовые задания из «Моих шаблонов» — отдельная задача управления
+                // библиотекой (страница «Мои шаблоны»), не часть быстрого создания.
                 TaskTemplateDto created = taskServiceClient.createTemplate(templateRequest);
                 finalTemplateId = created.id();
             }
 
-            if (finalTemplateId == null) {
-                redirectAttributes.addFlashAttribute("error", "Выберите задание или создайте новое");
-                return "redirect:/parent/assign";
+            Instant parsedDueDate;
+            try {
+                parsedDueDate = FormDateTimeParser.parseToInstant(dueDate);
+            } catch (IllegalArgumentException ex) {
+                redirectAttributes.addFlashAttribute("error", "Некорректный формат дедлайна");
+                return redirectBack;
             }
 
             Map<String, Object> request = new HashMap<>();
             request.put("templateId", finalTemplateId.toString());
-            request.put("childId", childId.toString());
-            if (dueDate != null && !dueDate.isEmpty()) {
-                request.put("dueDate", dueDate);
+            request.put("childId", finalChildId.toString());
+            if (parsedDueDate != null) {
+                request.put("dueDate", parsedDueDate.toString());
             }
-            request.put("important", important);
 
             taskServiceClient.assignTask(request);
 
@@ -723,7 +793,7 @@ public class ParentController {
                 Map<String, String> audit = new HashMap<>();
                 audit.put("action", "TASK_ASSIGNED");
                 audit.put("targetType", "ASSIGNMENT");
-                audit.put("details", "Назначено задание ребёнку " + childId);
+                audit.put("details", "Назначено задание ребёнку " + finalChildId);
                 adminServiceClient.createAuditEntry(audit);
             } catch (Exception ex) {
                 log.warn("Audit log failed: {}", ex.getMessage());
@@ -731,12 +801,33 @@ public class ParentController {
 
             redirectAttributes.addFlashAttribute("success", "Задание назначено!");
 
+            if (onboarding) {
+                return "redirect:/parent/onboarding/done";
+            }
+
         } catch (Exception e) {
             log.error("Error assigning task: {}", e.getMessage());
-            redirectAttributes.addFlashAttribute("error", "Ошибка назначения задания");
+            redirectAttributes.addFlashAttribute("error", extractErrorMessage(e, "Ошибка назначения задания"));
+            return redirectBack;
         }
 
         return "redirect:/parent/dashboard";
+    }
+
+    /**
+     * Извлечь читаемое сообщение об ошибке из тела ответа Feign (если оно есть),
+     * чтобы не показывать родителю обезличенное сообщение вместо настоящей причины.
+     */
+    private String extractErrorMessage(Exception e, String fallback) {
+        String msg = e.getMessage();
+        if (msg != null && msg.contains("\"message\":\"")) {
+            int start = msg.indexOf("\"message\":\"") + 11;
+            int end = msg.indexOf('"', start);
+            if (end > start) {
+                return msg.substring(start, end);
+            }
+        }
+        return fallback;
     }
 
     /**

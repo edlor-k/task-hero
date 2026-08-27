@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Назначить задание')}"></head>
+<head th:replace="~{fragments/layout :: head('Создать задание')}"></head>
 <body>
 <div class="th-layout">
     <nav th:replace="~{fragments/layout :: sidebar-parent}"></nav>
@@ -10,8 +10,8 @@
 
             <div class="lm-page-header">
                 <div>
-                    <h1 class="lm-page-title">Назначить задание</h1>
-                    <p class="lm-page-sub">Выберите ребёнка и шаблон или создайте задание вручную</p>
+                    <h1 class="lm-page-title">Создать задание</h1>
+                    <p class="lm-page-sub">Выберите готовое задание для быстрого заполнения или создайте своё</p>
                 </div>
             </div>
 
@@ -22,187 +22,99 @@
                 <i class="bi bi-exclamation-triangle-fill fs-5"></i><span th:text="${error}">Ошибка</span>
             </div>
 
-            <!-- Tabs -->
-            <ul class="nav nav-tabs mb-4" role="tablist">
-                <li class="nav-item">
-                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#fromTemplate" type="button">
-                        <i class="bi bi-journal-text me-1"></i>Из шаблона
-                    </button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#quickTask" type="button">
-                        <i class="bi bi-lightning me-1"></i>Быстрое задание
-                    </button>
-                </li>
-            </ul>
+            <div class="card">
+                <div class="card-body">
+                    <form th:action="@{/parent/assign}" method="post" id="assignForm">
+                        <input type="hidden" name="onboarding" th:value="${onboarding}">
+                        <input type="hidden" name="templateId" id="templateId" value="">
 
-            <div class="tab-content">
-                <!-- Tab: From template -->
-                <div class="tab-pane fade show active" id="fromTemplate">
-                    <div class="card">
-                        <div class="card-body">
-                            <form th:action="@{/parent/assign}" method="post">
-                                <input type="hidden" name="assignType" value="TEMPLATE">
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold">Ребёнок</label>
-                                        <select class="form-select" name="childId" required>
-                                            <option value="">Выберите ребёнка...</option>
-                                            <option th:each="child : ${children}"
-                                                    th:value="${child.id}"
-                                                    th:text="${child.firstName + ' ' + child.surname}">Ребёнок</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold">Шаблон</label>
-                                        <select class="form-select" name="templateId" required>
-                                            <option value="">Выберите шаблон...</option>
-                                            <option th:each="t : ${templates}"
-                                                    th:value="${t.id}"
-                                                    th:text="${t.title}">Шаблон</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold">Дедлайн (необязательно)</label>
-                                        <input type="datetime-local" class="form-control" id="templateDueDate" name="dueDate"
-                                               onchange="toggleDeadlineRecurrence()">
-                                        <small class="text-muted" id="dueDateHint" style="display:none;">Очистите дедлайн, чтобы выбрать повторение</small>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold">Повторение</label>
-                                        <select class="form-select" id="recurrenceSelect" name="recurrencePreset" onchange="updateRecurrenceRule(); toggleDeadlineRecurrence();">
-                                            <option value="">Без повторения</option>
-                                            <option value="DAILY">Ежедневно</option>
-                                            <option value="WEEKLY">Еженедельно</option>
-                                            <option value="MONTHLY">Ежемесячно</option>
-                                            <option value="CUSTOM">Настроить...</option>
-                                        </select>
-                                    </div>
+                        <div class="row g-3">
 
-                                    <!-- Custom recurrence -->
-                                    <div class="col-12" id="customRecurrence" style="display: none;">
-                                        <div class="card bg-body-secondary">
-                                            <div class="card-body">
-                                                <h6 class="fw-semibold mb-3">Настройка повторения</h6>
-                                                <div class="row g-3">
-                                                    <div class="col-md-4">
-                                                        <label class="form-label">Частота</label>
-                                                        <select id="customFreq" class="form-select" onchange="buildCustomRRule()">
-                                                            <option value="DAILY">Дни</option>
-                                                            <option value="WEEKLY">Недели</option>
-                                                            <option value="MONTHLY">Месяцы</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <label class="form-label">Интервал</label>
-                                                        <input type="number" id="customInterval" class="form-control" value="1" min="1" onchange="buildCustomRRule()">
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <label class="form-label">Повторений</label>
-                                                        <input type="number" id="customCount" class="form-control" value="10" min="1" onchange="buildCustomRRule()">
-                                                    </div>
-                                                    <div class="col-12" id="weekdaysRow" style="display: none;">
-                                                        <label class="form-label">Дни недели</label>
-                                                        <div class="d-flex flex-wrap gap-2">
-                                                            <div class="form-check" th:each="day : ${ {'MO','TU','WE','TH','FR','SA','SU'} }">
-                                                                <input class="form-check-input weekday-check" type="checkbox"
-                                                                       th:value="${day}" th:id="'day-' + ${day}" onchange="buildCustomRRule()">
-                                                                <label class="form-check-label" th:for="'day-' + ${day}"
-                                                                       th:text="${day == 'MO' ? 'Пн' : day == 'TU' ? 'Вт' : day == 'WE' ? 'Ср' : day == 'TH' ? 'Чт' : day == 'FR' ? 'Пт' : day == 'SA' ? 'Сб' : 'Вс'}">Пн</label>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                            <div class="col-md-6" th:if="${singleChild == null}">
+                                <label class="form-label fw-semibold">Ребёнок</label>
+                                <select class="form-select" name="childId" required>
+                                    <option value="">Выберите ребёнка...</option>
+                                    <option th:each="child : ${children}"
+                                            th:value="${child.id}"
+                                            th:text="${child.firstName}">Ребёнок</option>
+                                </select>
+                            </div>
+                            <input type="hidden" name="childId" th:if="${singleChild != null}" th:value="${singleChild.id}">
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Готовое задание <span class="text-muted fw-normal">(необязательно)</span></label>
+                                <select class="form-select" id="readyTaskSelect">
+                                    <option value="">— своё задание —</option>
+                                    <option th:each="t : ${templates}"
+                                            th:value="${t.id}"
+                                            th:text="${t.title}"
+                                            th:attr="data-title=${t.title},
+                                                     data-description=${t.description},
+                                                     data-coins=${t.coinsReward}">Задание</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Название</label>
+                                <input type="text" class="form-control" id="titleInput" name="title" required maxlength="128">
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Описание</label>
+                                <textarea class="form-control" id="descriptionInput" name="description" rows="2"
+                                          placeholder="Что именно нужно сделать?"></textarea>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Монеты за выполнение</label>
+                                <div class="d-flex gap-2 mb-2">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm coins-preset" data-coins="3">Маленькое · 3</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm coins-preset" data-coins="5">Обычное · 5</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm coins-preset" data-coins="10">Большое · 10</button>
+                                </div>
+                                <input type="number" class="form-control" id="coinsInput" name="coinsReward" min="0" max="500" value="5">
+                                <div class="form-text">Опыт начисляется автоматически — задавать его вручную не нужно.</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Дедлайн (необязательно)</label>
+                                <input type="datetime-local" class="form-control" id="dueDateInput" name="dueDate"
+                                       onchange="toggleDeadlineRecurrence()">
+                                <small class="text-muted" id="dueDateHint" style="display:none;">Очистите дедлайн, чтобы выбрать повторение</small>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Повторение</label>
+                                <select class="form-select" id="recurrenceSelect" onchange="updateRecurrenceRule(); toggleDeadlineRecurrence();">
+                                    <option value="">Не повторять</option>
+                                    <option value="DAILY">Каждый день</option>
+                                    <option value="WEEKDAYS">По будням</option>
+                                    <option value="WEEKLY">Каждую неделю</option>
+                                    <option value="CUSTOM_DAYS">Выбранные дни недели</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12" id="weekdaysRow" style="display:none;">
+                                <label class="form-label">Дни недели</label>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <div class="form-check" th:each="day : ${ {'MO','TU','WE','TH','FR','SA','SU'} }">
+                                        <input class="form-check-input weekday-check" type="checkbox"
+                                               th:value="${day}" th:id="'day-' + ${day}" onchange="buildCustomRRule()">
+                                        <label class="form-check-label" th:for="'day-' + ${day}"
+                                               th:text="${day == 'MO' ? 'Пн' : day == 'TU' ? 'Вт' : day == 'WE' ? 'Ср' : day == 'TH' ? 'Чт' : day == 'FR' ? 'Пт' : day == 'SA' ? 'Сб' : 'Вс'}">Пн</label>
                                     </div>
                                 </div>
-
-                                <input type="hidden" id="recurrenceRule" name="recurrenceRule">
-
-                                <div class="col-12">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="important" value="true" id="templateImportant">
-                                        <label class="form-check-label fw-semibold" for="templateImportant">
-                                            <i class="bi bi-exclamation-triangle text-warning me-1"></i>Важное задание
-                                        </label>
-                                        <div class="form-text">Без выполнения этого задания ребёнок не сможет перейти на новый уровень</div>
-                                    </div>
-                                </div>
-
-                                <div class="mt-4">
-                                    <button type="submit" class="btn btn-primary btn-lg">
-                                        <i class="bi bi-send me-1"></i>Назначить
-                                    </button>
-                                </div>
-                            </form>
+                            </div>
                         </div>
-                    </div>
-                </div>
 
-                <!-- Tab: Quick task -->
-                <div class="tab-pane fade" id="quickTask">
-                    <div class="card">
-                        <div class="card-body">
-                            <form th:action="@{/parent/assign}" method="post">
-                                <input type="hidden" name="assignType" value="QUICK">
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold">Ребёнок</label>
-                                        <select class="form-select" name="childId" required>
-                                            <option value="">Выберите ребёнка...</option>
-                                            <option th:each="child : ${children}"
-                                                    th:value="${child.id}"
-                                                    th:text="${child.firstName + ' ' + child.surname}">Ребёнок</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold">Название</label>
-                                        <input type="text" class="form-control" name="quickTitle" required>
-                                    </div>
-                                    <div class="col-12">
-                                        <label class="form-label fw-semibold">Описание</label>
-                                        <textarea class="form-control" name="quickDescription" rows="2"></textarea>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label fw-semibold">EXP награда</label>
-                                        <input type="number" class="form-control" name="quickExpReward" min="0" value="10">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label fw-semibold">Коины</label>
-                                        <input type="number" class="form-control" name="quickCoinsReward" min="0" value="5">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label fw-semibold">Сложность</label>
-                                        <select class="form-select" name="quickDifficulty">
-                                            <option value="EASY">Лёгкая</option>
-                                            <option value="NORMAL" selected>Средняя</option>
-                                            <option value="HARD">Сложная</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold">Дедлайн (необязательно)</label>
-                                        <input type="datetime-local" class="form-control" name="dueDate">
-                                    </div>
-                                    <div class="col-12">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="important" value="true" id="quickImportant">
-                                            <label class="form-check-label fw-semibold" for="quickImportant">
-                                                <i class="bi bi-exclamation-triangle text-warning me-1"></i>Важное задание
-                                            </label>
-                                            <div class="form-text">Без выполнения этого задания ребёнок не сможет перейти на новый уровень</div>
-                                        </div>
-                                    </div>
-                                </div>
+                        <input type="hidden" id="recurrenceRule" name="recurrenceRule">
 
-                                <div class="mt-4">
-                                    <button type="submit" class="btn btn-primary btn-lg">
-                                        <i class="bi bi-send me-1"></i>Назначить
-                                    </button>
-                                </div>
-                            </form>
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-send me-1"></i>Создать и назначить
+                            </button>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
 
@@ -213,61 +125,109 @@
 
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 <script>
+    // Выбор готового задания — это только автозаполнение полей формы ниже.
+    // Пока родитель ничего не менял вручную — форма отправит выбранный templateId как есть.
+    // Как только поле изменено — templateId сбрасывается, и сервер создаст новое задание
+    // из введённых значений (см. ParentController#assignTask).
+    let prefilled = null;
+
+    document.getElementById('readyTaskSelect').addEventListener('change', function () {
+        const option = this.options[this.selectedIndex];
+        const templateIdField = document.getElementById('templateId');
+        const titleField = document.getElementById('titleInput');
+        const descField = document.getElementById('descriptionInput');
+        const coinsField = document.getElementById('coinsInput');
+
+        if (!this.value) {
+            prefilled = null;
+            templateIdField.value = '';
+            return;
+        }
+
+        prefilled = {
+            title: option.getAttribute('data-title') || '',
+            description: option.getAttribute('data-description') || '',
+            coins: option.getAttribute('data-coins') || '5'
+        };
+        titleField.value = prefilled.title;
+        descField.value = prefilled.description;
+        coinsField.value = prefilled.coins;
+        templateIdField.value = this.value;
+    });
+
+    function detachFromTemplateIfEdited() {
+        if (!prefilled) return;
+        const titleField = document.getElementById('titleInput');
+        const descField = document.getElementById('descriptionInput');
+        const coinsField = document.getElementById('coinsInput');
+        const changed = titleField.value !== prefilled.title
+            || descField.value !== prefilled.description
+            || coinsField.value !== String(prefilled.coins);
+        if (changed) {
+            document.getElementById('templateId').value = '';
+        }
+    }
+
+    ['titleInput', 'descriptionInput', 'coinsInput'].forEach(id => {
+        document.getElementById(id).addEventListener('input', detachFromTemplateIfEdited);
+    });
+
+    // Пресеты монет
+    document.querySelectorAll('.coins-preset').forEach(btn => {
+        btn.addEventListener('click', function () {
+            document.getElementById('coinsInput').value = this.getAttribute('data-coins');
+            detachFromTemplateIfEdited();
+        });
+    });
+
     function updateRecurrenceRule() {
         const preset = document.getElementById('recurrenceSelect').value;
-        const customDiv = document.getElementById('customRecurrence');
+        const weekdaysRow = document.getElementById('weekdaysRow');
         const ruleInput = document.getElementById('recurrenceRule');
 
-        if (preset === 'CUSTOM') {
-            customDiv.style.display = 'block';
-            buildCustomRRule();
-        } else {
-            customDiv.style.display = 'none';
-            if (preset === 'DAILY') {
-                ruleInput.value = 'FREQ=DAILY;COUNT=30';
-            } else if (preset === 'WEEKLY') {
-                ruleInput.value = 'FREQ=WEEKLY;COUNT=12';
-            } else if (preset === 'MONTHLY') {
-                ruleInput.value = 'FREQ=MONTHLY;COUNT=6';
-            } else {
+        weekdaysRow.style.display = preset === 'CUSTOM_DAYS' ? 'block' : 'none';
+
+        switch (preset) {
+            case 'DAILY':
+                ruleInput.value = 'FREQ=DAILY';
+                break;
+            case 'WEEKDAYS':
+                ruleInput.value = 'FREQ=DAILY;BYDAY=MO,TU,WE,TH,FR';
+                break;
+            case 'WEEKLY':
+                ruleInput.value = 'FREQ=WEEKLY';
+                break;
+            case 'CUSTOM_DAYS':
+                buildCustomRRule();
+                break;
+            default:
                 ruleInput.value = '';
-            }
         }
     }
 
     function buildCustomRRule() {
-        const freq = document.getElementById('customFreq').value;
-        const interval = document.getElementById('customInterval').value;
-        const count = document.getElementById('customCount').value;
-        const weekdaysRow = document.getElementById('weekdaysRow');
-
-        weekdaysRow.style.display = freq === 'WEEKLY' ? 'block' : 'none';
-
-        let rule = 'FREQ=' + freq + ';INTERVAL=' + interval + ';COUNT=' + count;
-
-        if (freq === 'WEEKLY') {
-            const checked = document.querySelectorAll('.weekday-check:checked');
-            if (checked.length > 0) {
-                const days = Array.from(checked).map(c => c.value).join(',');
-                rule += ';BYDAY=' + days;
-            }
+        const checked = document.querySelectorAll('.weekday-check:checked');
+        const ruleInput = document.getElementById('recurrenceRule');
+        if (checked.length === 0) {
+            ruleInput.value = '';
+            return;
         }
-
-        document.getElementById('recurrenceRule').value = rule;
+        const days = Array.from(checked).map(c => c.value).join(',');
+        ruleInput.value = 'FREQ=WEEKLY;BYDAY=' + days;
     }
 
     function toggleDeadlineRecurrence() {
-        var dueDate = document.getElementById('templateDueDate');
-        var recurrence = document.getElementById('recurrenceSelect');
-        var hint = document.getElementById('dueDateHint');
-        var customDiv = document.getElementById('customRecurrence');
-        var ruleInput = document.getElementById('recurrenceRule');
+        const dueDate = document.getElementById('dueDateInput');
+        const recurrence = document.getElementById('recurrenceSelect');
+        const hint = document.getElementById('dueDateHint');
+        const weekdaysRow = document.getElementById('weekdaysRow');
+        const ruleInput = document.getElementById('recurrenceRule');
 
         if (dueDate.value) {
             recurrence.value = '';
             recurrence.disabled = true;
             ruleInput.value = '';
-            customDiv.style.display = 'none';
+            weekdaysRow.style.display = 'none';
             hint.style.display = 'block';
         } else if (recurrence.value) {
             dueDate.value = '';
@@ -279,33 +239,6 @@
             hint.style.display = 'none';
         }
     }
-
-    // Difficulty hint for quick task rewards
-    (function() {
-        const multipliers = { EASY: 0.8, NORMAL: 1.0, HARD: 1.5 };
-        const quickDifficulty = document.querySelector('#quickTask select[name="quickDifficulty"]');
-        const quickExp = document.querySelector('#quickTask input[name="quickExpReward"]');
-        const quickCoins = document.querySelector('#quickTask input[name="quickCoinsReward"]');
-        if (!quickDifficulty || !quickExp || !quickCoins) return;
-
-        let baseExp = parseInt(quickExp.value || '10');
-        let baseCoins = parseInt(quickCoins.value || '5');
-
-        quickDifficulty.addEventListener('change', function() {
-            const mult = multipliers[this.value] || 1.0;
-            quickExp.value = Math.round(baseExp * mult);
-            quickCoins.value = Math.round(baseCoins * mult);
-        });
-
-        quickExp.addEventListener('input', function() {
-            const mult = multipliers[quickDifficulty.value] || 1.0;
-            baseExp = Math.round(parseInt(this.value || '0') / mult);
-        });
-        quickCoins.addEventListener('input', function() {
-            const mult = multipliers[quickDifficulty.value] || 1.0;
-            baseCoins = Math.round(parseInt(this.value || '0') / mult);
-        });
-    })();
 </script>
 </body>
 </html>

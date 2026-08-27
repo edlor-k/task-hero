@@ -98,4 +98,10 @@ public interface TaskTemplateRepository extends JpaRepository<TaskTemplate, UUID
      * Найти системный шаблон вводного задания.
      */
     java.util.Optional<TaskTemplate> findByParentIdAndTitleAndLibraryTemplateFalse(UUID parentId, String title);
+
+    /**
+     * Найти все активные повторяющиеся шаблоны с заданным правилом повторения
+     * (используется планировщиком для автоматической генерации очередных заданий).
+     */
+    List<TaskTemplate> findAllByActiveTrueAndRepeatableTrueAndRecurrenceRuleIsNotNull();
 }
