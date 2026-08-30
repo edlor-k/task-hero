@@ -73,6 +73,22 @@ public interface ChildService {
     ChildResponseDto addReward(UUID childId, int exp, int coins, boolean capExp);
 
     /**
+     * Начислить награду ребёнку идемпотентно, привязав её к источнику (обычно —
+     * ID назначения задания в task-service). Повторный вызов с тем же
+     * {@code sourceAssignmentId} не начислит награду повторно — используется для
+     * защиты от повторного подтверждения (двойной клик, ретрай после сбоя,
+     * конкурентные запросы).
+     *
+     * @param childId            ID ребёнка
+     * @param sourceAssignmentId ID назначения задания — источник награды (может быть {@code null},
+     *                           тогда защита от дублирования не применяется)
+     * @param exp                количество EXP
+     * @param coins              количество коинов
+     * @param capExp             ограничить EXP максимумом текущего уровня
+     */
+    ChildResponseDto addRewardForAssignment(UUID childId, UUID sourceAssignmentId, int exp, int coins, boolean capExp);
+
+    /**
      * Выбрать аватар из галереи для ребёнка (при первом входе или позже).
      *
      * @param childId       ID ребёнка

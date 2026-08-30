@@ -11,10 +11,13 @@ import ru.taskhero.common.exception.ResourceNotFoundException;
 import ru.taskhero.common.exception.UnauthorizedException;
 import ru.taskhero.common.exception.ValidationException;
 import ru.taskhero.common.model.enums.TaskStatus;
+import ru.taskhero.taskservice.dto.AssignTaskRequest;
 import ru.taskhero.taskservice.dto.TaskAssignRequest;
 import ru.taskhero.taskservice.dto.TaskAssignmentResponseDto;
 import ru.taskhero.taskservice.dto.TaskReviewRequest;
 import ru.taskhero.taskservice.dto.TaskSubmitRequest;
+import ru.taskhero.taskservice.dto.TaskTemplateCreateRequest;
+import ru.taskhero.taskservice.dto.TaskTemplateResponseDto;
 import ru.taskhero.taskservice.entity.TaskAssignment;
 import ru.taskhero.taskservice.entity.TaskTemplate;
 import ru.taskhero.taskservice.mapper.TaskAssignmentMapper;
@@ -99,11 +102,43 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
             assignment.setReviewedAt(Instant.now());
             assignment.setExpEarned(expToGrant);
             assignment.setCoinsEarned(coinsToGrant);
-            rewardService.grantReward(request.childId(), expToGrant, coinsToGrant, false);
+            rewardService.grantReward(request.childId(), assignment.getId(), expToGrant, coinsToGrant, false);
             log.info("Задание {} автоподтверждено: {} EXP, {} коинов", assignment.getId(), expToGrant, coinsToGrant);
         }
 
         return assignmentMapper.toDto(assignment);
+    }
+
+    @Override
+    @Transactional
+    @LogMethod("assignment-create-template-and-assign")
+    public TaskAssignmentResponseDto createTemplateAndAssign(UUID parentId, AssignTaskRequest request) {
+        log.info("Атомарное назначение задания ребёнку {} от родителя {} (templateId={})",
+                request.childId(), parentId, request.templateId());
+
+        UUID templateId = request.templateId();
+
+        // Если существующий шаблон не выбран — создаём новый в ЭТОЙ ЖЕ транзакции.
+        // Метод assign() ниже вызывается напрямую (без прохождения через прокси), поэтому
+        // выполняется в той же транзакции, что и create() — если assign() бросит исключение
+        // после того, как шаблон уже сохранён, вся транзакция (включая INSERT шаблона)
+        // откатится, и осиротевшего TaskTemplate не останется.
+        if (templateId == null) {
+            if (request.title() == null || request.title().isBlank()) {
+                throw new ValidationException("Введите название задания или выберите готовое");
+            }
+            boolean repeatable = request.recurrenceRule() != null && !request.recurrenceRule().isBlank();
+            TaskTemplateCreateRequest createRequest = new TaskTemplateCreateRequest(
+                    request.title(), request.description(), null, request.coinsReward(),
+                    repeatable, null, null, null, null, null,
+                    request.recurrenceRule(), null, false, null, null);
+            TaskTemplateResponseDto created = templateService.create(parentId, createRequest);
+            templateId = created.id();
+        }
+
+        TaskAssignRequest assignRequest = new TaskAssignRequest(
+                templateId, request.childId(), request.dueDate(), request.important());
+        return assign(parentId, assignRequest);
     }
 
     @Override
@@ -213,7 +248,7 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
             assignment.setExpEarned(expToGrant);
             assignment.setCoinsEarned(coinsToGrant);
             assignment = assignmentRepository.save(assignment);
-            rewardService.grantReward(childId, expToGrant, coinsToGrant, false);
+            rewardService.grantReward(childId, assignment.getId(), expToGrant, coinsToGrant, false);
             try {
                 userServiceClient.unlockNickname(childId);
                 log.info("Никнейм ребёнка {} разблокирован после вводного задания", childId);
@@ -260,7 +295,7 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
         // Невыполненные важные задания больше не блокируют прогресс уровня — это
         // превращало отставание в наказание. Признак important сохранён технически
         // (используется только для визуальной пометки), но на начисление не влияет.
-        rewardService.grantReward(assignment.getChildId(), expToGrant, coinsToGrant, false);
+        rewardService.grantReward(assignment.getChildId(), assignment.getId(), expToGrant, coinsToGrant, false);
 
         log.info("Задание {} одобрено, начислено {} EXP и {} коинов",
                 assignmentId, expToGrant, coinsToGrant);

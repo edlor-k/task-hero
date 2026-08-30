@@ -22,6 +22,7 @@ import ru.taskhero.userservice.repository.AvatarOptionRepository;
 import ru.taskhero.userservice.repository.ChildRepository;
 import ru.taskhero.userservice.repository.ParentRepository;
 import ru.taskhero.userservice.service.impl.ChildServiceImpl;
+import ru.taskhero.userservice.service.impl.RewardGrantGuard;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +33,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -59,6 +62,9 @@ class ChildServiceImplTest {
 
     @Mock
     private AuditService auditService;
+
+    @Mock
+    private RewardGrantGuard rewardGrantGuard;
 
     @InjectMocks
     private ChildServiceImpl childService;
@@ -285,5 +291,58 @@ class ChildServiceImplTest {
 
         // Then
         assertThat(result).isFalse();
+    }
+
+    @Test
+    @DisplayName("addRewardForAssignment: должен начислить награду при первом обращении с этим ID назначения")
+    void shouldGrantRewardOnFirstCallForAssignment() {
+        // Given
+        UUID assignmentId = UUID.randomUUID();
+        when(rewardGrantGuard.tryRecord(childId, assignmentId, 25, 10)).thenReturn(true);
+        when(childRepository.findById(childId)).thenReturn(Optional.of(child));
+        when(childRepository.save(any(Child.class))).thenReturn(child);
+        when(childMapper.toDto(any(Child.class), anyInt(), anyInt(), anyInt(), any())).thenReturn(childResponseDto);
+
+        // When
+        ChildResponseDto result = childService.addRewardForAssignment(childId, assignmentId, 25, 10, false);
+
+        // Then
+        assertThat(result).isNotNull();
+        verify(rewardGrantGuard).tryRecord(childId, assignmentId, 25, 10);
+        verify(childRepository).save(any(Child.class));
+    }
+
+    @Test
+    @DisplayName("addRewardForAssignment: не должен начислять награду повторно за то же назначение " +
+            "(идемпотентность — защита от двойного клика, ретрая и конкурентных запросов)")
+    void shouldNotGrantRewardTwiceForSameAssignment() {
+        // Given — леджер сообщает, что награда за это назначение уже зарегистрирована
+        UUID assignmentId = UUID.randomUUID();
+        when(rewardGrantGuard.tryRecord(childId, assignmentId, 25, 10)).thenReturn(false);
+        when(childRepository.findById(childId)).thenReturn(Optional.of(child));
+        when(childMapper.toDto(any(Child.class), anyInt(), anyInt(), anyInt(), any())).thenReturn(childResponseDto);
+
+        // When
+        ChildResponseDto result = childService.addRewardForAssignment(childId, assignmentId, 25, 10, false);
+
+        // Then — баланс не пересчитывается и не сохраняется повторно
+        assertThat(result).isNotNull();
+        verify(childRepository, never()).save(any(Child.class));
+    }
+
+    @Test
+    @DisplayName("addRewardForAssignment: без ID назначения ведёт себя как обычное начисление (без дедупликации)")
+    void shouldGrantRewardWithoutDeduplicationWhenNoAssignmentId() {
+        // Given
+        when(childRepository.findById(childId)).thenReturn(Optional.of(child));
+        when(childRepository.save(any(Child.class))).thenReturn(child);
+        when(childMapper.toDto(any(Child.class), anyInt(), anyInt(), anyInt(), any())).thenReturn(childResponseDto);
+
+        // When
+        childService.addRewardForAssignment(childId, null, 25, 10, false);
+
+        // Then
+        verify(rewardGrantGuard, never()).tryRecord(any(), any(), anyInt(), anyInt());
+        verify(childRepository, times(1)).save(any(Child.class));
     }
 }

@@ -11,6 +11,7 @@ import ru.taskhero.common.exception.ResourceNotFoundException;
 import ru.taskhero.common.exception.UnauthorizedException;
 import ru.taskhero.common.exception.ValidationException;
 import ru.taskhero.common.model.enums.TaskStatus;
+import ru.taskhero.taskservice.dto.AssignTaskRequest;
 import ru.taskhero.taskservice.dto.TaskAssignRequest;
 import ru.taskhero.taskservice.dto.TaskAssignmentResponseDto;
 import ru.taskhero.taskservice.dto.TaskReviewRequest;
@@ -55,6 +56,9 @@ class TaskAssignmentServiceImplTest {
     @Mock
     private RewardService rewardService;
 
+    @Mock
+    private TaskTemplateService templateService;
+
     @InjectMocks
     private TaskAssignmentServiceImpl assignmentService;
 
@@ -83,6 +87,7 @@ class TaskAssignmentServiceImplTest {
                 .build();
 
         assignment = TaskAssignment.builder()
+                .id(assignmentId)
                 .template(template)
                 .childId(childId)
                 .status(TaskStatus.CREATED)
@@ -241,7 +246,7 @@ class TaskAssignmentServiceImplTest {
         // Then
         assertThat(result).isNotNull();
         assertThat(result.status()).isEqualTo(TaskStatus.APPROVED);
-        verify(rewardService).grantReward(childId, 25, 10, false);
+        verify(rewardService).grantReward(childId, assignmentId, 25, 10, false);
     }
 
     @Test
@@ -300,7 +305,7 @@ class TaskAssignmentServiceImplTest {
         assertThatThrownBy(() -> assignmentService.approve(assignmentId, parentId, request))
                 .isInstanceOf(ValidationException.class);
 
-        verify(rewardService, never()).grantReward(any(), anyInt(), anyInt(), anyBoolean());
+        verify(rewardService, never()).grantReward(any(), any(), anyInt(), anyInt(), anyBoolean());
         verify(assignmentRepository, never()).save(any());
     }
 
@@ -368,5 +373,69 @@ class TaskAssignmentServiceImplTest {
 
         // Then
         assertThat(result).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("createTemplateAndAssign: должен создать шаблон и назначить задание, если templateId не передан")
+    void shouldCreateTemplateAndAssignWhenTemplateIdMissing() {
+        // Given
+        AssignTaskRequest request = new AssignTaskRequest(
+                null, childId, null, null, "Новое задание", "Описание", 7, null);
+
+        TaskTemplateResponseDto createdTemplateDto = new TaskTemplateResponseDto(
+                templateId, parentId, "Новое задание", "Описание",
+                10, 7, false, null, null, null, null,
+                null, null, null, true, false, false, null, null, null, Instant.now(), null
+        );
+        when(templateService.create(eq(parentId), any())).thenReturn(createdTemplateDto);
+        when(templateRepository.findById(templateId)).thenReturn(Optional.of(template));
+        when(assignmentRepository.existsByChildIdAndTemplateIdAndStatusIn(eq(childId), eq(templateId), any()))
+                .thenReturn(false);
+        when(assignmentRepository.save(any(TaskAssignment.class))).thenReturn(assignment);
+        when(assignmentMapper.toDto(assignment)).thenReturn(responseDto);
+
+        // When
+        TaskAssignmentResponseDto result = assignmentService.createTemplateAndAssign(parentId, request);
+
+        // Then
+        assertThat(result).isNotNull();
+        verify(templateService).create(eq(parentId), any());
+        verify(assignmentRepository).save(any(TaskAssignment.class));
+    }
+
+    @Test
+    @DisplayName("createTemplateAndAssign: не должен создавать шаблон, если название пустое " +
+            "(регрессия «Ошибка назначения задания»: раньше эта проверка выполнялась ПОСЛЕ создания шаблона)")
+    void shouldNotCreateTemplateWhenTitleBlank() {
+        // Given — templateId не передан и название пустое
+        AssignTaskRequest request = new AssignTaskRequest(
+                null, childId, null, null, "   ", null, 5, null);
+
+        // When & Then
+        assertThatThrownBy(() -> assignmentService.createTemplateAndAssign(parentId, request))
+                .isInstanceOf(ValidationException.class);
+
+        verify(templateService, never()).create(any(), any());
+        verify(assignmentRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("createTemplateAndAssign: должен использовать существующий шаблон и не создавать новый, если templateId передан")
+    void shouldReuseExistingTemplateWhenTemplateIdProvided() {
+        // Given
+        AssignTaskRequest request = new AssignTaskRequest(
+                templateId, childId, null, null, null, null, null, null);
+
+        when(templateRepository.findById(templateId)).thenReturn(Optional.of(template));
+        when(assignmentRepository.existsByChildIdAndTemplateIdAndStatusIn(eq(childId), eq(templateId), any()))
+                .thenReturn(false);
+        when(assignmentRepository.save(any(TaskAssignment.class))).thenReturn(assignment);
+        when(assignmentMapper.toDto(assignment)).thenReturn(responseDto);
+
+        // When
+        assignmentService.createTemplateAndAssign(parentId, request);
+
+        // Then
+        verify(templateService, never()).create(any(), any());
     }
 }

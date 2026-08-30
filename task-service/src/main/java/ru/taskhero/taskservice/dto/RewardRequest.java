@@ -3,6 +3,8 @@ package ru.taskhero.taskservice.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 
+import java.util.UUID;
+
 /**
  * DTO для начисления наград ребёнку.
  * Используется при взаимодействии с user-service.
@@ -19,6 +21,11 @@ public record RewardRequest(
         int coins,
 
         @Schema(description = "Ограничить EXP максимумом текущего уровня")
-        boolean capExp
+        boolean capExp,
+
+        @Schema(description = "ID назначения задания — источник награды. " +
+                "Используется user-service как ключ идемпотентности: повторный запрос " +
+                "с тем же ID не приведёт к повторному начислению.")
+        UUID sourceAssignmentId
 ) {
 }

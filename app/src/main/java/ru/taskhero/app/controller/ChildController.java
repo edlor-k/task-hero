@@ -20,6 +20,7 @@ import ru.taskhero.app.dto.LevelRewardDto;
 import ru.taskhero.app.dto.ShopItemDto;
 import ru.taskhero.app.dto.ShopPurchaseDto;
 import ru.taskhero.app.dto.TaskAssignmentDto;
+import ru.taskhero.app.util.TaskAssignmentCounters;
 
 import java.util.HashMap;
 import java.util.List;
@@ -135,17 +136,20 @@ public class ChildController {
             List<TaskAssignmentDto> allAssignments = taskServiceClient.getMyAssignments(null);
 
             // Подсчёт статистики
-            long completedCount = allAssignments.stream()
-                    .filter(a -> "APPROVED".equals(a.status()))
-                    .count();
-            long pendingCount = activeAssignments.size();
+            long completedCount = TaskAssignmentCounters.countByStatus(allAssignments, "APPROVED");
+            // «На проверке» — только реально ОТПРАВЛЕННЫЕ ребёнком задания (SUBMITTED),
+            // а не все активные (CREATED тоже входит в getMyActiveAssignments()). Иначе
+            // счётчик показывает ещё не сданные задания как будто они уже ждут решения
+            // родителя — расхождение с тем, как этот же статус считает родительский кабинет.
+            long submittedCount = TaskAssignmentCounters.countByStatus(activeAssignments, "SUBMITTED");
+            long activeCount = activeAssignments.size();
 
             int totalExp = childProfile.exp();
             int totalCoins = childProfile.coins();
 
             model.addAttribute("activeAssignments", activeAssignments);
             model.addAttribute("completedCount", completedCount);
-            model.addAttribute("pendingCount", pendingCount);
+            model.addAttribute("pendingCount", submittedCount);
             model.addAttribute("totalExp", totalExp);
             model.addAttribute("totalCoins", totalCoins);
 
@@ -166,7 +170,7 @@ public class ChildController {
                                     .atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()))
                     .count();
             model.addAttribute("todayDoneCount", approvedToday);
-            model.addAttribute("todayTotalCount", approvedToday + pendingCount);
+            model.addAttribute("todayTotalCount", approvedToday + activeCount);
 
             // Reassigned tasks: tasks that were extended after expiration
             List<TaskAssignmentDto> reassigned = activeAssignments.stream()

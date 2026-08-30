@@ -20,6 +20,7 @@
   </licenses>
   <properties>
     <spring.kafka.version>3.2.4</spring.kafka.version>
+    <feign-form.version>3.8.0</feign-form.version>
     <liquibase.version>4.31.1</liquibase.version>
     <zipkin.version>2.16.3</zipkin.version>
     <spring.boot.version>3.4.0</spring.boot.version>
@@ -27,6 +28,7 @@
     <spring.doc.version>2.8.13</spring.doc.version>
     <spring.cloud.version>2024.0.0</spring.cloud.version>
     <lombok.version>1.18.34</lombok.version>
+    <aws-sdk.version>2.29.52</aws-sdk.version>
     <feign-okhttp.version>13.5</feign-okhttp.version>
     <mapstruct.version>1.6.0</mapstruct.version>
     <jjwt.version>0.11.5</jjwt.version>
@@ -49,6 +51,13 @@
         <groupId>org.springframework.cloud</groupId>
         <artifactId>spring-cloud-dependencies</artifactId>
         <version>${spring.cloud.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>software.amazon.awssdk</groupId>
+        <artifactId>bom</artifactId>
+        <version>${aws-sdk.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -76,6 +85,16 @@
         <groupId>io.github.openfeign</groupId>
         <artifactId>feign-okhttp</artifactId>
         <version>${feign-okhttp.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.github.openfeign.form</groupId>
+        <artifactId>feign-form</artifactId>
+        <version>${feign-form.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.github.openfeign.form</groupId>
+        <artifactId>feign-form-spring</artifactId>
+        <version>${feign-form.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.cloud</groupId>

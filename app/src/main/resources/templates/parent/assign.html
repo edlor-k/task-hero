@@ -26,7 +26,8 @@
                 <div class="card-body">
                     <form th:action="@{/parent/assign}" method="post" id="assignForm">
                         <input type="hidden" name="onboarding" th:value="${onboarding}">
-                        <input type="hidden" name="templateId" id="templateId" value="">
+                        <input type="hidden" name="templateId" id="templateId"
+                               th:value="${formValues != null ? formValues.get('templateId') : ''}">
 
                         <div class="row g-3">
 
@@ -36,7 +37,8 @@
                                     <option value="">Выберите ребёнка...</option>
                                     <option th:each="child : ${children}"
                                             th:value="${child.id}"
-                                            th:text="${child.firstName}">Ребёнок</option>
+                                            th:text="${child.firstName}"
+                                            th:selected="${formValues != null and formValues.get('childId') == child.id.toString()}">Ребёнок</option>
                                 </select>
                             </div>
                             <input type="hidden" name="childId" th:if="${singleChild != null}" th:value="${singleChild.id}">
@@ -56,13 +58,15 @@
 
                             <div class="col-12">
                                 <label class="form-label fw-semibold">Название</label>
-                                <input type="text" class="form-control" id="titleInput" name="title" required maxlength="128">
+                                <input type="text" class="form-control" id="titleInput" name="title" required maxlength="128"
+                                       th:value="${formValues != null ? formValues.get('title') : ''}">
                             </div>
 
                             <div class="col-12">
                                 <label class="form-label fw-semibold">Описание</label>
                                 <textarea class="form-control" id="descriptionInput" name="description" rows="2"
-                                          placeholder="Что именно нужно сделать?"></textarea>
+                                          placeholder="Что именно нужно сделать?"
+                                          th:text="${formValues != null ? formValues.get('description') : ''}"></textarea>
                             </div>
 
                             <div class="col-md-6">
@@ -72,13 +76,15 @@
                                     <button type="button" class="btn btn-outline-secondary btn-sm coins-preset" data-coins="5">Обычное · 5</button>
                                     <button type="button" class="btn btn-outline-secondary btn-sm coins-preset" data-coins="10">Большое · 10</button>
                                 </div>
-                                <input type="number" class="form-control" id="coinsInput" name="coinsReward" min="0" max="500" value="5">
+                                <input type="number" class="form-control" id="coinsInput" name="coinsReward" min="0" max="500"
+                                       th:value="${formValues != null ? formValues.get('coinsReward') : 5}">
                                 <div class="form-text">Опыт начисляется автоматически — задавать его вручную не нужно.</div>
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Дедлайн (необязательно)</label>
                                 <input type="datetime-local" class="form-control" id="dueDateInput" name="dueDate"
+                                       th:value="${formValues != null ? formValues.get('dueDateLocal') : ''}"
                                        onchange="toggleDeadlineRecurrence()">
                                 <small class="text-muted" id="dueDateHint" style="display:none;">Очистите дедлайн, чтобы выбрать повторение</small>
                             </div>
@@ -107,7 +113,8 @@
                             </div>
                         </div>
 
-                        <input type="hidden" id="recurrenceRule" name="recurrenceRule">
+                        <input type="hidden" id="recurrenceRule" name="recurrenceRule"
+                               th:value="${formValues != null ? formValues.get('recurrenceRule') : ''}">
 
                         <div class="mt-4">
                             <button type="submit" class="btn btn-primary btn-lg">

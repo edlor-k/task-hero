@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.taskhero.common.exception.ExceptionBody;
 import ru.taskhero.common.model.enums.TaskStatus;
+import ru.taskhero.taskservice.dto.AssignTaskRequest;
 import ru.taskhero.taskservice.dto.TaskAssignRequest;
 import ru.taskhero.taskservice.dto.TaskAssignmentResponseDto;
 import ru.taskhero.taskservice.dto.TaskReviewRequest;
@@ -92,6 +93,39 @@ public class TaskAssignmentController {
         log.info("Запрос на назначение задания от родителя: {}", parentId);
 
         TaskAssignmentResponseDto response = assignmentService.assign(parentId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    /**
+     * Атомарно создать шаблон (если нужно) и назначить задание ребёнку — единая транзакция.
+     *
+     * @param request данные для создания шаблона (опционально) и назначения
+     * @return созданное назначение
+     */
+    @PostMapping("/assign-with-template")
+    @PreAuthorize("hasRole('PARENT')")
+    @Operation(
+            summary = "Создать шаблон (если нужно) и назначить задание — атомарно",
+            description = "Если templateId не передан, создаёт новый шаблон и сразу назначает его ребёнку " +
+                    "в одной транзакции: при любой ошибке не сохраняется ни шаблон, ни назначение"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Задание назначено",
+                    content = @Content(schema = @Schema(implementation = TaskAssignmentResponseDto.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Некорректные данные",
+                    content = @Content(schema = @Schema(implementation = ExceptionBody.class))
+            )
+    })
+    public ResponseEntity<TaskAssignmentResponseDto> assignWithTemplate(@Valid @RequestBody AssignTaskRequest request) {
+        UUID parentId = SecurityUtils.getCurrentUserId();
+        log.info("Запрос на атомарное создание шаблона и назначение задания от родителя: {}", parentId);
+
+        TaskAssignmentResponseDto response = assignmentService.createTemplateAndAssign(parentId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

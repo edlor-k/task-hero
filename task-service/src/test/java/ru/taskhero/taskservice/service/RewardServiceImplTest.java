@@ -54,6 +54,31 @@ class RewardServiceImplTest {
     }
 
     @Test
+    @DisplayName("Должен передать ID назначения как ключ идемпотентности при начислении награды")
+    void shouldPassSourceAssignmentIdForIdempotency() {
+        // Given
+        UUID childId = UUID.randomUUID();
+        UUID assignmentId = UUID.randomUUID();
+
+        ChildResponseDto mockResponse = new ChildResponseDto(
+                childId, "Вася", "Иванов", "token123",
+                100, 50, 2, null, Instant.now(), null
+        );
+        when(userServiceClient.addReward(eq(childId), any(RewardRequest.class)))
+                .thenReturn(mockResponse);
+
+        // When
+        rewardService.grantReward(childId, assignmentId, 25, 10, false);
+
+        // Then
+        org.mockito.ArgumentCaptor<RewardRequest> captor = org.mockito.ArgumentCaptor.forClass(RewardRequest.class);
+        verify(userServiceClient).addReward(eq(childId), captor.capture());
+        assertThat(captor.getValue().sourceAssignmentId()).isEqualTo(assignmentId);
+        assertThat(captor.getValue().exp()).isEqualTo(25);
+        assertThat(captor.getValue().coins()).isEqualTo(10);
+    }
+
+    @Test
     @DisplayName("Должен рассчитать уровень 1 для EXP < 100")
     void shouldCalculateLevelOneForLowExp() {
         // When

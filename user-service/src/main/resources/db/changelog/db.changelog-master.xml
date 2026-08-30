@@ -23,4 +23,5 @@
     <include file="db/changelog/migrations/016-add-avatar-options.xml"/>
     <include file="db/changelog/migrations/017-add-background-options.xml"/>
     <include file="db/changelog/migrations/018-add-accent-color.xml"/>
+    <include file="db/changelog/migrations/019-create-reward-grants.xml"/>
 </databaseChangeLog>

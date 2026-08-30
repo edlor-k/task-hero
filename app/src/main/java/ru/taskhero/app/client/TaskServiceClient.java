@@ -112,10 +112,17 @@ public interface TaskServiceClient {
     );
 
     /**
-     * Назначить задание.
+     * Назначить задание (по существующему шаблону).
      */
     @PostMapping("/assignments")
     TaskAssignmentDto assignTask(@RequestBody Map<String, Object> request);
+
+    /**
+     * Атомарно создать шаблон (если templateId не передан) и назначить задание —
+     * одна транзакция БД на стороне task-service: либо сохраняется всё, либо ничего.
+     */
+    @PostMapping("/assignments/assign-with-template")
+    TaskAssignmentDto assignTaskWithTemplate(@RequestBody Map<String, Object> request);
 
     /**
      * Одобрить задание.

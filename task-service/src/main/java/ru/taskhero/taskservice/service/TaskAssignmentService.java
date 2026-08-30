@@ -3,6 +3,7 @@ package ru.taskhero.taskservice.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import ru.taskhero.common.model.enums.TaskStatus;
+import ru.taskhero.taskservice.dto.AssignTaskRequest;
 import ru.taskhero.taskservice.dto.TaskAssignRequest;
 import ru.taskhero.taskservice.dto.TaskAssignmentResponseDto;
 import ru.taskhero.taskservice.dto.TaskReviewRequest;
@@ -25,6 +26,18 @@ public interface TaskAssignmentService {
      * @return созданное назначение
      */
     TaskAssignmentResponseDto assign(UUID parentId, TaskAssignRequest request);
+
+    /**
+     * Атомарно создать шаблон (если {@code templateId} не передан) и назначить задание —
+     * единая транзакция БД: либо сохраняется и шаблон, и назначение, либо не сохраняется
+     * ничего. Устраняет сценарий, при котором ошибка назначения (например, невалидный
+     * дедлайн) оставляет в БД шаблон без единого назначения.
+     *
+     * @param parentId ID родителя
+     * @param request  данные для создания шаблона (опционально) и назначения
+     * @return созданное назначение
+     */
+    TaskAssignmentResponseDto createTemplateAndAssign(UUID parentId, AssignTaskRequest request);
 
     /**
      * Получить назначение по ID.

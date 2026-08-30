@@ -33,16 +33,23 @@ public class RewardServiceImpl implements RewardService {
     @Override
     @LogMethod("reward-grant")
     public void grantReward(UUID childId, int exp, int coins) {
-        grantReward(childId, exp, coins, false);
+        grantReward(childId, null, exp, coins, false);
     }
 
     @Override
     @LogMethod("reward-grant")
     public void grantReward(UUID childId, int exp, int coins, boolean capExp) {
-        log.info("Начисление награды ребёнку {}: {} EXP, {} коинов, capExp={}", childId, exp, coins, capExp);
+        grantReward(childId, null, exp, coins, capExp);
+    }
+
+    @Override
+    @LogMethod("reward-grant")
+    public void grantReward(UUID childId, UUID sourceAssignmentId, int exp, int coins, boolean capExp) {
+        log.info("Начисление награды ребёнку {}: {} EXP, {} коинов, capExp={}, назначение={}",
+                childId, exp, coins, capExp, sourceAssignmentId);
 
         try {
-            RewardRequest request = new RewardRequest(exp, coins, capExp);
+            RewardRequest request = new RewardRequest(exp, coins, capExp, sourceAssignmentId);
             userServiceClient.addReward(childId, request);
             log.info("Награда успешно начислена ребёнку {}", childId);
         } catch (Exception e) {

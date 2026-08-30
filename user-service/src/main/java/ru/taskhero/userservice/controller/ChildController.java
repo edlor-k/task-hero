@@ -368,9 +368,11 @@ public class ChildController {
             @PathVariable UUID childId,
             @Valid @RequestBody ru.taskhero.userservice.dto.RewardRequest request
     ) {
-        log.info("Начисление награды ребёнку {}: {} EXP, {} коинов", childId, request.exp(), request.coins());
+        log.info("Начисление награды ребёнку {}: {} EXP, {} коинов, источник={}",
+                childId, request.exp(), request.coins(), request.sourceAssignmentId());
 
-        ChildResponseDto response = childService.addReward(childId, request.exp(), request.coins(), request.capExp());
+        ChildResponseDto response = childService.addRewardForAssignment(
+                childId, request.sourceAssignmentId(), request.exp(), request.coins(), request.capExp());
         return ResponseEntity.ok(response);
     }
 

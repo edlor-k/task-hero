@@ -709,7 +709,9 @@ public class ParentController {
      * клиентское автозаполнение полей ниже (см. assign.html), а не отдельная ветка
      * бизнес-логики. Если {@code templateId} передан — используем существующий шаблон
      * как есть; если нет (родитель создаёт своё задание или изменил предзаполненные
-     * поля) — создаём новый шаблон из введённых значений.
+     * поля) — task-service создаст новый шаблон и назначение атомарно, одной
+     * транзакцией (см. {@code TaskServiceClient#assignTaskWithTemplate}) — при любой
+     * ошибке (в т.ч. в валидации самого назначения) не останется осиротевшего шаблона.
      */
     @PostMapping("/assign")
     public String assignTask(
@@ -724,94 +726,136 @@ public class ParentController {
             RedirectAttributes redirectAttributes
     ) {
         String redirectBack = "redirect:/parent/assign" + (onboarding ? "?onboarding=true" : "");
-        try {
-            UUID finalChildId = childId;
-            if (finalChildId == null) {
+        Map<String, Object> enteredValues = buildFormValuesEcho(
+                childId, templateId, title, description, dueDate, recurrenceRule, coinsReward);
+
+        UUID finalChildId = childId;
+        if (finalChildId == null) {
+            try {
                 List<ChildDto> children = userServiceClient.getChildren();
                 if (children.size() == 1) {
                     finalChildId = children.get(0).id();
                 }
-            }
-            if (finalChildId == null) {
-                redirectAttributes.addFlashAttribute("error", "Выберите ребёнка");
-                return redirectBack;
-            }
-
-            UUID finalTemplateId;
-            try {
-                finalTemplateId = (templateId != null && !templateId.isBlank()) ? UUID.fromString(templateId) : null;
-            } catch (IllegalArgumentException ex) {
-                redirectAttributes.addFlashAttribute("error", "Некорректное задание");
-                return redirectBack;
-            }
-
-            // Своё задание (с нуля или изменённое после выбора готового)
-            if (finalTemplateId == null) {
-                if (title == null || title.isBlank()) {
-                    redirectAttributes.addFlashAttribute("error", "Введите название задания или выберите готовое");
-                    return redirectBack;
-                }
-                Map<String, Object> templateRequest = new HashMap<>();
-                templateRequest.put("title", title);
-                templateRequest.put("description", description);
-                templateRequest.put("coinsReward", coinsReward);
-                // EXP теперь — системная величина: родитель её не задаёт, task-service
-                // применит разумное значение по умолчанию для нового шаблона.
-                if (recurrenceRule != null && !recurrenceRule.isBlank()) {
-                    templateRequest.put("recurrenceRule", recurrenceRule);
-                    templateRequest.put("repeatable", true);
-                }
-                // Шаблон создаётся активным независимо от того, разовое это задание или нет:
-                // assign() ниже проверяет template.isActive() и отклоняет назначение по
-                // неактивному шаблону — если создавать одноразовые задания неактивными
-                // (как было раньше), самое первое назначение по ним падало с ошибкой
-                // «Шаблон неактивен», которую родитель видел как «Ошибка назначения задания».
-                // Скрыть одноразовые задания из «Моих шаблонов» — отдельная задача управления
-                // библиотекой (страница «Мои шаблоны»), не часть быстрого создания.
-                TaskTemplateDto created = taskServiceClient.createTemplate(templateRequest);
-                finalTemplateId = created.id();
-            }
-
-            Instant parsedDueDate;
-            try {
-                parsedDueDate = FormDateTimeParser.parseToInstant(dueDate);
-            } catch (IllegalArgumentException ex) {
-                redirectAttributes.addFlashAttribute("error", "Некорректный формат дедлайна");
-                return redirectBack;
-            }
-
-            Map<String, Object> request = new HashMap<>();
-            request.put("templateId", finalTemplateId.toString());
-            request.put("childId", finalChildId.toString());
-            if (parsedDueDate != null) {
-                request.put("dueDate", parsedDueDate.toString());
-            }
-
-            taskServiceClient.assignTask(request);
-
-            try {
-                Map<String, String> audit = new HashMap<>();
-                audit.put("action", "TASK_ASSIGNED");
-                audit.put("targetType", "ASSIGNMENT");
-                audit.put("details", "Назначено задание ребёнку " + finalChildId);
-                adminServiceClient.createAuditEntry(audit);
             } catch (Exception ex) {
-                log.warn("Audit log failed: {}", ex.getMessage());
+                log.warn("Error loading children while assigning task: {}", ex.getMessage());
             }
-
-            redirectAttributes.addFlashAttribute("success", "Задание назначено!");
-
-            if (onboarding) {
-                return "redirect:/parent/onboarding/done";
-            }
-
-        } catch (Exception e) {
-            log.error("Error assigning task: {}", e.getMessage());
-            redirectAttributes.addFlashAttribute("error", extractErrorMessage(e, "Ошибка назначения задания"));
+        }
+        if (finalChildId == null) {
+            redirectAttributes.addFlashAttribute("error", "Выберите ребёнка");
+            redirectAttributes.addFlashAttribute("formValues", enteredValues);
             return redirectBack;
         }
 
+        UUID finalTemplateId;
+        try {
+            finalTemplateId = (templateId != null && !templateId.isBlank()) ? UUID.fromString(templateId) : null;
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("error", "Некорректное задание");
+            redirectAttributes.addFlashAttribute("formValues", enteredValues);
+            return redirectBack;
+        }
+
+        if (finalTemplateId == null && (title == null || title.isBlank())) {
+            redirectAttributes.addFlashAttribute("error", "Введите название задания или выберите готовое");
+            redirectAttributes.addFlashAttribute("formValues", enteredValues);
+            return redirectBack;
+        }
+
+        // Валидируем дедлайн ДО любого сетевого вызова: раньше шаблон уже мог быть
+        // сохранён в task-service к этому моменту, и ошибка парсинга дедлайна
+        // оставляла его осиротевшим (регрессия «Ошибка назначения задания»).
+        Instant parsedDueDate;
+        try {
+            parsedDueDate = FormDateTimeParser.parseToInstant(dueDate);
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("error", "Некорректный формат дедлайна");
+            redirectAttributes.addFlashAttribute("formValues", enteredValues);
+            return redirectBack;
+        }
+
+        Map<String, Object> request = new HashMap<>();
+        request.put("childId", finalChildId.toString());
+        if (parsedDueDate != null) {
+            request.put("dueDate", parsedDueDate.toString());
+        }
+        if (finalTemplateId != null) {
+            request.put("templateId", finalTemplateId.toString());
+        } else {
+            // Своё задание (с нуля или изменённое после выбора готового) — task-service
+            // создаст шаблон и назначение в одной транзакции. EXP — системная величина,
+            // родитель её не задаёт, task-service применит разумное значение по умолчанию.
+            request.put("title", title);
+            request.put("description", description);
+            request.put("coinsReward", coinsReward);
+            if (recurrenceRule != null && !recurrenceRule.isBlank()) {
+                request.put("recurrenceRule", recurrenceRule);
+            }
+        }
+
+        try {
+            taskServiceClient.assignTaskWithTemplate(request);
+        } catch (Exception e) {
+            log.error("Error assigning task: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", extractErrorMessage(e, "Ошибка назначения задания"));
+            redirectAttributes.addFlashAttribute("formValues", enteredValues);
+            return redirectBack;
+        }
+
+        try {
+            Map<String, String> audit = new HashMap<>();
+            audit.put("action", "TASK_ASSIGNED");
+            audit.put("targetType", "ASSIGNMENT");
+            audit.put("details", "Назначено задание ребёнку " + finalChildId);
+            adminServiceClient.createAuditEntry(audit);
+        } catch (Exception ex) {
+            log.warn("Audit log failed: {}", ex.getMessage());
+        }
+
+        redirectAttributes.addFlashAttribute("success", "Задание назначено!");
+
+        if (onboarding) {
+            return "redirect:/parent/onboarding/done";
+        }
         return "redirect:/parent/dashboard";
+    }
+
+    /**
+     * Собрать введённые в форму назначения значения для повторного показа при ошибке —
+     * без этого редирект на форму с флеш-ошибкой стирал всё, что родитель уже заполнил.
+     */
+    private Map<String, Object> buildFormValuesEcho(
+            UUID childId, String templateId, String title, String description,
+            String dueDate, String recurrenceRule, int coinsReward
+    ) {
+        Map<String, Object> values = new HashMap<>();
+        values.put("childId", childId != null ? childId.toString() : null);
+        values.put("templateId", templateId);
+        values.put("title", title);
+        values.put("description", description);
+        values.put("recurrenceRule", recurrenceRule);
+        values.put("coinsReward", coinsReward);
+        values.put("dueDateLocal", toDatetimeLocalValue(dueDate));
+        return values;
+    }
+
+    /**
+     * Лучшее приближение для повторного отображения дедлайна в {@code <input type="datetime-local">}:
+     * если то, что ввёл родитель, удаётся разобрать — приводим обратно к формату
+     * {@code yyyy-MM-dd'T'HH:mm} в зоне сервера; иначе оставляем поле пустым (браузер
+     * всё равно не примет невалидное значение в этом типе поля).
+     */
+    private String toDatetimeLocalValue(String rawDueDate) {
+        try {
+            Instant parsed = FormDateTimeParser.parseToInstant(rawDueDate);
+            if (parsed == null) {
+                return null;
+            }
+            return java.time.LocalDateTime.ofInstant(parsed, java.time.ZoneId.systemDefault())
+                    .truncatedTo(java.time.temporal.ChronoUnit.MINUTES)
+                    .toString();
+        } catch (IllegalArgumentException ex) {
+            return null;
+        }
     }
 
     /**

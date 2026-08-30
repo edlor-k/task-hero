@@ -49,6 +49,7 @@ public class ChildServiceImpl implements ChildService {
     private final ParentMapper parentMapper;
     private final LevelRewardService levelRewardService;
     private final AuditService auditService;
+    private final RewardGrantGuard rewardGrantGuard;
 
     /**
      * Добавить нового ребёнка к родителю.
@@ -339,6 +340,28 @@ public class ChildServiceImpl implements ChildService {
                 childId, child.getExp(), child.getCoins(), child.getLevel());
 
         return toChildResponseDto(child);
+    }
+
+    /**
+     * Начислить награду идемпотентно, привязав её к источнику (обычно — ID назначения
+     * задания). Идемпотентность обеспечивается уникальным ограничением БД на
+     * {@code source_assignment_id} в {@code reward_grants}: конкурентная или повторная
+     * попытка вставить запись с тем же ID нарушит ограничение, и второй вызов не изменит
+     * баланс ребёнка. Это защищает от повторного начисления даже в сценарии, когда
+     * вызывающая сторона (task-service) уже получила от нас успешный ответ, но её
+     * собственная транзакция откатилась и она повторяет запрос.
+     */
+    @Override
+    @Transactional
+    @LogMethod("child-add-reward-for-assignment")
+    public ChildResponseDto addRewardForAssignment(UUID childId, UUID sourceAssignmentId, int exp, int coins, boolean capExp) {
+        if (sourceAssignmentId != null) {
+            boolean firstTime = rewardGrantGuard.tryRecord(childId, sourceAssignmentId, exp, coins);
+            if (!firstTime) {
+                return getById(childId);
+            }
+        }
+        return addReward(childId, exp, coins, capExp);
     }
 
     /**

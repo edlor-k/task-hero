@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Леджер применённых начислений наград — ключ идемпотентности подтверждения задания.
+        Чисто аддитивная миграция: новая таблица, существующие данные не затрагиваются.
+        Полностью обратима через rollback ниже (DROP TABLE).
+    -->
+    <changeSet id="019-create-reward-grants" author="task-hero">
+        <createTable tableName="reward_grants">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="child_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="source_assignment_id" type="uuid"/>
+            <column name="exp" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="coins" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp"/>
+        </createTable>
+
+        <!-- NULL допускает несколько начислений без источника; Postgres не считает
+             несколько NULL нарушением уникального ограничения. -->
+        <addUniqueConstraint tableName="reward_grants"
+                             columnNames="source_assignment_id"
+                             constraintName="uq_reward_grants_source_assignment_id"/>
+
+        <createIndex tableName="reward_grants" indexName="idx_reward_grants_child_id">
+            <column name="child_id"/>
+        </createIndex>
+
+        <rollback>
+            <dropTable tableName="reward_grants"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>
